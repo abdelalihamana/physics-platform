@@ -1,0 +1,17 @@
+{
+  "name": "المنصة السحابية للعلوم الفيزيائية",
+  "short_name": "فيزياء",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f3f4f6",
+  "theme_color": "#1e3a8a",
+  "description": "منصة تعليمية سحابية لمادة العلوم الفيزيائية",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
