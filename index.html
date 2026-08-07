@@ -3,94 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>منصة العلوم الفيزيائية السحابية</title>
+    <title>منصة المجتهد للعلوم الفيزيائية</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#1e3a8a">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#f8fafc">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     
     <style>
         body { 
             font-family: 'Cairo', sans-serif; 
-            background: linear-gradient(rgba(15, 23, 42, 0.85), rgba(30, 58, 138, 0.85)), url('icon.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             min-height: 100vh;
             -webkit-tap-highlight-color: transparent; 
         }
         .screen { display: none; }
-        .screen.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .screen.active { display: block; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
         details > summary { list-style: none; cursor: pointer; user-select: none; }
         details > summary::-webkit-details-marker { display: none; }
         details > summary::after { content: '▼'; float: left; transition: transform 0.3s ease; }
         details[open] > summary::after { transform: rotate(180deg); }
         
-        .branch-completed { background-color: #ecfdf5 !important; border-color: #10b981 !important; }
-        .btn-complete.active { background-color: #10b981; color: white; border-color: #10b981; }
+        .branch-completed { background-color: #f0fdf4 !important; border-color: #22c55e !important; }
+        .btn-complete.active { background-color: #22c55e; color: white; border-color: #22c55e; }
         
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         
         /* تنسيقات الدردشة */
-        .chat-bubble { max-width: 80%; padding: 10px 14px; border-radius: 16px; margin-bottom: 8px; position: relative; word-wrap: break-word;}
-        .chat-mine { background-color: #dcf8c6; margin-right: auto; border-bottom-right-radius: 4px; }
-        .chat-other { background-color: #ffffff; border: 1px solid #e2e8f0; margin-left: auto; border-bottom-left-radius: 4px; }
-        .floating-chat-btn { position: fixed; bottom: 20px; right: 20px; z-index: 40; box-shadow: 0 10px 25px rgba(0,0,0,0.3); animation: bounce 2s infinite; }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .chat-bubble { max-width: 85%; padding: 12px 16px; border-radius: 20px; margin-bottom: 8px; position: relative; word-wrap: break-word; line-height: 1.5;}
+        .chat-mine { background-color: #eff6ff; border: 1px solid #bfdbfe; margin-right: auto; border-bottom-right-radius: 4px; color: #1e3a8a;}
+        .chat-other { background-color: #ffffff; border: 1px solid #e2e8f0; margin-left: auto; border-bottom-left-radius: 4px; color: #334155;}
+        .floating-chat-btn { position: fixed; bottom: 24px; right: 24px; z-index: 40; box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.5); animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        
+        /* تأثيرات الأزرار الحديثة */
+        .btn-modern { transition: all 0.2s ease; }
+        .btn-modern:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .btn-modern:active { transform: translateY(0); }
     </style>
 </head>
-<body class="text-gray-800 antialiased p-3 md:p-6 pb-20">
+<body class="text-slate-800 antialiased p-3 md:p-6 pb-24 selection:bg-blue-200 selection:text-blue-900">
 
-    <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[60] flex flex-col gap-2 w-[90%] md:w-auto"></div>
+    <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[70] flex flex-col gap-2 w-[90%] md:w-auto"></div>
 
-    <!-- نافذة المحادثة (الدردشة النصية) -->
-    <div id="chat-modal" class="fixed inset-0 bg-gray-900 bg-opacity-70 hidden items-center justify-center z-50 backdrop-blur-sm p-3">
-        <div class="bg-slate-50 w-full max-w-lg h-[85vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden">
+    <!-- نافذة الإعدادات (تغيير كلمة المرور) -->
+    <div id="settings-modal" class="fixed inset-0 bg-slate-900/40 hidden items-center justify-center z-[60] backdrop-blur-sm p-4">
+        <div class="bg-white p-8 rounded-3xl max-w-sm w-full shadow-2xl border border-slate-100">
+            <div class="flex justify-between items-center mb-6 border-b pb-3">
+                <h3 class="text-xl font-black text-slate-800">الإعدادات ⚙️</h3>
+                <button onclick="closeSettings()" class="text-slate-400 hover:text-red-500 font-bold text-xl">✖</button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-slate-600 mb-1">اسم المستخدم (لا يمكن تغييره)</label>
+                    <input type="text" id="settings-username" disabled class="w-full px-4 py-3 rounded-xl border bg-slate-100 text-slate-500 font-bold outline-none cursor-not-allowed">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-600 mb-1">كلمة المرور الجديدة</label>
+                    <input type="text" id="settings-new-password" class="w-full px-4 py-3 rounded-xl border bg-white focus:ring-2 focus:ring-blue-500 outline-none font-bold transition">
+                </div>
+                <button onclick="saveNewPassword()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3.5 rounded-xl transition btn-modern mt-2">حفظ التغييرات</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة المحادثة النصية والروابط -->
+    <div id="chat-modal" class="fixed inset-0 bg-slate-900/40 hidden items-center justify-center z-50 backdrop-blur-sm p-2 md:p-4">
+        <div class="bg-white w-full max-w-xl h-[90vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-slate-200">
             <!-- رأس الدردشة -->
-            <div class="bg-blue-600 text-white p-4 flex justify-between items-center shadow-md z-10">
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 flex justify-between items-center shadow-md z-10">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-xl">👤</div>
+                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-2xl shadow-inner">💬</div>
                     <div>
-                        <h3 class="font-bold text-lg leading-tight" id="chat-target-name">الدردشة</h3>
-                        <p class="text-xs text-blue-100">محادثة نصية آمنة ومباشرة</p>
+                        <h3 class="font-black text-lg leading-tight" id="chat-target-name">الدردشة</h3>
+                        <p class="text-xs text-blue-100 font-semibold mt-0.5">الدردشة وإرسال الروابط</p>
                     </div>
                 </div>
-                <button onclick="closeChat()" class="bg-white/20 hover:bg-white/30 rounded-full w-8 h-8 flex items-center justify-center transition">✖</button>
+                <button onclick="closeChat()" class="bg-white/10 hover:bg-white/20 rounded-full w-10 h-10 flex items-center justify-center transition text-xl">✖</button>
             </div>
             
             <!-- مساحة الرسائل -->
-            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 flex flex-col gap-2 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
-                <!-- الرسائل ستظهر هنا -->
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 md:p-6 flex flex-col gap-3 bg-slate-50">
+                <!-- الرسائل -->
             </div>
 
             <!-- منطقة الكتابة والإرسال -->
-            <div class="bg-white p-3 border-t flex gap-2 items-end">
-                <div class="flex-1 bg-gray-100 rounded-xl border border-gray-200 p-1 flex flex-col">
-                    <textarea id="chat-input" rows="1" class="w-full bg-transparent px-3 py-3 outline-none resize-none font-semibold text-gray-700" placeholder="اكتب رسالتك هنا..."></textarea>
+            <div class="bg-white p-3 md:p-4 border-t border-slate-200 flex gap-2 items-end">
+                <div class="flex-1 bg-slate-100 rounded-2xl border border-slate-200 p-1 flex flex-col focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+                    <textarea id="chat-input" rows="1" class="w-full bg-transparent px-4 py-3 outline-none resize-none font-semibold text-slate-700 placeholder-slate-400" placeholder="اكتب رسالة أو الصق رابطاً هنا..."></textarea>
                 </div>
-                <button id="send-msg-btn" onclick="sendChatMessage()" class="px-5 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition font-bold text-lg">إرسال 🚀</button>
+                <button id="send-msg-btn" onclick="sendChatMessage()" class="px-5 py-4 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition font-black text-lg btn-modern flex items-center justify-center">إرسال</button>
             </div>
         </div>
     </div>
 
     <!-- نافذة تأكيد الإجراءات -->
-    <div id="confirm-modal" class="fixed inset-0 bg-gray-900 bg-opacity-70 hidden items-center justify-center z-50 backdrop-blur-sm">
-        <div class="bg-white p-6 rounded-2xl max-w-sm w-[90%] mx-auto shadow-2xl">
-            <h3 class="text-xl font-bold mb-2 text-gray-800">تأكيد الإجراء</h3>
-            <p class="text-gray-600 mb-6" id="confirm-message">هل أنت متأكد؟</p>
-            <div class="flex justify-end gap-3">
-                <button onclick="closeConfirm(false)" class="px-5 py-2 bg-gray-100 rounded-lg font-semibold">إلغاء</button>
-                <button onclick="closeConfirm(true)" class="px-5 py-2 bg-red-500 text-white rounded-lg font-semibold">تأكيد</button>
+    <div id="confirm-modal" class="fixed inset-0 bg-slate-900/40 hidden items-center justify-center z-[80] backdrop-blur-sm">
+        <div class="bg-white p-6 rounded-3xl max-w-sm w-[90%] mx-auto shadow-2xl text-center">
+            <div class="text-4xl mb-3">⚠️</div>
+            <h3 class="text-xl font-black mb-2 text-slate-800">تأكيد الإجراء</h3>
+            <p class="text-slate-600 mb-6 font-semibold" id="confirm-message">هل أنت متأكد؟</p>
+            <div class="flex justify-center gap-3">
+                <button onclick="closeConfirm(false)" class="px-6 py-2.5 bg-slate-100 text-slate-700 rounded-xl font-bold hover:bg-slate-200 transition">إلغاء</button>
+                <button onclick="closeConfirm(true)" class="px-6 py-2.5 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition shadow-lg shadow-red-500/30">تأكيد</button>
             </div>
         </div>
     </div>
@@ -98,19 +121,23 @@
     <div class="max-w-5xl mx-auto">
         
         <!-- 1. شاشة تسجيل الدخول -->
-        <div id="auth-screen" class="screen active max-w-md mx-auto mt-10 md:mt-16 bg-white/95 backdrop-blur-md p-6 md:p-8 rounded-3xl shadow-2xl border border-white/20">
-            <div class="text-center mb-6">
-                <div class="w-20 h-20 mx-auto mb-4 rounded-2xl shadow-lg overflow-hidden border-2 border-blue-400/30">
-                    <img src="icon.png" alt="شعار المنصة" class="w-full h-full object-cover">
+        <div id="auth-screen" class="screen active max-w-md mx-auto mt-8 md:mt-12 bg-white p-8 md:p-10 rounded-[2rem] shadow-2xl border border-slate-100 relative overflow-hidden">
+            <!-- شكل زخرفي -->
+            <div class="absolute -top-20 -right-20 w-40 h-40 bg-blue-500 rounded-full opacity-10 blur-2xl"></div>
+            <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-indigo-500 rounded-full opacity-10 blur-2xl"></div>
+
+            <div class="text-center mb-8 relative z-10">
+                <div class="w-24 h-24 mx-auto mb-5 rounded-3xl shadow-xl overflow-hidden border border-slate-100 bg-white p-2">
+                    <img src="icon.png" alt="شعار المنصة" class="w-full h-full object-cover rounded-2xl">
                 </div>
-                <h2 id="auth-title" class="text-2xl font-extrabold text-blue-900">منصة العلوم الفيزيائية</h2>
-                <p class="text-gray-500 text-sm mt-1">بوابتك السحابية للتفوق الدراسي</p>
+                <h2 id="auth-title" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-700">منصة المجتهد</h2>
+                <p class="text-slate-500 font-bold mt-2 text-sm tracking-wide">للعلوم الفيزيائية</p>
             </div>
             
-            <div class="space-y-4">
-                <input type="text" id="username" class="w-full px-4 py-3 rounded-xl border bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500 font-bold" placeholder="اسم المستخدم (بدون مسافات)">
+            <div class="space-y-4 relative z-10">
+                <input type="text" id="username" class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 outline-none focus:border-blue-500 focus:bg-white transition-all font-bold text-slate-700" placeholder="اسم المستخدم">
                 
-                <select id="user-level" class="w-full px-4 py-3 rounded-xl border bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500 hidden font-bold text-blue-700">
+                <select id="user-level" class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 outline-none focus:border-blue-500 focus:bg-white transition-all hidden font-bold text-blue-700">
                     <option value="" disabled selected>اختر مستواك الدراسي بدقة...</option>
                     <option value="m_y1">السنة الأولى متوسط</option>
                     <option value="m_y2">السنة الثانية متوسط</option>
@@ -121,94 +148,109 @@
                     <option value="h_y3">السنة الثالثة ثانوي</option>
                 </select>
 
-                <input type="password" id="password" class="w-full px-4 py-3 rounded-xl border bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500 font-bold" placeholder="كلمة المرور">
-                <button id="auth-action-btn" onclick="handleAuth()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-3.5 rounded-xl shadow-lg shadow-blue-200 transition text-lg">تسجيل الدخول</button>
+                <input type="password" id="password" class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 outline-none focus:border-blue-500 focus:bg-white transition-all font-bold text-slate-700" placeholder="كلمة المرور">
+                <button id="auth-action-btn" onclick="handleAuth()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-4 rounded-2xl btn-modern text-lg mt-2">تسجيل الدخول</button>
             </div>
             
-            <div class="text-center mt-6">
-                <button onclick="toggleAuthMode()" id="switch-mode-text" class="text-blue-600 font-bold underline text-sm hover:text-blue-800 transition">إنشاء حساب تلميذ جديد</button>
+            <div class="text-center mt-6 relative z-10">
+                <button onclick="toggleAuthMode()" id="switch-mode-text" class="text-slate-500 font-bold text-sm hover:text-blue-600 transition underline decoration-2 underline-offset-4">إنشاء حساب تلميذ جديد</button>
             </div>
         </div>
 
         <!-- 2. شاشة الانتظار -->
-        <div id="pending-screen" class="screen max-w-md mx-auto mt-20 bg-white/95 backdrop-blur-md p-8 rounded-3xl shadow-2xl text-center border-t-8 border-yellow-400">
-            <div class="text-6xl mb-4 animate-pulse">⏳</div>
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">حسابك قيد الانتظار</h2>
-            <p class="text-gray-600 mb-8 font-semibold">تم تسجيل طلبك. يرجى انتظار الأستاذ لتفعيل حسابك.</p>
-            <button onclick="logout()" class="w-full bg-gray-200 font-bold py-3 rounded-xl hover:bg-gray-300 transition">تسجيل الخروج و العودة</button>
+        <div id="pending-screen" class="screen max-w-md mx-auto mt-20 bg-white p-10 rounded-[2rem] shadow-xl text-center border-t-8 border-yellow-400">
+            <div class="text-7xl mb-6 animate-pulse">⏳</div>
+            <h2 class="text-2xl font-black text-slate-800 mb-3">طلبك قيد المراجعة</h2>
+            <p class="text-slate-500 mb-8 font-semibold leading-relaxed">تم تسجيل حسابك بنجاح في منصة المجتهد. يرجى الانتظار حتى يقوم الأستاذ بتفعيل حسابك لتبدأ التعلم.</p>
+            <button onclick="logout()" class="w-full bg-slate-100 text-slate-700 font-black py-4 rounded-2xl hover:bg-slate-200 transition btn-modern">العودة للرئيسية</button>
         </div>
 
         <!-- 3. شاشة تحكم المسؤول (الأستاذ) -->
         <div id="admin-screen" class="screen">
-            <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-lg mb-6 border border-white/20 gap-4 sticky top-4 z-30">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-full border-2 border-blue-500 overflow-hidden"><img src="icon.png" class="w-full h-full object-cover"></div>
+            <header class="flex flex-col md:flex-row justify-between items-center bg-white p-5 rounded-3xl shadow-sm border border-slate-200 mb-6 gap-4 sticky top-4 z-30">
+                <div class="flex items-center gap-4 w-full md:w-auto">
+                    <div class="w-14 h-14 rounded-2xl shadow-md overflow-hidden bg-white p-1 border border-slate-100"><img src="icon.png" class="w-full h-full object-cover rounded-xl"></div>
                     <div>
-                        <h1 class="text-2xl font-extrabold text-blue-900 leading-tight">لوحة الأستاذ</h1>
-                        <span class="text-xs font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded-full">مدير المنصة</span>
+                        <h1 class="text-2xl font-black text-slate-800 leading-tight">منصة المجتهد</h1>
+                        <span class="text-sm font-bold text-blue-600">لوحة تحكم الأستاذ 👨‍🏫</span>
                     </div>
                 </div>
-                <button onclick="logout()" class="w-full md:w-auto bg-red-100 text-red-600 px-6 py-2.5 rounded-xl font-bold hover:bg-red-200 transition shadow-sm border border-red-200">تسجيل الخروج 🚪</button>
+                <div class="flex items-center gap-2 w-full md:w-auto justify-end">
+                    <!-- عداد التلاميذ الجديد -->
+                    <div id="admin-students-counter" class="bg-blue-50 border border-blue-100 text-blue-700 px-4 py-2.5 rounded-xl font-black text-sm flex items-center gap-2">
+                        <span>👥 التلاميذ:</span> <span id="total-students-count" class="text-lg">0</span>
+                    </div>
+                    <button onclick="openSettings()" class="bg-slate-100 text-slate-700 px-4 py-2.5 rounded-xl font-black hover:bg-slate-200 transition btn-modern" title="الإعدادات">⚙️</button>
+                    <button onclick="logout()" class="bg-red-50 text-red-600 px-4 py-2.5 rounded-xl font-black hover:bg-red-100 transition btn-modern border border-red-100">خروج 🚪</button>
+                </div>
             </header>
 
-            <div class="bg-white/95 backdrop-blur-md p-4 md:p-6 rounded-3xl shadow-lg mb-6 border border-white/20">
-                <h3 class="text-xl font-extrabold text-gray-800 mb-4 border-b pb-2">📋 متابعة التلاميذ</h3>
-                <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-inner">
-                    <table class="w-full text-right border-collapse whitespace-nowrap min-w-[700px]">
-                        <thead class="bg-slate-100 text-slate-700 text-sm font-bold">
+            <div class="bg-white p-5 md:p-7 rounded-3xl shadow-sm border border-slate-200 mb-8">
+                <h3 class="text-xl font-black text-slate-800 mb-5 flex items-center gap-2">📋 متابعة التلاميذ</h3>
+                <div class="overflow-x-auto rounded-2xl border border-slate-100 shadow-inner">
+                    <table class="w-full text-right border-collapse whitespace-nowrap min-w-[800px]">
+                        <thead class="bg-slate-50 text-slate-600 text-sm font-black border-b border-slate-200">
                             <tr>
-                                <th class="p-4 border-b">التلميذ (كلمة المرور)</th>
-                                <th class="p-4 border-b">المستوى</th>
-                                <th class="p-4 border-b">التقدم</th>
-                                <th class="p-4 border-b">الحالة</th>
-                                <th class="p-4 border-b text-left">إجراءات</th>
+                                <th class="p-4">التلميذ (كلمة المرور)</th>
+                                <th class="p-4">المستوى</th>
+                                <th class="p-4 w-48">التقدم</th>
+                                <th class="p-4">الحالة</th>
+                                <th class="p-4 text-left">إجراءات</th>
                             </tr>
                         </thead>
-                        <tbody id="students-table-body" class="bg-white divide-y divide-gray-100"></tbody>
+                        <tbody id="students-table-body" class="bg-white divide-y divide-slate-100"></tbody>
                     </table>
                 </div>
             </div>
 
-            <div class="bg-white/95 backdrop-blur-md p-4 md:p-6 rounded-3xl shadow-lg border border-white/20">
-                <h3 class="text-xl font-extrabold text-gray-800 mb-2 border-b pb-2">📚 إدارة البرنامج الدراسي</h3>
-                <p class="text-sm text-gray-500 mb-6 font-semibold">المحتوى الذي تضيفه هنا يظهر فوراً لتلاميذ كل مستوى.</p>
-                <div id="admin-program-view" class="space-y-4"></div>
+            <div class="bg-white p-5 md:p-7 rounded-3xl shadow-sm border border-slate-200">
+                <h3 class="text-xl font-black text-slate-800 mb-2 flex items-center gap-2">📚 إدارة محتوى المنصة</h3>
+                <p class="text-sm text-slate-500 mb-6 font-bold">أضف الدروس والتمارين لتظهر فوراً لدى تلاميذ المستوى المحدد.</p>
+                <div id="admin-program-view" class="space-y-5"></div>
             </div>
         </div>
 
         <!-- 4. شاشة التلميذ -->
         <div id="app-screen" class="screen">
-            <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-lg mb-6 border border-white/20 gap-4 sticky top-4 z-30">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-full border-2 border-blue-500 overflow-hidden shadow-sm"><img src="icon.png" class="w-full h-full object-cover"></div>
+            <header class="flex flex-col md:flex-row justify-between items-center bg-white p-5 rounded-3xl shadow-sm border border-slate-200 mb-6 gap-4 sticky top-4 z-30">
+                <div class="flex items-center gap-4 w-full md:w-auto">
+                    <div class="w-14 h-14 rounded-2xl shadow-md overflow-hidden bg-white p-1 border border-slate-100"><img src="icon.png" class="w-full h-full object-cover rounded-xl"></div>
                     <div>
-                        <h1 class="text-xl font-extrabold text-blue-900 leading-tight">مرحباً، <span id="display-username" class="text-blue-600"></span></h1>
-                        <span id="student-level-badge" class="text-xs font-bold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">تلميذ</span>
+                        <h1 class="text-xl font-black text-slate-800 leading-tight">مرحباً بك، <span id="display-username" class="text-blue-600"></span> 👋</h1>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-xs font-black text-slate-500 bg-slate-100 px-2 py-1 rounded-md">منصة المجتهد</span>
+                            <span id="student-level-badge" class="text-xs font-black text-emerald-700 bg-emerald-100 px-2 py-1 rounded-md border border-emerald-200">تلميذ</span>
+                        </div>
                     </div>
                 </div>
-                <button onclick="logout()" class="w-full md:w-auto bg-red-100 text-red-600 px-6 py-2.5 rounded-xl font-bold hover:bg-red-200 transition shadow-sm border border-red-200">تسجيل الخروج 🚪</button>
+                <div class="flex items-center gap-2 w-full md:w-auto justify-end">
+                    <button onclick="openSettings()" class="bg-slate-100 text-slate-700 px-4 py-2.5 rounded-xl font-black hover:bg-slate-200 transition btn-modern">الإعدادات ⚙️</button>
+                    <button onclick="logout()" class="bg-red-50 text-red-600 px-4 py-2.5 rounded-xl font-black hover:bg-red-100 transition btn-modern border border-red-100">خروج 🚪</button>
+                </div>
             </header>
 
-            <div class="bg-white/95 backdrop-blur-md p-5 md:p-6 rounded-3xl shadow-lg mb-6 border border-white/20">
-                <div class="flex justify-between items-end mb-3">
-                    <h3 class="font-extrabold text-gray-700">تقدمك في مستواك الدراسي 🚀</h3>
-                    <span id="progress-text" class="text-3xl font-black text-emerald-500">0%</span>
+            <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-200 mb-8 relative overflow-hidden">
+                <div class="absolute right-0 top-0 w-2 h-full bg-emerald-500"></div>
+                <div class="flex justify-between items-end mb-4">
+                    <h3 class="font-black text-slate-700 text-lg">مستوى تقدمك الدراسي 🚀</h3>
+                    <span id="progress-text" class="text-4xl font-black text-emerald-500 tracking-tighter">0%</span>
                 </div>
-                <div class="w-full bg-slate-200 rounded-full h-4 overflow-hidden shadow-inner">
-                    <div id="progress-bar" class="bg-gradient-to-l from-emerald-400 to-emerald-600 h-4 rounded-full transition-all duration-1000 w-0 shadow"></div>
+                <div class="w-full bg-slate-100 rounded-full h-5 overflow-hidden shadow-inner p-1">
+                    <div id="progress-bar" class="bg-gradient-to-l from-emerald-400 to-emerald-600 h-full rounded-full transition-all duration-1000 w-0 relative">
+                        <div class="absolute inset-0 bg-white/20 w-full h-full" style="background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent); background-size: 1rem 1rem;"></div>
+                    </div>
                 </div>
             </div>
             
-            <div id="student-program-view" class="space-y-4"></div>
+            <div id="student-program-view" class="space-y-5 pb-10"></div>
 
             <!-- زر المحادثة العائم للتلميذ -->
-            <button onclick="openChat('admin')" class="floating-chat-btn bg-blue-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-blue-400/50 hover:bg-blue-700 transition">
+            <button onclick="openChat('admin')" class="floating-chat-btn bg-gradient-to-r from-blue-600 to-indigo-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-3xl transition border-4 border-white">
                 💬
             </button>
         </div>
     </div>
 
-    <!-- استدعاء مكتبات Firebase الأساسية فقط (بدون التخزين) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -217,7 +259,7 @@
         // =========================================================================================
         // الصق مفاتيح مشروعك الحقيقية هنا
         // =========================================================================================
-           const firebaseConfig = {
+        const firebaseConfig = {
              apiKey: "AIzaSyDuuYHwmSW0UV1TO3gDGyETrvOimE7iGLs",
   authDomain: "physique-58073.firebaseapp.com",
   projectId: "physique-58073",
@@ -234,7 +276,7 @@
         
         const usersCol = collection(db, 'physics_db', 'public', 'profiles');
         const programCol = collection(db, 'physics_db', 'public', 'curriculum');
-        const chatsPath = 'physics_db/public/chats'; // مسار الدردشات
+        const chatsPath = 'physics_db/public/chats';
 
         let isAuthReady = false;
         window.currentUserRecord = null;
@@ -250,8 +292,8 @@
 
         window.showToast = (msg, type = 'success') => {
             const toast = document.createElement('div');
-            toast.className = `px-5 py-3 rounded-lg shadow-xl text-white font-bold text-sm text-center transform transition-all duration-300 translate-y-[-20px] opacity-0 border border-white/20 backdrop-blur-sm ${type === 'error' ? 'bg-red-500/90' : 'bg-green-500/90'}`;
-            toast.innerText = msg;
+            toast.className = `px-6 py-4 rounded-2xl shadow-2xl text-white font-bold text-sm text-center transform transition-all duration-300 translate-y-[-20px] opacity-0 border border-white/10 flex items-center justify-center gap-2 ${type === 'error' ? 'bg-red-500' : 'bg-slate-800'}`;
+            toast.innerHTML = (type === 'error' ? '⚠️ ' : '✅ ') + msg;
             document.getElementById('toast-container').appendChild(toast);
             setTimeout(() => { toast.classList.remove('translate-y-[-20px]', 'opacity-0'); }, 10);
             setTimeout(() => { 
@@ -306,9 +348,9 @@
 
         window.toggleAuthMode = () => {
             window.isRegistering = !window.isRegistering;
-            document.getElementById('auth-title').innerText = window.isRegistering ? "إنشاء حساب جديد" : "منصة العلوم الفيزيائية";
+            document.getElementById('auth-title').innerText = window.isRegistering ? "حساب جديد" : "منصة المجتهد";
             document.getElementById('auth-action-btn').innerText = window.isRegistering ? "إرسال الطلب" : "تسجيل الدخول";
-            document.getElementById('switch-mode-text').innerText = window.isRegistering ? "لديك حساب؟ سجل دخولك" : "إنشاء حساب تلميذ جديد";
+            document.getElementById('switch-mode-text').innerText = window.isRegistering ? "لديك حساب بالفعل؟ سجل دخولك" : "إنشاء حساب تلميذ جديد";
             document.getElementById('user-level').classList.toggle('hidden', !window.isRegistering);
         };
 
@@ -331,7 +373,7 @@
 
                 if (window.isRegistering) {
                     if (userSnap.exists()) {
-                        showToast("اسم المستخدم موجود، اختر اسماً آخر", "error");
+                        showToast("اسم المستخدم مستخدم مسبقاً، اختر اسماً آخر", "error");
                     } else {
                         await setDoc(userRef, { password, role: 'student', approved: false, progress: [], level: level });
                         showToast("تم إرسال الطلب بنجاح!");
@@ -370,7 +412,33 @@
             switchScreen('auth-screen');
         };
 
-        // دالة حساب نسبة التقدم 
+        // --- نظام الإعدادات (تغيير كلمة المرور) ---
+        window.openSettings = () => {
+            document.getElementById('settings-username').value = window.currentUserRecord.username;
+            document.getElementById('settings-new-password').value = window.currentUserRecord.password;
+            document.getElementById('settings-modal').classList.remove('hidden');
+            document.getElementById('settings-modal').classList.add('flex');
+        }
+        
+        window.closeSettings = () => {
+            document.getElementById('settings-modal').classList.add('hidden');
+            document.getElementById('settings-modal').classList.remove('flex');
+        }
+
+        window.saveNewPassword = async () => {
+            const newPass = document.getElementById('settings-new-password').value.trim();
+            if(!newPass) return showToast("كلمة المرور لا يمكن أن تكون فارغة", "error");
+            
+            try {
+                await updateDoc(doc(usersCol, window.currentUserRecord.username), { password: newPass });
+                window.currentUserRecord.password = newPass;
+                showToast("تم تغيير كلمة المرور بنجاح 🔒");
+                closeSettings();
+            } catch(e) {
+                showToast("حدث خطأ أثناء تغيير كلمة المرور", "error");
+            }
+        }
+
         const calculateProgress = (levelId, progressArray, sections) => {
             if(!sections || !levelId) return 0;
             let total = 0;
@@ -395,40 +463,46 @@
             unsubscribeUsers = onSnapshot(usersCol, (snapshot) => {
                 const tbody = document.getElementById('students-table-body');
                 tbody.innerHTML = '';
+                let studentCount = 0; // عداد التلاميذ
+
                 snapshot.forEach(d => {
                     const data = d.data();
                     if(data.role === 'admin') return;
                     
+                    studentCount++; // زيادة العداد
                     let levelDisplay = data.level ? (levelNames[data.level] || data.level) : "غير محدد";
                     let progPercent = calculateProgress(data.level, data.progress || [], window.currentSections);
 
                     tbody.innerHTML += `
-                        <tr class="hover:bg-slate-50 transition border-b border-gray-100">
+                        <tr class="hover:bg-slate-50 transition border-b border-slate-100">
                             <td class="p-4">
-                                <div class="font-bold text-gray-800 text-lg">${d.id}</div>
-                                <div class="text-xs text-blue-600 font-bold bg-blue-50 inline-block px-2 py-1 rounded border border-blue-100">🔑 ${data.password}</div>
+                                <div class="font-black text-slate-800 text-lg">${d.id}</div>
+                                <div class="text-xs text-slate-500 font-bold mt-1">كلمة المرور: <span class="text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">${data.password}</span></div>
                             </td>
                             <td class="p-4 text-sm font-bold text-slate-600">${levelDisplay}</td>
                             <td class="p-4">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-sm font-black ${progPercent > 50 ? 'text-green-600' : 'text-orange-500'}">${progPercent}%</span>
-                                    <div class="w-16 h-2 bg-gray-200 rounded-full overflow-hidden"><div class="h-full bg-green-500" style="width:${progPercent}%"></div></div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-sm font-black ${progPercent > 50 ? 'text-emerald-600' : 'text-amber-500'} w-8">${progPercent}%</span>
+                                    <div class="flex-1 h-2.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200"><div class="h-full bg-emerald-500" style="width:${progPercent}%"></div></div>
                                 </div>
                             </td>
                             <td class="p-4">
-                                <span class="px-3 py-1 rounded-full text-xs font-black ${data.approved ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
+                                <span class="px-3 py-1.5 rounded-lg text-xs font-black ${data.approved ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700 border border-amber-200'}">
                                     ${data.approved ? 'مفعل' : 'انتظار'}
                                 </span>
                             </td>
                             <td class="p-4 text-left">
-                                <div class="flex gap-1 justify-end flex-wrap">
-                                    <button onclick="openChat('${d.id}')" class="bg-blue-100 text-blue-700 px-3 py-2 rounded-lg text-xs font-bold hover:bg-blue-200 shadow-sm">مراسلة 💬</button>
-                                    <button onclick="toggleUserStatus('${d.id}', ${!data.approved})" class="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-xs font-bold hover:bg-gray-200 shadow-sm">${data.approved ? 'تعطيل ⛔' : 'تفعيل ✅'}</button>
-                                    <button onclick="deleteUserAccount('${d.id}')" class="bg-red-50 text-red-600 px-3 py-2 rounded-lg text-xs font-bold hover:bg-red-100 border border-red-100 shadow-sm">حذف 🗑️</button>
+                                <div class="flex gap-2 justify-end flex-wrap">
+                                    <button onclick="openChat('${d.id}')" class="bg-blue-50 text-blue-700 px-3 py-2 rounded-xl text-xs font-bold hover:bg-blue-100 transition border border-blue-200">الدردشة 💬</button>
+                                    <button onclick="toggleUserStatus('${d.id}', ${!data.approved})" class="bg-slate-100 text-slate-700 px-3 py-2 rounded-xl text-xs font-bold hover:bg-slate-200 transition">${data.approved ? 'تعطيل ⛔' : 'تفعيل ✅'}</button>
+                                    <button onclick="deleteUserAccount('${d.id}')" class="bg-red-50 text-red-600 px-3 py-2 rounded-xl text-xs font-bold hover:bg-red-100 transition border border-red-100">حذف</button>
                                 </div>
                             </td>
                         </tr>`;
                 });
+                
+                // تحديث عداد التلاميذ في الواجهة
+                document.getElementById('total-students-count').innerText = studentCount;
             });
         }
 
@@ -450,7 +524,15 @@
             });
         };
 
-        // --- نظام الدردشة النصية ---
+        // تحويل النصوص التي تحتوي روابط إلى روابط قابلة للضغط
+        const linkify = (text) => {
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            return text.replace(urlRegex, function(url) {
+                return '<a href="' + url + '" target="_blank" class="text-blue-500 font-bold underline decoration-2 underline-offset-2 hover:text-blue-700">' + url + '</a>';
+            });
+        };
+
+        // --- نظام الدردشة والروابط ---
         window.openChat = (targetUser) => {
             window.activeChatUser = targetUser; 
             let displayTarget = window.currentUserRecord.role === 'admin' ? targetUser : "الأستاذ (المدير)";
@@ -473,18 +555,19 @@
                     let bubbleClass = isMine ? 'chat-mine' : 'chat-other';
                     let alignment = isMine ? 'self-end' : 'self-start';
                     
-                    let contentHtml = `<p class="text-sm font-semibold whitespace-pre-wrap">${m.text}</p>`;
+                    // استخدام دالة linkify لتحويل الروابط
+                    let contentHtml = `<p class="text-sm font-semibold whitespace-pre-wrap" dir="auto">${linkify(m.text)}</p>`;
                     let timeStr = new Date(m.timestamp).toLocaleTimeString('ar-DZ', {hour: '2-digit', minute:'2-digit'});
                     
                     chatHtml += `
                     <div class="${bubbleClass} ${alignment} shadow-sm">
                         ${contentHtml}
-                        <div class="text-[10px] text-gray-400 text-left mt-1" dir="ltr">${timeStr}</div>
+                        <div class="text-[10px] opacity-60 text-left mt-2 font-bold" dir="ltr">${timeStr}</div>
                     </div>`;
                 });
                 
                 const msgBox = document.getElementById('chat-messages');
-                msgBox.innerHTML = chatHtml || '<div class="text-center text-gray-400 text-sm mt-10 font-bold bg-white/50 p-4 rounded-xl">👋 أهلاً بك في المحادثة! الرسائل مشفرة ومحفوظة.</div>';
+                msgBox.innerHTML = chatHtml || '<div class="text-center text-slate-500 text-sm mt-10 font-bold bg-white p-6 rounded-2xl border border-slate-200">👋 أهلاً بك! يمكنك هنا كتابة الرسائل أو لصق الروابط وسجلها محفوظ.</div>';
                 msgBox.scrollTop = msgBox.scrollHeight;
             }, e => { console.error("Chat Error", e); });
         };
@@ -520,7 +603,7 @@
                 console.error(e);
                 showToast("فشل الإرسال. تأكد من اتصالك بالإنترنت", "error");
             }
-            btn.disabled = false; btn.innerText = 'إرسال 🚀';
+            btn.disabled = false; btn.innerText = 'إرسال';
         };
 
         // --- باقي وظائف المسؤول والتلميذ ---
@@ -586,60 +669,60 @@
                 let pColor = part.color === 'blue' ? 'blue' : 'emerald';
                 let partHasContent = false;
                 let partHtml = `
-                <details class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden mb-4" ${!isAdmin ? 'open' : ''}>
-                    <summary class="bg-${pColor}-600 text-white p-4 font-black text-lg hover:bg-${pColor}-700 transition">
+                <details class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden mb-5" ${!isAdmin ? 'open' : ''}>
+                    <summary class="bg-slate-50 text-slate-800 p-5 font-black text-xl hover:bg-slate-100 transition border-b border-slate-200">
                         ${part.title}
                     </summary>
-                    <div class="p-3 md:p-5 space-y-4 bg-slate-50/50">`;
+                    <div class="p-4 md:p-6 space-y-5 bg-white">`;
 
                 part.years.forEach((year, yIdx) => {
                     if (!isAdmin && userLevel && userLevel !== year.id) return;
                     partHasContent = true;
 
                     partHtml += `
-                    <details class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm" ${!isAdmin ? 'open' : ''}>
-                        <summary class="text-${pColor}-800 p-4 font-black hover:bg-slate-50 transition border-b border-gray-100 text-lg">
-                            ${year.title}
+                    <details class="bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden shadow-sm" ${!isAdmin ? 'open' : ''}>
+                        <summary class="text-slate-700 p-5 font-black hover:bg-slate-100 transition border-b border-slate-200 text-lg flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-${pColor}-500"></span> ${year.title}
                         </summary>
-                        <div class="p-4 space-y-5">`;
+                        <div class="p-5 space-y-6 bg-white">`;
 
                     year.branches.forEach((branch, bIdx) => {
                         let isComp = progress.includes(branch.id);
-                        let cardCls = isComp ? 'branch-completed shadow-md' : 'bg-white border-gray-200';
-                        let btnCls = isComp ? 'active shadow-lg' : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300';
+                        let cardCls = isComp ? 'branch-completed shadow-md' : 'bg-white border-slate-200 shadow-sm';
+                        let btnCls = isComp ? 'active shadow-lg' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-transparent';
 
                         partHtml += `
-                        <div class="border-2 rounded-2xl p-4 md:p-5 transition-all duration-300 ${cardCls}">
-                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-5 border-b-2 border-dashed pb-3 gap-3">
-                                <h4 class="font-extrabold text-gray-800 text-xl flex items-center gap-2"><span class="text-${pColor}-500">▪</span> ${branch.title}</h4>
+                        <div class="border-2 rounded-3xl p-5 md:p-6 transition-all duration-300 ${cardCls}">
+                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b-2 border-slate-100 pb-4 gap-4">
+                                <h4 class="font-black text-slate-800 text-xl flex items-center gap-2">${branch.title}</h4>
                                 ${!isAdmin ? `
-                                <button onclick="studentToggleComplete('${branch.id}')" class="w-full md:w-auto border-2 px-6 py-2.5 rounded-xl text-sm font-black transition ${btnCls}">
-                                    ${isComp ? '✅ مكتمل رائع!' : 'تحديد كمكتمل'}
+                                <button onclick="studentToggleComplete('${branch.id}')" class="w-full md:w-auto px-6 py-3 rounded-xl text-sm font-black transition btn-modern border-2 ${btnCls}">
+                                    ${isComp ? '✅ اكتملت دراسته' : 'تحديد كمكتمل'}
                                 </button>` : ''}
                             </div>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">`;
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">`;
 
                         ['lessons', 'exercises', 'exams'].forEach(cat => {
                             let links = branch.categories[cat] || [];
                             let linksList = links.length ? links.map((lnk, lIdx) => `
-                                <li class="flex justify-between items-center bg-white p-3 rounded-xl border border-gray-100 shadow-sm text-sm mb-2 hover:shadow-md transition group">
-                                    <a href="${lnk.url}" target="_blank" class="text-blue-700 font-bold truncate w-3/4 hover:underline decoration-2 underline-offset-4">
-                                        🔗 ${lnk.title}
+                                <li class="flex justify-between items-center bg-white p-3.5 rounded-xl border border-slate-100 shadow-sm text-sm mb-3 hover:shadow-md transition group">
+                                    <a href="${lnk.url}" target="_blank" class="text-blue-600 font-bold truncate w-3/4 hover:text-blue-800 hover:underline decoration-2 underline-offset-4 flex items-center gap-2">
+                                        <span class="text-lg">🔗</span> ${lnk.title}
                                     </a>
-                                    ${isAdmin ? `<button onclick="adminDeleteLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" class="text-red-500 hover:bg-red-50 p-1.5 rounded-lg text-lg transition" title="حذف">🗑️</button>` : ''}
+                                    ${isAdmin ? `<button onclick="adminDeleteLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" class="text-red-400 hover:bg-red-50 hover:text-red-600 p-2 rounded-lg text-lg transition" title="حذف">✖</button>` : ''}
                                 </li>
-                            `).join('') : `<li class="text-xs text-gray-400 text-center p-4 font-bold bg-gray-50 rounded-xl border border-dashed">لا يوجد محتوى بعد.</li>`;
+                            `).join('') : `<li class="text-sm text-slate-400 text-center p-5 font-bold bg-slate-50/50 rounded-xl border-2 border-dashed border-slate-200">لا يوجد محتوى بعد</li>`;
 
                             partHtml += `
-                            <div class="bg-slate-100/70 p-4 rounded-2xl border border-slate-200">
-                                <h5 class="font-extrabold text-slate-800 text-base mb-4 border-b-2 border-slate-300 pb-2 inline-block">${catTitles[cat]}</h5>
-                                <ul class="mb-3">${linksList}</ul>
+                            <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                                <h5 class="font-black text-slate-700 text-base mb-4 inline-block">${catTitles[cat]}</h5>
+                                <ul class="mb-2">${linksList}</ul>
                                 
                                 ${isAdmin ? `
                                 <div class="mt-4 pt-4 border-t-2 border-slate-200 border-dashed space-y-3">
-                                    <input type="text" id="title_${branch.id}_${cat}" class="w-full text-sm font-bold p-3 border-2 rounded-xl outline-none focus:border-blue-500 transition" placeholder="عنوان الدرس...">
-                                    <input type="text" id="url_${branch.id}_${cat}" class="w-full text-sm p-3 border-2 rounded-xl outline-none focus:border-blue-500 transition" placeholder="الرابط (http...)">
-                                    <button onclick="adminAddLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', '${branch.id}')" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-black py-3 rounded-xl transition shadow-md">➕ إضافة الرابط</button>
+                                    <input type="text" id="title_${branch.id}_${cat}" class="w-full text-sm font-bold p-3.5 border-2 border-slate-200 rounded-xl outline-none focus:border-blue-500 transition bg-white" placeholder="عنوان المحتوى...">
+                                    <input type="text" id="url_${branch.id}_${cat}" class="w-full text-sm p-3.5 border-2 border-slate-200 rounded-xl outline-none focus:border-blue-500 transition bg-white text-left" dir="ltr" placeholder="https://...">
+                                    <button onclick="adminAddLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', '${branch.id}')" class="w-full bg-slate-800 hover:bg-slate-900 text-white text-sm font-black py-3.5 rounded-xl transition btn-modern">إضافة</button>
                                 </div>` : ''}
                             </div>`;
                         });
