@@ -5,18 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>منصة العلوم الفيزيائية السحابية</title>
     
-<!-- إعدادات تحويل الموقع لتطبيق هاتف -->
+    <!-- إعدادات تحويل الموقع لتطبيق هاتف -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#1e3a8a">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        body { font-family: 'Cairo', sans-serif; background-color: #f3f4f6; -webkit-tap-highlight-color: transparent; }
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            /* جعل صورة الشعار icon.png هي الخلفية للمنصة بالكامل */
+            background: linear-gradient(rgba(15, 23, 42, 0.85), rgba(30, 58, 138, 0.85)), url('icon.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            -webkit-tap-highlight-color: transparent; 
+        }
         .screen { display: none; }
         .screen.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -38,7 +48,7 @@
 
     <div id="toast-container" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 w-[90%] md:w-auto"></div>
 
-    <div id="confirm-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50">
+    <div id="confirm-modal" class="fixed inset-0 bg-gray-900 bg-opacity-70 hidden items-center justify-center z-50 backdrop-blur-sm">
         <div class="bg-white p-6 rounded-2xl max-w-sm w-[90%] mx-auto shadow-2xl">
             <h3 class="text-xl font-bold mb-2 text-gray-800">تأكيد الإجراء</h3>
             <p class="text-gray-600 mb-6" id="confirm-message">هل أنت متأكد؟</p>
@@ -52,16 +62,19 @@
     <div class="max-w-4xl mx-auto">
         
         <!-- 1. شاشة تسجيل الدخول -->
-        <div id="auth-screen" class="screen active max-w-md mx-auto mt-10 md:mt-20 bg-white p-6 rounded-3xl shadow-xl">
-            <div class="text-center mb-8">
-                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">⚛️</div>
-                <h2 id="auth-title" class="text-2xl font-extrabold text-blue-900">دخول المنصة</h2>
+        <div id="auth-screen" class="screen active max-w-md mx-auto mt-10 md:mt-16 bg-white/95 backdrop-blur-md p-6 md:p-8 rounded-3xl shadow-2xl border border-white/20">
+            <div class="text-center mb-6">
+                <!-- عرض الشعار icon.png كصورة بارزة في أعلى الشاشة -->
+                <div class="w-20 h-20 mx-auto mb-4 rounded-2xl shadow-lg overflow-hidden border-2 border-blue-400/30">
+                    <img src="icon.png" alt="شعار المنصة" class="w-full h-full object-cover">
+                </div>
+                <h2 id="auth-title" class="text-2xl font-extrabold text-blue-900">منصة العلوم الفيزيائية</h2>
+                <p class="text-gray-500 text-sm mt-1">بوابتك السحابية للتفوق الدراسي</p>
             </div>
             
             <div class="space-y-4">
                 <input type="text" id="username" class="w-full px-4 py-3 rounded-xl border bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500" placeholder="اسم المستخدم (إنجليزي أو أرقام)">
                 
-                <!-- قائمة اختيار المستوى (تظهر فقط عند إنشاء حساب) -->
                 <select id="user-level" class="w-full px-4 py-3 rounded-xl border bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500 hidden">
                     <option value="" disabled selected>اختر مستواك الدراسي...</option>
                     <option value="m_y1">السنة الأولى متوسط</option>
@@ -86,20 +99,20 @@
         <div id="pending-screen" class="screen max-w-md mx-auto mt-20 bg-white p-8 rounded-3xl shadow-xl text-center border-t-4 border-yellow-400">
             <div class="text-5xl mb-4">⏳</div>
             <h2 class="text-2xl font-bold text-gray-800 mb-2">حسابك قيد الانتظار</h2>
-            <p class="text-gray-600 mb-8 text-sm">تم تسجيل طلبك بنجاح. يرجى الانتظار حتى يقوم الأستاذ بتفعيل حسابك من لوحة التحكم.</p>
+            <p class="text-gray-600 mb-8 text-sm">تم تسجيل طلبك بنجاح. يرجى الانتظار حتى يقوم الأستاذ بتفعيل حسابك.</p>
             <button onclick="logout()" class="w-full bg-gray-100 font-bold py-3 rounded-xl">تسجيل الخروج</button>
         </div>
 
         <!-- 3. شاشة تحكم المسؤول (الأستاذ) -->
         <div id="admin-screen" class="screen">
-            <header class="flex flex-col md:flex-row justify-between items-center bg-white p-4 md:p-6 rounded-2xl shadow-sm mb-6 border border-gray-100 gap-4">
+            <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-lg mb-6 border border-white/20 gap-4">
                 <div class="text-center md:text-right">
                     <h1 class="text-2xl font-extrabold text-blue-900">لوحة تحكم الأستاذ 🛠️</h1>
                 </div>
                 <button onclick="logout()" class="w-full md:w-auto bg-red-50 text-red-600 px-6 py-2 rounded-xl font-bold">خروج</button>
             </header>
 
-            <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 mb-6">
+            <div class="bg-white/95 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-lg mb-6 border border-white/20">
                 <h3 class="text-lg font-bold text-gray-800 mb-4">حسابات التلاميذ</h3>
                 <div class="overflow-x-auto rounded-xl border border-gray-100">
                     <table class="w-full text-right border-collapse whitespace-nowrap">
@@ -116,23 +129,23 @@
                 </div>
             </div>
 
-            <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100">
+            <div class="bg-white/95 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-lg border border-white/20">
                 <h3 class="text-lg font-bold text-gray-800 mb-2">إدارة البرنامج الدراسي</h3>
-                <p class="text-sm text-gray-500 mb-6">أضف الروابط هنا لتظهر فوراً لدى التلاميذ (كل تلميذ سيرى مستواه فقط).</p>
+                <p class="text-sm text-gray-500 mb-6">أضف الروابط هنا لتظهر فوراً لدى التلاميذ.</p>
                 <div id="admin-program-view" class="space-y-3"></div>
             </div>
         </div>
 
         <!-- 4. شاشة التلميذ -->
         <div id="app-screen" class="screen">
-            <header class="flex flex-col md:flex-row justify-between items-center bg-white p-4 md:p-6 rounded-2xl shadow-sm mb-6 border border-gray-100 gap-4">
+            <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-lg mb-6 border border-white/20 gap-4">
                 <div class="text-center md:text-right">
                     <h1 class="text-2xl font-extrabold text-blue-900">مرحباً، <span id="display-username" class="text-blue-600"></span> 👋</h1>
                 </div>
                 <button onclick="logout()" class="w-full md:w-auto bg-red-50 text-red-600 px-6 py-2 rounded-xl font-bold">تسجيل الخروج</button>
             </header>
 
-            <div class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-gray-100 mb-6">
+            <div class="bg-white/95 backdrop-blur-md p-5 md:p-6 rounded-2xl shadow-lg mb-6 border border-white/20">
                 <div class="flex justify-between items-end mb-3">
                     <h3 class="font-bold text-gray-700">تقدمك في مستواك الدراسي:</h3>
                     <span id="progress-text" class="text-2xl font-extrabold text-green-500">0%</span>
@@ -146,16 +159,15 @@
         </div>
     </div>
 
-    <!-- استدعاء مكتبات Firebase السحابية -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // =========================================================================================
-        // منطقة مفاتيح المشروع: الصق بيانات مشروعك بين الأقواس المجعدة أدناه
+        // الصق مفاتيح مشروعك الحقيقية هنا
         // =========================================================================================
-        const firebaseConfig = {
+const firebaseConfig = {
              apiKey: "AIzaSyDuuYHwmSW0UV1TO3gDGyETrvOimE7iGLs",
   authDomain: "physique-58073.firebaseapp.com",
   projectId: "physique-58073",
@@ -288,11 +300,10 @@
         window.isRegistering = false;
         window.toggleAuthMode = () => {
             window.isRegistering = !window.isRegistering;
-            document.getElementById('auth-title').innerText = window.isRegistering ? "إنشاء حساب جديد" : "دخول المنصة";
+            document.getElementById('auth-title').innerText = window.isRegistering ? "إنشاء حساب جديد" : "منصة العلوم الفيزيائية";
             document.getElementById('auth-action-btn').innerText = window.isRegistering ? "إرسال الطلب" : "تسجيل الدخول";
             document.getElementById('switch-mode-text').innerText = window.isRegistering ? "لديك حساب؟ سجل دخولك" : "إنشاء حساب تلميذ جديد";
             
-            // إظهار أو إخفاء حقل المستوى
             if(window.isRegistering) {
                 document.getElementById('user-level').classList.remove('hidden');
             } else {
@@ -458,7 +469,7 @@
             let total = 0; 
             
             sections.forEach(p => p.years.forEach(y => {
-                if(y.id === userLevel) total += y.branches.length; // حساب فروع مستواه فقط
+                if(y.id === userLevel) total += y.branches.length;
             }));
 
             let percentage = total === 0 ? 0 : Math.round((progress.length / total) * 100);
@@ -482,14 +493,13 @@
                 let pColor = part.color === 'blue' ? 'blue' : 'emerald';
                 let partHasContent = false;
                 let partHtml = `
-                <details class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-4" ${!isAdmin ? 'open' : ''}>
+                <details class="bg-white/95 backdrop-blur-md rounded-2xl shadow-lg border border-white/20 overflow-hidden mb-4" ${!isAdmin ? 'open' : ''}>
                     <summary class="bg-${pColor}-600 text-white p-4 font-bold text-lg hover:bg-${pColor}-700 transition">
                         ${part.title}
                     </summary>
                     <div class="p-3 md:p-5 space-y-4 bg-gray-50/50">`;
 
                 part.years.forEach((year, yIdx) => {
-                    // ** فلترة المستوى للتلميذ ** : إذا لم يكن مسؤولاً ومستواه لا يطابق هذه السنة، تجاهلها
                     if (!isAdmin && userLevel && userLevel !== year.id) return;
                     
                     partHasContent = true;
@@ -547,7 +557,6 @@
                 });
                 partHtml += `</div></details>`; 
 
-                // إذا كان هناك محتوى مسموح له برؤيته، أضف الجزء للـ HTML
                 if (isAdmin || partHasContent) {
                     html += partHtml;
                 }
