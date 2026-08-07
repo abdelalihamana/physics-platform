@@ -189,12 +189,13 @@
                 
                 <div class="relative group hidden" id="parent-name-container">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-xl">👨‍👦</div>
-                    <input type="text" id="parent-name" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50/50 outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all font-black text-slate-700 text-lg placeholder-slate-400" placeholder="اسم ولي الأمر">
+                    <input type="text" id="parent-name" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50/50 outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all font-black text-slate-700 text-lg placeholder-slate-400" placeholder="اسم ولي الأمر (ثلاثي)">
                 </div>
                 
                 <div class="relative group hidden" id="phone-number-container">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-xl">📱</div>
-                    <input type="tel" id="phone-number" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50/50 outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all font-black text-slate-700 text-lg placeholder-slate-400 text-left" dir="auto" placeholder="رقم هاتف الولي">
+                    <!-- تم تحديد النوع كـ tel وتحديد الطول الأقصى -->
+                    <input type="tel" id="phone-number" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50/50 outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all font-black text-slate-700 text-lg placeholder-slate-400 text-left tracking-[0.2em]" dir="auto" placeholder="05 / 06 / 07...">
                 </div>
 
                 <div class="relative group">
@@ -245,6 +246,7 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3 w-full md:w-auto justify-end flex-wrap">
+                    
                     <div class="stats-container relative">
                         <div class="bg-blue-50 border border-blue-100 text-blue-700 px-5 py-3.5 rounded-2xl font-black text-base flex items-center gap-2 cursor-help transition hover:bg-blue-100 shadow-sm">
                             <span class="text-xl">👥</span> 
@@ -256,6 +258,7 @@
                             <ul id="level-stats-list" class="space-y-3 text-base font-bold text-slate-600"></ul>
                         </div>
                     </div>
+
                     <button onclick="openSettings()" class="bg-slate-100 text-slate-700 px-5 py-3.5 rounded-2xl font-black hover:bg-slate-200 transition btn-modern shadow-sm border border-slate-200 text-xl" title="الإعدادات">⚙️</button>
                     <button onclick="logout()" class="bg-red-50 text-red-600 px-6 py-3.5 rounded-2xl font-black hover:bg-red-100 transition btn-modern border border-red-100 shadow-sm flex items-center gap-2 text-lg"><span class="hidden md:inline">خروج</span> 🚪</button>
                 </div>
@@ -308,7 +311,7 @@
             </div>
         </div>
 
-        <!-- 4. شاشة التلميذ (وهنا زر العودة للأستاذ) -->
+        <!-- 4. شاشة التلميذ -->
         <div id="app-screen" class="screen">
             <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 backdrop-blur-xl p-4 md:p-6 rounded-[2.5rem] shadow-lg border border-white/50 mb-6 gap-5 sticky top-4 z-40">
                 <div class="flex items-center gap-4 w-full md:w-auto">
@@ -323,7 +326,6 @@
                 </div>
                 <div class="flex items-center gap-3 w-full md:w-auto justify-end flex-wrap">
                     
-                    <!-- زر العودة الخاص بالمدير -->
                     <button id="return-admin-btn" onclick="returnToAdmin()" class="hidden relative bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-3.5 rounded-2xl font-black text-lg hover:from-amber-600 hover:to-orange-600 transition btn-modern shadow-md shadow-amber-500/30 flex items-center gap-2">
                         <span class="hidden sm:inline">العودة للإدارة</span> 🔙
                     </button>
@@ -529,8 +531,16 @@
             const phoneNumber = document.getElementById('phone-number').value.trim();
 
             if (!username || !password) return showToast("يرجى ملء اسم المستخدم وكلمة المرور", "error");
-            if (window.isRegistering && (!level || !parentName || !phoneNumber)) {
-                return showToast("يرجى تعبئة جميع الحقول بدقة (المستوى، واسم ورقم ولي الأمر)", "error");
+            if (window.isRegistering) {
+                if (!level || !parentName || !phoneNumber) {
+                    return showToast("يرجى تعبئة جميع الحقول بدقة", "error");
+                }
+                
+                // تحقق من رقم الهاتف: 10 أرقام ويبدأ ب 05 أو 06 أو 07
+                const phoneRegex = /^(05|06|07)\d{8}$/;
+                if(!phoneRegex.test(phoneNumber)) {
+                    return showToast("رقم الهاتف غير صحيح! يجب أن يتكون من 10 أرقام ويبدأ بـ 05، 06، أو 07", "error");
+                }
             }
 
             const btn = document.getElementById('auth-action-btn');
@@ -783,7 +793,7 @@
             if(unsubscribeUsers) unsubscribeUsers();
             unsubscribeUsers = onSnapshot(usersCol, (snapshot) => {
                 window.adminUsersList = [];
-                window.allStudentsProgress = []; // للأستاذ أيضاً لو أراد مستقبلاً عرض الصدارة
+                window.allStudentsProgress = []; 
                 snapshot.forEach(d => { 
                     if(d.data().role !== 'admin') {
                         let data = d.data();
@@ -1028,7 +1038,7 @@
                                 <div class="mt-6 pt-6 border-t-2 border-black/5 border-dashed space-y-4">
                                     <input type="text" id="title_${branch.id}_${cat}" class="w-full text-base font-black p-4 border-2 border-white/50 rounded-xl outline-none focus:border-blue-400 focus:bg-white transition bg-white/60 shadow-inner text-slate-700" placeholder="عنوان المحتوى...">
                                     <input type="text" id="url_${branch.id}_${cat}" class="w-full text-base p-4 border-2 border-white/50 rounded-xl outline-none focus:border-blue-400 focus:bg-white transition bg-white/60 shadow-inner text-left font-bold text-slate-600" dir="ltr" placeholder="https://...">
-                                    <button onclick="adminAddLink(${pIdx}, ${yIdx}, bIdx, '${cat}', '${branch.id}')" class="w-full bg-slate-800 hover:bg-slate-900 text-white text-base font-black py-4 rounded-xl transition btn-modern shadow-md">إضافة محتوى ➕</button>
+                                    <button onclick="adminAddLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', '${branch.id}')" class="w-full bg-slate-800 hover:bg-slate-900 text-white text-base font-black py-4 rounded-xl transition btn-modern shadow-md">إضافة محتوى ➕</button>
                                 </div>` : ''}
                             </div>`;
                         });
