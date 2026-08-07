@@ -76,7 +76,6 @@
         .theme-exercises { background-color: #fff7ed; border-color: #fed7aa; }
         .theme-exams { background-color: #faf5ff; border-color: #e9d5ff; }
 
-        /* تأثيرات لوحة الصدارة */
         .leaderboard-row { transition: all 0.3s ease; }
         .leaderboard-row:hover { transform: scale(1.02); background-color: #f8fafc; z-index: 10; position: relative; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
         .rank-1 { background: linear-gradient(to left, #fffbeb, #ffffff); border-right: 4px solid #fbbf24; }
@@ -246,7 +245,6 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3 w-full md:w-auto justify-end flex-wrap">
-                    
                     <div class="stats-container relative">
                         <div class="bg-blue-50 border border-blue-100 text-blue-700 px-5 py-3.5 rounded-2xl font-black text-base flex items-center gap-2 cursor-help transition hover:bg-blue-100 shadow-sm">
                             <span class="text-xl">👥</span> 
@@ -258,42 +256,48 @@
                             <ul id="level-stats-list" class="space-y-3 text-base font-bold text-slate-600"></ul>
                         </div>
                     </div>
-
                     <button onclick="openSettings()" class="bg-slate-100 text-slate-700 px-5 py-3.5 rounded-2xl font-black hover:bg-slate-200 transition btn-modern shadow-sm border border-slate-200 text-xl" title="الإعدادات">⚙️</button>
                     <button onclick="logout()" class="bg-red-50 text-red-600 px-6 py-3.5 rounded-2xl font-black hover:bg-red-100 transition btn-modern border border-red-100 shadow-sm flex items-center gap-2 text-lg"><span class="hidden md:inline">خروج</span> 🚪</button>
                 </div>
             </header>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                <!-- قسم متابعة التلاميذ -->
-                <div class="lg:col-span-12 bg-white/95 backdrop-blur-xl p-5 md:p-8 rounded-[2.5rem] shadow-lg border border-white/50 interactive-card">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-3xl font-black text-slate-800 flex items-center gap-3">
-                            <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-2xl shadow-inner">📋</div>
-                            متابعة التلاميذ
-                        </h3>
-                    </div>
-                    <div class="overflow-x-auto rounded-3xl border border-slate-100 shadow-inner bg-slate-50/50">
-                        <table class="w-full text-right border-collapse whitespace-nowrap min-w-[1100px]">
-                            <thead class="bg-slate-100 text-slate-600 text-base font-black border-b border-slate-200">
-                                <tr>
-                                    <th class="p-6 rounded-tr-3xl">التلميذ (وكلمة المرور)</th>
-                                    <th class="p-6">معلومات الولي (والهاتف)</th>
-                                    <th class="p-6">المستوى</th>
-                                    <th class="p-6 w-56">التقدم الدراسي</th>
-                                    <th class="p-6">الحالة</th>
-                                    <th class="p-6 text-left rounded-tl-3xl">الإجراءات</th>
-                                </tr>
-                            </thead>
-                            <tbody id="students-table-body" class="bg-white divide-y divide-slate-100 text-base"></tbody>
-                        </table>
-                    </div>
+                <!-- قسم متابعة التلاميذ (قابل للطي) -->
+                <div class="lg:col-span-12">
+                    <details class="bg-white/95 backdrop-blur-xl rounded-[2.5rem] shadow-lg border border-white/50 interactive-card overflow-hidden group">
+                        <summary class="p-6 md:p-8 flex items-center justify-between outline-none">
+                            <div class="flex items-center gap-5">
+                                <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-3xl shadow-inner group-hover:scale-110 transition-transform">📋</div>
+                                <div>
+                                    <h3 class="text-3xl font-black text-slate-800">متابعة التلاميذ</h3>
+                                    <p class="text-slate-500 font-bold mt-2 text-lg hidden sm:block">انقر هنا لعرض أو إخفاء قائمة جميع التلاميذ المسجلين</p>
+                                </div>
+                            </div>
+                        </summary>
+                        <div class="p-5 md:p-8 pt-0 border-t border-slate-100/50">
+                            <div class="overflow-x-auto rounded-3xl border border-slate-100 shadow-inner bg-slate-50/50 mt-6">
+                                <table class="w-full text-right border-collapse whitespace-nowrap min-w-[1100px]">
+                                    <thead class="bg-slate-100 text-slate-600 text-base font-black border-b border-slate-200">
+                                        <tr>
+                                            <th class="p-6 rounded-tr-3xl">التلميذ (وكلمة المرور)</th>
+                                            <th class="p-6">معلومات الولي (والهاتف)</th>
+                                            <th class="p-6">المستوى</th>
+                                            <th class="p-6 w-56">التقدم الدراسي</th>
+                                            <th class="p-6">الحالة</th>
+                                            <th class="p-6 text-left rounded-tl-3xl">الإجراءات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="students-table-body" class="bg-white divide-y divide-slate-100 text-base"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </details>
                 </div>
 
                 <!-- قسم إدارة المحتوى -->
-                <div class="lg:col-span-12 bg-white/95 backdrop-blur-xl p-5 md:p-8 rounded-[2.5rem] shadow-lg border border-white/50">
+                <div class="lg:col-span-12 bg-white/95 backdrop-blur-xl p-5 md:p-8 rounded-[2.5rem] shadow-lg border border-white/50 mb-10">
                     <div class="mb-8 border-b border-slate-100 pb-6">
-                        <h3 class="text-3xl font-black text-slate-800 flex items-center gap-3 mb-3">
+                        <h3 class="text-3xl font-black text-slate-800 flex items-center gap-4 mb-3">
                             <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center text-2xl shadow-inner">📚</div>
                             إدارة محتوى المنصة
                         </h3>
@@ -304,7 +308,7 @@
             </div>
         </div>
 
-        <!-- 4. شاشة التلميذ -->
+        <!-- 4. شاشة التلميذ (وهنا زر العودة للأستاذ) -->
         <div id="app-screen" class="screen">
             <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 backdrop-blur-xl p-4 md:p-6 rounded-[2.5rem] shadow-lg border border-white/50 mb-6 gap-5 sticky top-4 z-40">
                 <div class="flex items-center gap-4 w-full md:w-auto">
@@ -319,6 +323,7 @@
                 </div>
                 <div class="flex items-center gap-3 w-full md:w-auto justify-end flex-wrap">
                     
+                    <!-- زر العودة الخاص بالمدير -->
                     <button id="return-admin-btn" onclick="returnToAdmin()" class="hidden relative bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-3.5 rounded-2xl font-black text-lg hover:from-amber-600 hover:to-orange-600 transition btn-modern shadow-md shadow-amber-500/30 flex items-center gap-2">
                         <span class="hidden sm:inline">العودة للإدارة</span> 🔙
                     </button>
@@ -352,7 +357,7 @@
                 </div>
 
                 <!-- لوحة الصدارة (Leaderboard) -->
-                <div class="lg:col-span-4 bg-white/95 backdrop-blur-xl p-6 rounded-[2.5rem] shadow-lg border border-white/50 interactive-card flex flex-col h-full">
+                <div class="lg:col-span-4 bg-white/95 backdrop-blur-xl p-6 rounded-[2.5rem] shadow-lg border border-white/50 interactive-card flex flex-col h-full max-h-[300px]">
                     <h3 class="font-black text-slate-800 text-xl flex items-center gap-2 mb-4 border-b border-slate-100 pb-3">
                         <div class="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-xl shadow-inner">🏆</div>
                         أبطال المستوى 
@@ -406,7 +411,7 @@
         
         window.adminUsersList = [];
         window.adminChatsData = {};
-        window.allStudentsProgress = []; // قائمة عالمية لترتيب الطلاب
+        window.allStudentsProgress = []; 
 
         const levelNames = {
             "m_y1": "الأولى متوسط", "m_y2": "الثانية متوسط", "m_y3": "الثالثة متوسط", "m_y4": "الرابعة متوسط",
@@ -659,47 +664,45 @@
             return p > 100 ? 100 : p;
         };
 
-        // --- دالة عرض لوحة الصدارة ---
         const renderLeaderboard = () => {
             if(!window.currentUserRecord || window.currentUserRecord.role === 'admin') return;
             
             const container = document.getElementById('leaderboard-container');
             container.innerHTML = '';
             
-            // فلترة الطلاب من نفس مستوى التلميذ الحالي وترتيبهم حسب التقدم
             let levelMates = window.allStudentsProgress
                 .filter(s => s.level === window.currentUserRecord.level && s.approved)
-                .sort((a, b) => b.progress - a.progress); // ترتيب تنازلي
+                .sort((a, b) => b.progress - a.progress); 
 
             if(levelMates.length === 0) {
                 container.innerHTML = '<div class="text-slate-400 text-center py-4 font-bold">لا يوجد منافسون بعد.. كن أنت المتصدر!</div>';
                 return;
             }
 
-            let html = '<div class="flex flex-col gap-2 mt-2">';
+            let html = '<div class="flex flex-col gap-3 mt-2">';
             levelMates.forEach((student, index) => {
                 let rank = index + 1;
                 let rankClass = '';
                 let medal = '';
                 
-                if(rank === 1) { rankClass = 'rank-1 font-black'; medal = '🥇'; }
+                if(rank === 1) { rankClass = 'rank-1 font-black shadow-md'; medal = '🥇'; }
                 else if(rank === 2) { rankClass = 'rank-2 font-black'; medal = '🥈'; }
                 else if(rank === 3) { rankClass = 'rank-3 font-black'; medal = '🥉'; }
-                else { rankClass = 'bg-white font-bold border border-slate-100'; medal = `<span class="text-slate-400 bg-slate-100 rounded-full w-6 h-6 flex items-center justify-center text-xs font-black">${rank}</span>`; }
+                else { rankClass = 'bg-white font-bold border border-slate-100'; medal = `<span class="text-slate-400 bg-slate-100 rounded-full w-7 h-7 flex items-center justify-center text-sm font-black shadow-inner">${rank}</span>`; }
                 
                 let isMe = student.id === window.currentUserRecord.username;
-                let meClass = isMe ? 'ring-2 ring-blue-500 shadow-md' : '';
+                let meClass = isMe ? 'ring-2 ring-blue-500 shadow-lg' : '';
                 let nameDisplay = isMe ? 'أنت (بطل المنصة)' : student.id;
 
                 html += `
-                    <div class="leaderboard-row flex items-center justify-between p-3 rounded-2xl ${rankClass} ${meClass}">
-                        <div class="flex items-center gap-3">
-                            <div class="text-xl w-6 text-center">${medal}</div>
-                            <div class="text-slate-700 ${isMe ? 'text-blue-700' : ''}">${nameDisplay}</div>
+                    <div class="leaderboard-row flex items-center justify-between p-4 rounded-2xl ${rankClass} ${meClass}">
+                        <div class="flex items-center gap-4">
+                            <div class="text-2xl w-8 text-center">${medal}</div>
+                            <div class="text-slate-700 text-lg ${isMe ? 'text-blue-700' : ''}">${nameDisplay}</div>
                         </div>
-                        <div class="bg-slate-100 text-slate-700 px-3 py-1 rounded-lg text-sm flex items-center gap-1">
-                            <span class="${student.progress > 50 ? 'text-emerald-600' : 'text-amber-500'}">${student.progress}%</span>
-                            <span class="text-xs opacity-50">إنجاز</span>
+                        <div class="bg-slate-100 text-slate-700 px-4 py-1.5 rounded-xl text-base flex items-center gap-2 shadow-inner">
+                            <span class="${student.progress > 50 ? 'text-emerald-600' : 'text-amber-500'} font-black">${student.progress}%</span>
+                            <span class="text-sm opacity-60 font-bold">إنجاز</span>
                         </div>
                     </div>
                 `;
@@ -751,7 +754,7 @@
                         </td>
                         <td class="p-6 text-left rounded-tl-3xl">
                             <div class="flex gap-3 justify-end flex-wrap">
-                                <button onclick="loginAsStudent('${d.id}')" class="bg-indigo-50 text-indigo-700 px-4 py-2.5 rounded-xl text-sm font-black hover:bg-indigo-100 transition border border-indigo-200 shadow-sm btn-modern">دخول للحساب 👁️</button>
+                                <button onclick="loginAsStudent('${d.id}')" class="bg-indigo-50 text-indigo-700 px-5 py-3 rounded-xl text-sm font-black hover:bg-indigo-100 transition border-2 border-indigo-200 shadow-sm btn-modern">دخول للحساب 👁️</button>
                                 <button onclick="openChat('${d.id}')" class="relative bg-white text-blue-600 px-5 py-3 rounded-xl text-sm font-black hover:bg-blue-50 hover:text-blue-700 transition border-2 border-slate-100 shadow-sm btn-modern">مراسلة 💬 ${chatBadge}</button>
                                 <button onclick="toggleUserStatus('${d.id}', ${!data.approved})" class="${data.approved ? 'bg-slate-50 text-slate-600 hover:bg-slate-100 border-slate-200' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200'} px-5 py-3 rounded-xl text-sm font-black transition border-2 shadow-sm btn-modern">${data.approved ? 'تعطيل' : 'تفعيل ✅'}</button>
                                 <button onclick="deleteUserAccount('${d.id}')" class="bg-white text-red-400 px-4 py-3 rounded-xl text-xl font-black hover:bg-red-50 hover:text-red-600 transition border-2 border-slate-100 shadow-sm btn-modern" title="حذف التلميذ">🗑️</button>
@@ -780,7 +783,15 @@
             if(unsubscribeUsers) unsubscribeUsers();
             unsubscribeUsers = onSnapshot(usersCol, (snapshot) => {
                 window.adminUsersList = [];
-                snapshot.forEach(d => { if(d.data().role !== 'admin') window.adminUsersList.push({id: d.id, data: d.data()}); });
+                window.allStudentsProgress = []; // للأستاذ أيضاً لو أراد مستقبلاً عرض الصدارة
+                snapshot.forEach(d => { 
+                    if(d.data().role !== 'admin') {
+                        let data = d.data();
+                        window.adminUsersList.push({id: d.id, data: data}); 
+                        let progPercent = calculateProgress(data.level, data.progress || [], window.currentSections);
+                        window.allStudentsProgress.push({ id: d.id, level: data.level, progress: progPercent, approved: data.approved });
+                    }
+                });
                 renderAdminTable();
             });
 
@@ -798,11 +809,10 @@
                     window.currentSections = docSnap.data().sections; 
                     renderProgramUI(window.currentSections, 'student-program-view', false); 
                     updateProgressUI(window.currentSections); 
-                    renderLeaderboard(); // تحديث لوحة الصدارة عند تغيير المنهج
+                    renderLeaderboard(); 
                 }
             });
             
-            // مستمع عام لكل التلاميذ لجمع بيانات لوحة الصدارة
             if(unsubscribeUsers) unsubscribeUsers();
             unsubscribeUsers = onSnapshot(usersCol, (snapshot) => {
                 window.allStudentsProgress = [];
@@ -812,14 +822,13 @@
                         let progPercent = calculateProgress(data.level, data.progress || [], window.currentSections);
                         window.allStudentsProgress.push({ id: d.id, level: data.level, progress: progPercent, approved: data.approved });
                     }
-                    // تحديث التلميذ الحالي
                     if(d.id === window.currentUserRecord.username) {
                         window.currentUserRecord.progress = data.progress || [];
                         updateProgressUI(window.currentSections || []); 
                         renderProgramUI(window.currentSections || [], 'student-program-view', false);
                     }
                 });
-                renderLeaderboard(); // تحديث اللوحة بعد جلب كل تقدم التلاميذ
+                renderLeaderboard(); 
             });
 
             if(unsubscribeChatMeta) unsubscribeChatMeta();
@@ -1019,7 +1028,7 @@
                                 <div class="mt-6 pt-6 border-t-2 border-black/5 border-dashed space-y-4">
                                     <input type="text" id="title_${branch.id}_${cat}" class="w-full text-base font-black p-4 border-2 border-white/50 rounded-xl outline-none focus:border-blue-400 focus:bg-white transition bg-white/60 shadow-inner text-slate-700" placeholder="عنوان المحتوى...">
                                     <input type="text" id="url_${branch.id}_${cat}" class="w-full text-base p-4 border-2 border-white/50 rounded-xl outline-none focus:border-blue-400 focus:bg-white transition bg-white/60 shadow-inner text-left font-bold text-slate-600" dir="ltr" placeholder="https://...">
-                                    <button onclick="adminAddLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', '${branch.id}')" class="w-full bg-slate-800 hover:bg-slate-900 text-white text-base font-black py-4 rounded-xl transition btn-modern shadow-md">إضافة محتوى ➕</button>
+                                    <button onclick="adminAddLink(${pIdx}, ${yIdx}, bIdx, '${cat}', '${branch.id}')" class="w-full bg-slate-800 hover:bg-slate-900 text-white text-base font-black py-4 rounded-xl transition btn-modern shadow-md">إضافة محتوى ➕</button>
                                 </div>` : ''}
                             </div>`;
                         });
