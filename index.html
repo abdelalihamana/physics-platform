@@ -108,23 +108,27 @@
         </div>
     </div>
 
-    <!-- نافذة الإعدادات -->
+    <!-- نافذة الإعدادات (محدثة لتشمل كلمة المرور ورقم الهاتف) -->
     <div id="settings-modal" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-[60] backdrop-blur-md p-4 transition-opacity duration-300">
         <div class="bg-white/95 p-8 rounded-3xl max-w-sm w-full shadow-2xl border border-white/50 transform transition-transform duration-300 scale-95" id="settings-content">
             <div class="flex justify-between items-center mb-6 border-b pb-3 border-slate-100">
                 <h3 class="text-2xl font-black text-slate-800">الإعدادات ⚙️</h3>
                 <button onclick="closeSettings()" class="text-slate-400 hover:text-red-500 font-bold text-3xl transition hover:rotate-90">✖</button>
             </div>
-            <div class="space-y-5">
+            <div class="space-y-4">
                 <div>
-                    <label class="block text-base font-bold text-slate-600 mb-2">اسم المستخدم (للقراءة فقط)</label>
-                    <input type="text" id="settings-username" disabled class="w-full px-5 py-4 rounded-xl border-2 border-slate-100 bg-slate-50 text-slate-400 font-black outline-none cursor-not-allowed shadow-inner text-lg">
+                    <label class="block text-sm font-bold text-slate-600 mb-1">اسم المستخدم (للقراءة فقط)</label>
+                    <input type="text" id="settings-username" disabled class="w-full px-4 py-3 rounded-xl border-2 border-slate-100 bg-slate-50 text-slate-400 font-black outline-none cursor-not-allowed shadow-inner">
                 </div>
                 <div>
-                    <label class="block text-base font-bold text-slate-600 mb-2">كلمة المرور الجديدة</label>
-                    <input type="text" id="settings-new-password" class="w-full px-5 py-4 rounded-xl border-2 border-slate-200 bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none font-black transition shadow-sm text-lg">
+                    <label class="block text-sm font-bold text-slate-600 mb-1">كلمة المرور الجديدة</label>
+                    <input type="text" id="settings-new-password" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-white focus:border-blue-500 outline-none font-black transition shadow-sm">
                 </div>
-                <button onclick="saveNewPassword()" class="w-full bg-gradient-to-r from-slate-800 to-slate-900 text-white font-black py-4 rounded-xl transition btn-modern mt-4 shadow-lg shadow-slate-900/20 text-xl">حفظ التغييرات</button>
+                <div>
+                    <label class="block text-sm font-bold text-slate-600 mb-1">رقم هاتف ولي الأمر</label>
+                    <input type="tel" id="settings-new-phone" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-white focus:border-blue-500 outline-none font-black transition shadow-sm text-left tracking-[0.2em]" dir="auto" placeholder="05/06/07...">
+                </div>
+                <button onclick="saveSettingsData()" class="w-full bg-gradient-to-r from-slate-800 to-slate-900 text-white font-black py-4 rounded-xl transition btn-modern mt-2 shadow-lg shadow-slate-900/20 text-lg">حفظ التغييرات</button>
             </div>
         </div>
     </div>
@@ -197,7 +201,6 @@
                 
                 <div class="relative group hidden" id="phone-number-container">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-xl">📱</div>
-                    <!-- إجبار التلميذ على كتابة 10 أرقام -->
                     <input type="tel" id="phone-number" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50/50 outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all font-black text-slate-700 text-lg placeholder-slate-400 text-left tracking-[0.2em]" dir="auto" placeholder="05 / 06 / 07...">
                 </div>
 
@@ -641,6 +644,9 @@
         window.openSettings = () => {
             document.getElementById('settings-username').value = window.currentUserRecord.username;
             document.getElementById('settings-new-password').value = window.currentUserRecord.password;
+            // تعبئة حقل الهاتف برقم الولي الحالي للتلميذ
+            document.getElementById('settings-new-phone').value = window.currentUserRecord.phoneNumber || '';
+            
             const modal = document.getElementById('settings-modal');
             const content = document.getElementById('settings-content');
             modal.classList.remove('hidden'); modal.classList.add('flex');
@@ -654,15 +660,32 @@
             setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
         }
 
-        window.saveNewPassword = async () => {
+        // --- تحديث دالة الحفظ لتشمل كلمة المرور ورقم الهاتف معاً مع التحقق ---
+        window.saveSettingsData = async () => {
             const newPass = document.getElementById('settings-new-password').value.trim();
+            const newPhone = document.getElementById('settings-new-phone').value.trim();
+
             if(!newPass) return showToast("كلمة المرور لا يمكن أن تكون فارغة", "error");
+            
+            // التحقق من صحة رقم الهاتف الجديد
+            const phoneRegex = /^(05|06|07)\d{8}$/;
+            if(!phoneRegex.test(newPhone)) {
+                return showToast("رقم الهاتف غير صحيح! يجب أن يتكون من 10 أرقام ويبدأ بـ 05، 06، أو 07", "error");
+            }
+
             try {
-                await updateDoc(doc(usersCol, window.currentUserRecord.username), { password: newPass });
+                await updateDoc(doc(usersCol, window.currentUserRecord.username), { 
+                    password: newPass,
+                    phoneNumber: newPhone 
+                });
                 window.currentUserRecord.password = newPass;
-                showToast("تم تغيير كلمة المرور بنجاح 🔒");
+                window.currentUserRecord.phoneNumber = newPhone;
+                
+                showToast("تم تحديث الإعدادات بنجاح 🔒📱");
                 closeSettings();
-            } catch(e) { showToast("حدث خطأ أثناء تغيير كلمة المرور", "error"); }
+            } catch(e) { 
+                showToast("حدث خطأ أثناء الحفظ", "error"); 
+            }
         }
 
         const calculateProgress = (levelId, progressArray, sections) => {
@@ -734,7 +757,6 @@
                 let levelDisplay = data.level ? (levelNames[data.level] || data.level) : "غير محدد";
                 let progPercent = calculateProgress(data.level, data.progress || [], window.currentSections);
                 
-                // صياغة رسالة واتساب ديناميكية حسب نسبة تقدم التلميذ
                 let waMessage = "";
                 if(progPercent >= 70) {
                     waMessage = `السلام عليكم السيد(ة) ${data.parentName}، نود إعلامكم أن ابنكم/ابنتكم ${d.id} يحقق نتائج ممتازة وتقدماً رائعاً بنسبة (${progPercent}%) في منصة المجتهد للفيزياء 🌟. شكراً لمتابعتكم!`;
@@ -745,7 +767,7 @@
                 }
                 
                 let encodedWaMessage = encodeURIComponent(waMessage);
-                let formattedPhone = data.phoneNumber ? "213" + data.phoneNumber.substring(1) : ""; // تحويل 0555 إلى 213555
+                let formattedPhone = data.phoneNumber ? "213" + data.phoneNumber.substring(1) : ""; 
 
                 let parentInfo = data.parentName ? 
                     `<div class="font-black text-slate-800">${data.parentName}</div>
@@ -850,6 +872,7 @@
                     }
                     if(d.id === window.currentUserRecord.username) {
                         window.currentUserRecord.progress = data.progress || [];
+                        window.currentUserRecord.phoneNumber = data.phoneNumber || ''; // تحديث الهاتف محلياً
                         updateProgressUI(window.currentSections || []); 
                         renderProgramUI(window.currentSections || [], 'student-program-view', false);
                     }
