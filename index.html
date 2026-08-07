@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>منصة العلوم الفيزيائية السحابية</title>
+    <!-- مكتبة التصميم Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- خطوط جوجل (Cairo) -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Cairo', sans-serif; background-color: #f3f4f6; -webkit-tap-highlight-color: transparent; }
+        .screen { display: none; }
+        .screen.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        details > summary { list-style: none; cursor: pointer; user-select: none; }
+        details > summary::-webkit-details-marker { display: none; }
+        details > summary::after { content: '▼'; float: left; transition: transform 0.3s ease; }
+        details[open] > summary::after { transform: rotate(180deg); }
+        
+        .branch-completed { background-color: #ecfdf5 !important; border-color: #10b981 !important; }
+        .btn-complete.active { background-color: #10b981; color: white; border-color: #10b981; }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
+</head>
+<body class="text-gray-800 antialiased p-3 md:p-6 pb-20">
+
+    <!-- نظام الإشعارات والنوافذ المنبثقة -->
+    <div id="toast-container" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 w-[90%] md:w-auto"></div>
+
+    <div id="confirm-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-2xl max-w-sm w-[90%] mx-auto shadow-2xl">
+            <h3 class="text-xl font-bold mb-2 text-gray-800">تأكيد الإجراء</h3>
+            <p class="text-gray-600 mb-6" id="confirm-message">هل أنت متأكد؟</p>
+            <div class="flex justify-end gap-3">
+                <button onclick="closeConfirm(false)" class="px-5 py-2 bg-gray-100 rounded-lg font-semibold">إلغاء</button>
+                <button onclick="closeConfirm(true)" class="px-5 py-2 bg-red-500 text-white rounded-lg font-semibold">تأكيد</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto">
+        
+        <!-- 1. شاشة تسجيل الدخول -->
+        <div id="auth-screen" class="screen active max-w-md mx-auto mt-10 md:mt-20 bg-white p-6 rounded-3xl shadow-xl">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">⚛️</div>
+                <h2 id="auth-title" class="text-2xl font-extrabold text-blue-900">دخول المنصة</h2>
+            </div>
+            
+            <div class="space-y-4">
+                <input type="text" id="username" class="w-full px-4 py-3 rounded-xl border bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500" placeholder="اسم المستخدم (إنجليزي أو أرقام)">
+                <input type="password" id="password" class="w-full px-4 py-3 rounded-xl border bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500" placeholder="كلمة المرور">
+                <button id="auth-action-btn" onclick="handleAuth()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-200 transition">تسجيل الدخول</button>
+            </div>
+            
+            <div class="text-center mt-6">
+                <button onclick="toggleAuthMode()" id="switch-mode-text" class="text-blue-600 font-semibold underline text-sm">إنشاء حساب تلميذ جديد</button>
+            </div>
+        </div>
+
+        <!-- 2. شاشة الانتظار -->
+        <div id="pending-screen" class="screen max-w-md mx-auto mt-20 bg-white p-8 rounded-3xl shadow-xl text-center border-t-4 border-yellow-400">
+            <div class="text-5xl mb-4">⏳</div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">حسابك قيد الانتظار</h2>
+            <p class="text-gray-600 mb-8 text-sm">تم تسجيل طلبك بنجاح. يرجى الانتظار حتى يقوم الأستاذ بتفعيل حسابك من لوحة التحكم.</p>
+            <button onclick="logout()" class="w-full bg-gray-100 font-bold py-3 rounded-xl">تسجيل الخروج</button>
+        </div>
+
+        <!-- 3. شاشة تحكم المسؤول (الأستاذ) -->
+        <div id="admin-screen" class="screen">
+            <header class="flex flex-col md:flex-row justify-between items-center bg-white p-4 md:p-6 rounded-2xl shadow-sm mb-6 border border-gray-100 gap-4">
+                <div class="text-center md:text-right">
+                    <h1 class="text-2xl font-extrabold text-blue-900">لوحة تحكم الأستاذ 🛠️</h1>
+                </div>
+                <button onclick="logout()" class="w-full md:w-auto bg-red-50 text-red-600 px-6 py-2 rounded-xl font-bold">خروج</button>
+            </header>
+
+            <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 mb-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">حسابات التلاميذ</h3>
+                <div class="overflow-x-auto rounded-xl border border-gray-100">
+                    <table class="w-full text-right border-collapse whitespace-nowrap">
+                        <thead class="bg-gray-50 text-gray-600 text-sm">
+                            <tr>
+                                <th class="p-3 border-b">التلميذ</th>
+                                <th class="p-3 border-b">الحالة</th>
+                                <th class="p-3 border-b text-left">إجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="students-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 class="text-lg font-bold text-gray-800 mb-2">إدارة البرنامج الدراسي</h3>
+                <p class="text-sm text-gray-500 mb-6">أضف الروابط هنا لتظهر فوراً لدى التلاميذ.</p>
+                <div id="admin-program-view" class="space-y-3"></div>
+            </div>
+        </div>
+
+        <!-- 4. شاشة التلميذ -->
+        <div id="app-screen" class="screen">
+            <header class="flex flex-col md:flex-row justify-between items-center bg-white p-4 md:p-6 rounded-2xl shadow-sm mb-6 border border-gray-100 gap-4">
+                <div class="text-center md:text-right">
+                    <h1 class="text-2xl font-extrabold text-blue-900">مرحباً، <span id="display-username" class="text-blue-600"></span> 👋</h1>
+                </div>
+                <button onclick="logout()" class="w-full md:w-auto bg-red-50 text-red-600 px-6 py-2 rounded-xl font-bold">تسجيل الخروج</button>
+            </header>
+
+            <div class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-gray-100 mb-6">
+                <div class="flex justify-between items-end mb-3">
+                    <h3 class="font-bold text-gray-700">تقدمك الدراسي:</h3>
+                    <span id="progress-text" class="text-2xl font-extrabold text-green-500">0%</span>
+                </div>
+                <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+                    <div id="progress-bar" class="bg-green-400 h-3 rounded-full transition-all duration-1000 w-0"></div>
+                </div>
+            </div>
+            
+            <div id="student-program-view" class="space-y-3"></div>
+        </div>
+    </div>
+
+    <!-- استدعاء مكتبات Firebase السحابية -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // =========================================================================================
+        // منطقة مفاتيح المشروع: الصق بيانات مشروعك بين الأقواس المجعدة أدناه
+        // =========================================================================================
+        const firebaseConfig = {
+             apiKey: "AIzaSyDuuYHwmSW0UV1TO3gDGyETrvOimE7iGLs",
+  authDomain: "physique-58073.firebaseapp.com",
+  projectId: "physique-58073",
+  storageBucket: "physique-58073.firebasestorage.app",
+  messagingSenderId: "744073429659",
+  appId: "1:744073429659:web:0859514e70482543d13c3e",
+  measurementId: "G-D6BHHHVBX6"
+        };
+        // =========================================================================================
+
+        // التهيئة
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        // مسارات قاعدة البيانات
+        const usersCol = collection(db, 'physics_db', 'public', 'profiles');
+        const programCol = collection(db, 'physics_db', 'public', 'curriculum');
+
+        let isAuthReady = false;
+        window.currentUserRecord = null;
+        let unsubscribeProgram = null;
+        let unsubscribeUsers = null;
+
+        // دالة إظهار الإشعارات
+        window.showToast = (msg, type = 'success') => {
+            const toast = document.createElement('div');
+            toast.className = `px-5 py-3 rounded-lg shadow-lg text-white font-bold text-sm text-center transform transition-all duration-300 translate-y-10 opacity-0 ${type === 'error' ? 'bg-red-500' : 'bg-green-500'}`;
+            toast.innerText = msg;
+            document.getElementById('toast-container').appendChild(toast);
+            setTimeout(() => { toast.classList.remove('translate-y-10', 'opacity-0'); }, 10);
+            setTimeout(() => { 
+                toast.classList.add('translate-y-10', 'opacity-0'); 
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        };
+
+        // دالة تأكيد الحذف
+        window.closeConfirm = null;
+        const confirmAction = (msg) => {
+            return new Promise((resolve) => {
+                document.getElementById('confirm-message').innerText = msg;
+                const modal = document.getElementById('confirm-modal');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                
+                window.closeConfirm = (isConfirmed) => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                    resolve(isConfirmed);
+                };
+            });
+        };
+
+        const switchScreen = (screenId) => {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        };
+
+        // الهيكل الدراسي الكامل
+        const defaultProgramData = [
+            {
+                id: "part_middle", title: "الجزء الأول: التعليم المتوسط", color: "blue",
+                years: [
+                    {
+                        id: "m_y1", title: "السنة الأولى متوسط",
+                        branches: [
+                            { id: "m1_b1", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [], exams: [] } },
+                            { id: "m1_b2", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [], exams: [] } },
+                            { id: "m1_b3", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [], exams: [] } }
+                        ]
+                    },
+                    {
+                        id: "m_y2", title: "السنة الثانية متوسط",
+                        branches: [
+                            { id: "m2_b1", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [], exams: [] } },
+                            { id: "m2_b2", title: "الظواهر الميكانيكية", categories: { lessons: [], exercises: [], exams: [] } },
+                            { id: "m2_b3", title: "الظواهر الكهرومغناطيسية", categories: { lessons: [], exercises: [], exams: [] } }
+                        ]
+                    },
+                    {
+                        id: "m_y3", title: "السنة الثالثة متوسط",
+                        branches: [
+                            { id: "m3_b1", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [], exams: [] } },
+                            { id: "m3_b2", title: "الطاقة", categories: { lessons: [], exercises: [], exams: [] } },
+                            { id: "m3_b3", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [], exams: [] } },
+                            { id: "m3_b4", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [], exams: [] } }
+                        ]
+                    },
+                    {
+                        id: "m_y4", title: "السنة الرابعة متوسط",
+                        branches: [
+                            { id: "m4_b1", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [], exams: [] } },
+                            { id: "m4_b2", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [], exams: [] } },
+                            { id: "m4_b3", title: "الظواهر الميكانيكية", categories: { lessons: [], exercises: [], exams: [] } },
+                            { id: "m4_b4", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [], exams: [] } }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: "part_high", title: "الجزء الثاني: التعليم الثانوي", color: "emerald",
+                years: [
+                    { id: "h_y1", title: "السنة أولى ثانوي", branches: [ { id: "h1_b1", title: "الدروس والوحدات", categories: { lessons: [], exercises: [], exams: [] } } ] },
+                    { id: "h_y2", title: "السنة الثانية ثانوي", branches: [ { id: "h2_b1", title: "الدروس والوحدات", categories: { lessons: [], exercises: [], exams: [] } } ] },
+                    { id: "h_y3", title: "السنة الثالثة ثانوي", branches: [ { id: "h3_b1", title: "الدروس والوحدات", categories: { lessons: [], exercises: [], exams: [] } } ] }
+                ]
+            }
+        ];
+
+        // الاتصال الأولي الصامت بـ Firebase
+        const initAuth = async () => {
+            try {
+                await signInAnonymously(auth);
+            } catch (error) {
+                console.error("Auth Error:", error);
+                showToast("خطأ: يرجى التأكد من تفعيل (Anonymous) في إعدادات Firebase Authentication، وإضافة رابط موقعك في النطاقات المسموح بها.", "error");
+            }
+        };
+        initAuth();
+
+        // مراقبة حالة الاتصال وتجهيز قاعدة البيانات
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                isAuthReady = true;
+                try {
+                    const progDoc = await getDoc(doc(programCol, 'main'));
+                    if (!progDoc.exists()) await setDoc(doc(programCol, 'main'), { sections: defaultProgramData });
+                    
+                    const adminDoc = await getDoc(doc(usersCol, 'admin'));
+                    if (!adminDoc.exists()) await setDoc(doc(usersCol, 'admin'), { password: 'admin', role: 'admin', approved: true, progress: [] });
+                } catch(e) {
+                    console.error("Firestore Error:", e);
+                    showToast("خطأ: لا يمكن القراءة من قاعدة البيانات. يرجى التأكد من تعديل قواعد Firestore (Rules) إلى if true;", "error");
+                }
+            }
+        });
+
+        // واجهة تسجيل الدخول
+        window.isRegistering = false;
+        window.toggleAuthMode = () => {
+            window.isRegistering = !window.isRegistering;
+            document.getElementById('auth-title').innerText = window.isRegistering ? "إنشاء حساب جديد" : "دخول المنصة";
+            document.getElementById('auth-action-btn').innerText = window.isRegistering ? "إرسال الطلب" : "تسجيل الدخول";
+            document.getElementById('switch-mode-text').innerText = window.isRegistering ? "لديك حساب؟ سجل دخولك" : "إنشاء حساب تلميذ جديد";
+        };
+
+        window.handleAuth = async () => {
+            if (!isAuthReady) return showToast("يتم الاتصال بالسحابة... يرجى الانتظار", "error");
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            if (!username || !password) return showToast("يرجى ملء جميع الحقول", "error");
+
+            const btn = document.getElementById('auth-action-btn');
+            const originalText = btn.innerText;
+            btn.disabled = true; btn.innerText = "جاري التحقق...";
+
+            try {
+                const userRef = doc(usersCol, username);
+                const userSnap = await getDoc(userRef);
+
+                if (window.isRegistering) {
+                    if (userSnap.exists()) {
+                        showToast("اسم المستخدم هذا موجود مسبقاً", "error");
+                    } else {
+                        await setDoc(userRef, { password, role: 'student', approved: false, progress: [] });
+                        showToast("تم إرسال الطلب بنجاح");
+                        window.toggleAuthMode();
+                        document.getElementById('username').value = '';
+                        document.getElementById('password').value = '';
+                    }
+                } else {
+                    if (!userSnap.exists() || userSnap.data().password !== password) {
+                        showToast("بيانات الدخول غير صحيحة", "error");
+                    } else {
+                        window.currentUserRecord = { username, ...userSnap.data() };
+                        if (window.currentUserRecord.role === 'admin') {
+                            switchScreen('admin-screen');
+                            startAdminListeners();
+                        } else if (!window.currentUserRecord.approved) {
+                            switchScreen('pending-screen');
+                        } else {
+                            document.getElementById('display-username').innerText = username;
+                            switchScreen('app-screen');
+                            startStudentListeners();
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+                showToast("فشل الاتصال. تحقق من إعدادات الحماية في Firebase", "error");
+            }
+            btn.disabled = false; btn.innerText = originalText;
+        };
+
+        window.logout = () => {
+            window.currentUserRecord = null;
+            document.getElementById('password').value = '';
+            if(unsubscribeProgram) unsubscribeProgram();
+            if(unsubscribeUsers) unsubscribeUsers();
+            switchScreen('auth-screen');
+        };
+
+        // مستمعات الأحداث الحية (Real-time)
+        const startAdminListeners = () => {
+            unsubscribeUsers = onSnapshot(usersCol, (snapshot) => {
+                const tbody = document.getElementById('students-table-body');
+                tbody.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if(data.role === 'admin') return;
+                    tbody.innerHTML += `
+                        <tr class="border-b">
+                            <td class="p-3 font-semibold">${doc.id}</td>
+                            <td class="p-3">
+                                <span class="px-2 py-1 rounded text-xs font-bold ${data.approved ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
+                                    ${data.approved ? 'مفعل' : 'انتظار'}
+                                </span>
+                            </td>
+                            <td class="p-3 text-left space-x-1 space-x-reverse">
+                                <button onclick="toggleUserStatus('${doc.id}', ${!data.approved})" class="bg-gray-100 px-3 py-1.5 rounded-lg text-xs font-bold">${data.approved ? 'تعطيل' : 'تفعيل'}</button>
+                                <button onclick="deleteUserAccount('${doc.id}')" class="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold">حذف</button>
+                            </td>
+                        </tr>`;
+                });
+            });
+
+            unsubscribeProgram = onSnapshot(doc(programCol, 'main'), (doc) => {
+                if(doc.exists()) renderProgramUI(doc.data().sections, 'admin-program-view', true);
+            });
+        };
+
+        const startStudentListeners = () => {
+            unsubscribeProgram = onSnapshot(doc(programCol, 'main'), (docSnap) => {
+                if(docSnap.exists()) renderProgramUI(docSnap.data().sections, 'student-program-view', false);
+            });
+            
+            onSnapshot(doc(usersCol, window.currentUserRecord.username), (docSnap) => {
+                if(docSnap.exists()) {
+                    window.currentUserRecord.progress = docSnap.data().progress || [];
+                    updateProgressUI(window.currentSections || []);
+                    renderProgramUI(window.currentSections || [], 'student-program-view', false);
+                }
+            });
+        };
+
+        // وظائف المسؤول 
+        window.toggleUserStatus = async (username, status) => { 
+            await updateDoc(doc(usersCol, username), { approved: status }); 
+            showToast(status ? "تم تفعيل الحساب" : "تم التعطيل");
+        };
+        
+        window.deleteUserAccount = async (username) => { 
+            if(await confirmAction(`سيتم حذف حساب ${username} نهائياً.`)) {
+                await deleteDoc(doc(usersCol, username)); 
+                showToast("تم الحذف بنجاح");
+            }
+        };
+
+        window.adminAddLink = async (pIdx, yIdx, bIdx, cat, branchId) => {
+            let title = document.getElementById(`title_${branchId}_${cat}`).value.trim();
+            let url = document.getElementById(`url_${branchId}_${cat}`).value.trim();
+            if(!title || !url) return showToast("أدخل العنوان والرابط", "error");
+            if(!url.startsWith('http')) url = 'https://' + url;
+
+            const docRef = doc(programCol, 'main');
+            const docSnap = await getDoc(docRef);
+            let sections = docSnap.data().sections;
+            sections[pIdx].years[yIdx].branches[bIdx].categories[cat].push({title, url});
+            
+            await updateDoc(docRef, { sections });
+            showToast("تمت إضافة الرابط بنجاح");
+        };
+
+        window.adminDeleteLink = async (pIdx, yIdx, bIdx, cat, lIdx) => {
+            if(await confirmAction("هل أنت متأكد من مسح الرابط؟")) {
+                const docRef = doc(programCol, 'main');
+                const docSnap = await getDoc(docRef);
+                let sections = docSnap.data().sections;
+                sections[pIdx].years[yIdx].branches[bIdx].categories[cat].splice(lIdx, 1);
+                await updateDoc(docRef, { sections });
+                showToast("تم مسح الرابط");
+            }
+        };
+
+        // وظائف التلميذ 
+        window.studentToggleComplete = async (branchId) => {
+            let progress = [...(window.currentUserRecord.progress || [])];
+            const idx = progress.indexOf(branchId);
+            if (idx > -1) progress.splice(idx, 1); else progress.push(branchId);
+            await updateDoc(doc(usersCol, window.currentUserRecord.username), { progress });
+        };
+
+        const updateProgressUI = (sections) => {
+            let progress = window.currentUserRecord.progress || [];
+            let total = 0; sections.forEach(p => p.years.forEach(y => total += y.branches.length));
+            let percentage = total === 0 ? 0 : Math.round((progress.length / total) * 100);
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+            document.getElementById('progress-text').innerText = `${percentage}%`;
+        };
+
+        // بناء الواجهة (HTML Generator)
+        const catTitles = { lessons: 'الدروس', exercises: 'التمارين', exams: 'الفروض والاختبارات' };
+        
+        const renderProgramUI = (sections, containerId, isAdmin) => {
+            window.currentSections = sections;
+            if(!isAdmin) updateProgressUI(sections);
+            
+            let html = '';
+            let progress = (!isAdmin && window.currentUserRecord) ? (window.currentUserRecord.progress || []) : [];
+
+            sections.forEach((part, pIdx) => {
+                let pColor = part.color === 'blue' ? 'blue' : 'emerald';
+                html += `
+                <details class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-4">
+                    <summary class="bg-${pColor}-600 text-white p-4 font-bold text-lg hover:bg-${pColor}-700 transition">
+                        ${part.title}
+                    </summary>
+                    <div class="p-3 md:p-5 space-y-4 bg-gray-50/50">`;
+
+                part.years.forEach((year, yIdx) => {
+                    html += `
+                    <details class="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm">
+                        <summary class="text-${pColor}-700 p-4 font-semibold hover:bg-gray-50 transition border-b border-gray-50">
+                            ${year.title}
+                        </summary>
+                        <div class="p-4 space-y-4">`;
+
+                    year.branches.forEach((branch, bIdx) => {
+                        let isComp = progress.includes(branch.id);
+                        let cardCls = isComp ? 'branch-completed' : 'bg-white border-gray-200';
+                        let btnCls = isComp ? 'active' : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-200';
+
+                        html += `
+                        <div class="border rounded-xl p-4 md:p-5 shadow-sm transition-all duration-300 ${cardCls}">
+                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 border-b pb-3 gap-3">
+                                <h4 class="font-bold text-gray-800 text-lg">${branch.title}</h4>
+                                ${!isAdmin ? `
+                                <button onclick="studentToggleComplete('${branch.id}')" class="w-full md:w-auto border px-5 py-2 rounded-lg text-sm font-bold transition ${btnCls}">
+                                    ${isComp ? '✔ مكتمل' : 'تحديد كمكتمل'}
+                                </button>` : ''}
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">`;
+
+                        ['lessons', 'exercises', 'exams'].forEach(cat => {
+                            let links = branch.categories[cat] || [];
+                            let linksList = links.length ? links.map((lnk, lIdx) => `
+                                <li class="flex justify-between items-center bg-white p-2.5 rounded-lg border border-gray-100 shadow-sm text-sm mb-2 group">
+                                    <a href="${lnk.url}" target="_blank" class="text-blue-600 font-semibold truncate w-3/4 hover:underline">
+                                        • ${lnk.title}
+                                    </a>
+                                    ${isAdmin ? `<button onclick="adminDeleteLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" class="text-red-500 hover:bg-red-50 px-2 py-1 rounded text-xs transition">حذف</button>` : ''}
+                                </li>
+                            `).join('') : `<li class="text-xs text-gray-400 text-center p-2">لا يوجد محتوى.</li>`;
+
+                            html += `
+                            <div class="bg-gray-50/80 p-3 rounded-xl border border-gray-100">
+                                <h5 class="font-bold text-gray-700 text-sm mb-3 border-b pb-1 inline-block">${catTitles[cat]}</h5>
+                                <ul class="mb-2">${linksList}</ul>
+                                
+                                ${isAdmin ? `
+                                <div class="mt-3 pt-3 border-t border-gray-200 space-y-2">
+                                    <input type="text" id="title_${branch.id}_${cat}" class="w-full text-xs p-2.5 border rounded-lg outline-none" placeholder="عنوان الدرس...">
+                                    <input type="text" id="url_${branch.id}_${cat}" class="w-full text-xs p-2.5 border rounded-lg outline-none" placeholder="الرابط (http...)">
+                                    <button onclick="adminAddLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', '${branch.id}')" class="w-full bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold py-2 rounded-lg transition">إضافة الرابط</button>
+                                </div>` : ''}
+                            </div>`;
+                        });
+                        html += `</div></div>`; 
+                    });
+                    html += `</div></details>`; 
+                });
+                html += `</div></details>`; 
+            });
+            document.getElementById(containerId).innerHTML = html;
+        };
+    </script>
+</body>
+</html>
