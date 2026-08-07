@@ -17,8 +17,7 @@
     <style>
         body { 
             font-family: 'Cairo', sans-serif; 
-            /* عودة صورة الشعار كخلفية مع تأثير زجاجي مشرق */
-            background: linear-gradient(rgba(248, 250, 252, 0.9), rgba(226, 232, 240, 0.95)), url('icon.png');
+            background: linear-gradient(rgba(248, 250, 252, 0.93), rgba(226, 232, 240, 0.95)), url('icon.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -27,7 +26,6 @@
             -webkit-tap-highlight-color: transparent; 
         }
         
-        /* تأثيرات حركية تفاعلية */
         .screen { display: none; }
         .screen.active { display: block; animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes slideUpFade { 
@@ -55,7 +53,6 @@
         ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #64748b; }
         
-        /* تنسيقات الدردشة */
         .chat-bubble { max-width: 85%; padding: 12px 16px; border-radius: 20px; margin-bottom: 8px; position: relative; word-wrap: break-word; line-height: 1.5; animation: popIn 0.3s ease;}
         @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
         .chat-mine { background-color: #eff6ff; border: 1px solid #bfdbfe; margin-right: auto; border-bottom-right-radius: 4px; color: #1e3a8a;}
@@ -63,35 +60,24 @@
         .floating-chat-btn { position: fixed; bottom: 24px; right: 24px; z-index: 40; box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.5); animation: float 3s ease-in-out infinite; }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
         
-        /* إحصائيات المستويات */
         .stats-dropdown {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            margin-top: 0.5rem;
-            width: 280px;
-            background: white;
-            border-radius: 1rem;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            border: 1px solid #e2e8f0;
-            z-index: 50;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
+            position: absolute; top: 100%; left: 0; margin-top: 0.5rem; width: 280px; background: white;
+            border-radius: 1rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border: 1px solid #e2e8f0; z-index: 50; opacity: 0; visibility: hidden; transform: translateY(-10px);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .stats-container:hover .stats-dropdown {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
+        .stats-container:hover .stats-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+        
+        /* تأثيرات رسالة التحفيز */
+        .quote-box { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1px solid #bbf7d0; animation: fadeInDown 0.6s ease-out; }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="text-slate-800 antialiased p-3 md:p-6 pb-24 selection:bg-blue-200 selection:text-blue-900 relative">
 
     <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[70] flex flex-col gap-2 w-[90%] md:w-auto"></div>
 
-    <!-- نافذة الإعدادات (تغيير كلمة المرور) -->
+    <!-- نافذة الإعدادات -->
     <div id="settings-modal" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-[60] backdrop-blur-md p-4 transition-opacity duration-300">
         <div class="bg-white/95 p-8 rounded-3xl max-w-sm w-full shadow-2xl border border-white/50 transform transition-transform duration-300 scale-95" id="settings-content">
             <div class="flex justify-between items-center mb-6 border-b pb-3 border-slate-100">
@@ -112,10 +98,9 @@
         </div>
     </div>
 
-    <!-- نافذة المحادثة النصية والروابط -->
+    <!-- نافذة المحادثة -->
     <div id="chat-modal" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-50 backdrop-blur-md p-2 md:p-4 transition-opacity duration-300">
         <div class="bg-white/95 w-full max-w-xl h-[90vh] rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden border border-white/50">
-            <!-- رأس الدردشة -->
             <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-5 flex justify-between items-center shadow-md z-10 relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
                 <div class="flex items-center gap-4 relative z-10">
@@ -128,12 +113,10 @@
                 <button onclick="closeChat()" class="bg-black/10 hover:bg-black/20 rounded-2xl w-10 h-10 flex items-center justify-center transition text-xl relative z-10 backdrop-blur-sm border border-white/10">✖</button>
             </div>
             
-            <!-- مساحة الرسائل -->
             <div id="chat-messages" class="flex-1 overflow-y-auto p-4 md:p-6 flex flex-col gap-3 bg-slate-50/80 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] scroll-smooth">
                 <!-- الرسائل -->
             </div>
 
-            <!-- منطقة الكتابة والإرسال -->
             <div class="bg-white p-3 md:p-5 border-t border-slate-100 flex gap-3 items-end shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.05)]">
                 <div class="flex-1 bg-slate-100 rounded-2xl border-2 border-slate-100 p-1 flex flex-col focus-within:border-blue-400 focus-within:bg-white transition-all shadow-inner">
                     <textarea id="chat-input" rows="1" class="w-full bg-transparent px-4 py-3 outline-none resize-none font-bold text-slate-700 placeholder-slate-400 leading-relaxed" placeholder="اكتب رسالة أو الصق رابطاً هنا..."></textarea>
@@ -177,7 +160,6 @@
                     <input type="text" id="username" class="w-full pl-5 pr-12 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50/50 outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all font-bold text-slate-700 text-lg placeholder-slate-400" placeholder="اسم المستخدم">
                 </div>
                 
-                <!-- حقول التسجيل الجديدة (اسم الولي ورقم الهاتف) - مخفية في وضع الدخول -->
                 <div class="relative group hidden" id="parent-name-container">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors">👨‍👦</div>
                     <input type="text" id="parent-name" class="w-full pl-5 pr-12 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50/50 outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all font-bold text-slate-700 text-lg placeholder-slate-400" placeholder="اسم ولي الأمر">
@@ -237,20 +219,15 @@
                 </div>
                 <div class="flex items-center gap-3 w-full md:w-auto justify-end">
                     
-                    <!-- إحصائيات المستويات التفاعلية -->
                     <div class="stats-container relative">
                         <div class="bg-blue-50 border border-blue-100 text-blue-700 px-5 py-3 rounded-2xl font-black text-sm flex items-center gap-2 cursor-help transition hover:bg-blue-100 shadow-sm">
                             <span class="text-lg">👥</span> 
                             <span>التلاميذ:</span> 
                             <span id="total-students-count" class="text-xl bg-white px-2 rounded-md shadow-sm">0</span>
                         </div>
-                        
-                        <!-- القائمة المنسدلة للإحصائيات -->
                         <div class="stats-dropdown p-4">
                             <h4 class="font-black text-slate-800 mb-3 border-b pb-2 flex items-center gap-2">📊 تفاصيل المستويات</h4>
-                            <ul id="level-stats-list" class="space-y-2 text-sm font-bold text-slate-600">
-                                <!-- سيتم حقن الإحصائيات هنا برمجياً -->
-                            </ul>
+                            <ul id="level-stats-list" class="space-y-2 text-sm font-bold text-slate-600"></ul>
                         </div>
                     </div>
 
@@ -269,7 +246,6 @@
                         </h3>
                     </div>
                     <div class="overflow-x-auto rounded-3xl border border-slate-100 shadow-inner bg-slate-50/50">
-                        <!-- تم توسيع الحد الأدنى لعرض الجدول لاستيعاب البيانات الجديدة -->
                         <table class="w-full text-right border-collapse whitespace-nowrap min-w-[1050px]">
                             <thead class="bg-slate-100 text-slate-600 text-sm font-black border-b border-slate-200">
                                 <tr>
@@ -302,7 +278,7 @@
 
         <!-- 4. شاشة التلميذ -->
         <div id="app-screen" class="screen">
-            <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 backdrop-blur-xl p-4 md:p-6 rounded-[2rem] shadow-lg border border-white/50 mb-8 gap-5 sticky top-4 z-40">
+            <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 backdrop-blur-xl p-4 md:p-6 rounded-[2rem] shadow-lg border border-white/50 mb-6 gap-5 sticky top-4 z-40">
                 <div class="flex items-center gap-4 w-full md:w-auto">
                     <div class="w-16 h-16 rounded-2xl shadow-lg overflow-hidden bg-white p-1 border border-slate-100 transform transition hover:scale-105"><img src="icon.png" class="w-full h-full object-cover rounded-xl"></div>
                     <div>
@@ -318,6 +294,16 @@
                     <button onclick="logout()" class="bg-red-50 text-red-600 px-5 py-3 rounded-2xl font-black hover:bg-red-100 transition btn-modern border border-red-100 shadow-sm flex items-center gap-2">خروج <span class="hidden md:inline">🚪</span></button>
                 </div>
             </header>
+            
+            <!-- رسالة التحفيز اليومية -->
+            <div class="mb-8 quote-box p-4 md:p-5 rounded-2xl shadow-sm flex items-center gap-4 relative overflow-hidden">
+                <div class="absolute -right-4 -top-4 text-emerald-200 opacity-50 text-6xl">💡</div>
+                <div class="text-4xl relative z-10 hidden md:block">💡</div>
+                <div class="relative z-10">
+                    <p class="text-xs font-black text-emerald-600 mb-1">جرعة تحفيزية:</p>
+                    <p id="motivational-quote-text" class="text-sm md:text-base font-bold text-emerald-900 leading-relaxed"></p>
+                </div>
+            </div>
 
             <div class="bg-white/95 backdrop-blur-xl p-6 md:p-8 rounded-[2.5rem] shadow-lg border border-white/50 mb-8 relative overflow-hidden interactive-card group">
                 <div class="absolute -right-10 -top-10 w-40 h-40 bg-gradient-to-br from-emerald-400 to-teal-400 rounded-full opacity-10 blur-2xl group-hover:opacity-20 transition duration-500"></div>
@@ -337,9 +323,10 @@
             
             <div id="student-program-view" class="space-y-6 pb-20"></div>
 
-            <!-- زر المحادثة العائم للتلميذ -->
-            <button onclick="openChat('admin')" class="floating-chat-btn bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white w-16 h-16 rounded-full flex items-center justify-center text-3xl transition btn-modern border-4 border-white/50 backdrop-blur-sm">
+            <!-- زر المحادثة العائم للتلميذ مع إشعار البادج -->
+            <button onclick="openChat('admin')" class="floating-chat-btn bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white w-16 h-16 rounded-full flex items-center justify-center text-3xl transition btn-modern border-4 border-white/50 backdrop-blur-sm relative">
                 💬
+                <span id="student-chat-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[11px] font-black w-6 h-6 rounded-full flex items-center justify-center border-2 border-white shadow-sm hidden animate-bounce">0</span>
             </button>
         </div>
     </div>
@@ -347,7 +334,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, deleteDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // =========================================================================================
         // الصق مفاتيح مشروعك الحقيقية هنا
@@ -376,12 +363,27 @@
         let unsubscribeProgram = null;
         let unsubscribeUsers = null;
         let unsubscribeChat = null;
+        let unsubscribeChatMeta = null;
         window.activeChatUser = null; 
+        
+        window.adminUsersList = [];
+        window.adminChatsData = {};
 
         const levelNames = {
             "m_y1": "الأولى متوسط", "m_y2": "الثانية متوسط", "m_y3": "الثالثة متوسط", "m_y4": "الرابعة متوسط",
             "h_y1": "أولى ثانوي", "h_y2": "الثانية ثانوي", "h_y3": "الثالثة ثانوي"
         };
+
+        const motivationalQuotes = [
+            "النجاح يجذب النجاح، استمر في محاولاتك ولا تتوقف! 🌟",
+            "الفيزياء ليست مجرد معادلات، بل هي لغة الكون. استمتع باكتشافها! 🔭",
+            "كل جهد تبذله اليوم، هو خطوة ثابتة نحو مستقبلك المشرق. 🚀",
+            "لا تستسلم أبداً، فالأشياء العظيمة تأخذ بعض الوقت لتتحقق. ⏳",
+            "أنت قادر على تحقيق المستحيل، ثق بقدراتك وانطلق! 💪",
+            "التعلم هو الكنز الوحيد الذي سيرافقك أينما ذهبت. 📚",
+            "طريق الألف ميل يبدأ بخطوة واحدة، وأنت الآن في المسار الصحيح. 🚶‍♂️",
+            "المحاولة فوز حتى وإن لم تصل، فكيف بك وأنت تجتهد للوصول! 🏆"
+        ];
 
         window.showToast = (msg, type = 'success') => {
             const toast = document.createElement('div');
@@ -489,7 +491,6 @@
                     if (userSnap.exists()) {
                         showToast("اسم المستخدم مستخدم مسبقاً، اختر اسماً آخر", "error");
                     } else {
-                        // إضافة بيانات الولي لقاعدة البيانات
                         await setDoc(userRef, { 
                             password: password, 
                             role: 'student', 
@@ -519,6 +520,11 @@
                         } else {
                             document.getElementById('display-username').innerText = username;
                             document.getElementById('student-level-badge').innerText = levelNames[window.currentUserRecord.level];
+                            
+                            // اختيار مقولة تحفيزية عشوائية
+                            const randomQuote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
+                            document.getElementById('motivational-quote-text').innerText = randomQuote;
+                            
                             switchScreen('app-screen');
                             startStudentListeners();
                         }
@@ -534,52 +540,35 @@
             if(unsubscribeProgram) unsubscribeProgram();
             if(unsubscribeUsers) unsubscribeUsers();
             if(unsubscribeChat) unsubscribeChat();
+            if(unsubscribeChatMeta) unsubscribeChatMeta();
             switchScreen('auth-screen');
         };
 
-        // --- نظام الإعدادات (تغيير كلمة المرور) ---
         window.openSettings = () => {
             document.getElementById('settings-username').value = window.currentUserRecord.username;
             document.getElementById('settings-new-password').value = window.currentUserRecord.password;
-            
             const modal = document.getElementById('settings-modal');
             const content = document.getElementById('settings-content');
-            
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            
-            // تفعيل الحركة
-            setTimeout(() => {
-                content.classList.remove('scale-95');
-                content.classList.add('scale-100');
-            }, 10);
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+            setTimeout(() => { content.classList.remove('scale-95'); content.classList.add('scale-100'); }, 10);
         }
         
         window.closeSettings = () => {
             const modal = document.getElementById('settings-modal');
             const content = document.getElementById('settings-content');
-            
-            content.classList.remove('scale-100');
-            content.classList.add('scale-95');
-            
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-            }, 300);
+            content.classList.remove('scale-100'); content.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
         }
 
         window.saveNewPassword = async () => {
             const newPass = document.getElementById('settings-new-password').value.trim();
             if(!newPass) return showToast("كلمة المرور لا يمكن أن تكون فارغة", "error");
-            
             try {
                 await updateDoc(doc(usersCol, window.currentUserRecord.username), { password: newPass });
                 window.currentUserRecord.password = newPass;
                 showToast("تم تغيير كلمة المرور بنجاح 🔒");
                 closeSettings();
-            } catch(e) {
-                showToast("حدث خطأ أثناء تغيير كلمة المرور", "error");
-            }
+            } catch(e) { showToast("حدث خطأ أثناء تغيير كلمة المرور", "error"); }
         }
 
         const calculateProgress = (levelId, progressArray, sections) => {
@@ -591,100 +580,103 @@
             return p > 100 ? 100 : p;
         };
 
+        const renderAdminTable = () => {
+            const tbody = document.getElementById('students-table-body');
+            tbody.innerHTML = '';
+            
+            let studentCount = 0;
+            let levelStats = {}; 
+
+            window.adminUsersList.forEach(d => {
+                const data = d.data;
+                studentCount++;
+                if(data.level) levelStats[data.level] = (levelStats[data.level] || 0) + 1;
+                
+                let levelDisplay = data.level ? (levelNames[data.level] || data.level) : "غير محدد";
+                let progPercent = calculateProgress(data.level, data.progress || [], window.currentSections);
+                
+                let parentInfo = data.parentName ? 
+                    `<div class="font-bold text-slate-700">${data.parentName}</div>
+                     <div class="text-xs text-slate-500 mt-1 flex items-center gap-1 font-bold">
+                        <span class="opacity-50 text-base">📱</span> <span dir="ltr">${data.phoneNumber || 'لا يوجد'}</span>
+                     </div>` 
+                    : '<div class="text-xs text-slate-400 font-bold">غير متوفر</div>';
+
+                // إشعار الدردشة للمدير
+                let unreadCount = window.adminChatsData[d.id]?.unreadAdmin || 0;
+                let chatBadge = unreadCount > 0 ? `<span class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full animate-bounce shadow-md border-2 border-white">${unreadCount}</span>` : '';
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-blue-50/30 transition duration-200 border-b border-slate-100 group">
+                        <td class="p-5">
+                            <div class="font-black text-slate-800 text-lg group-hover:text-blue-600 transition">${d.id}</div>
+                            <div class="text-xs text-slate-500 font-bold mt-1.5 flex items-center gap-1">
+                                <span class="opacity-50">🔑</span> 
+                                <span class="text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100/50">${data.password}</span>
+                            </div>
+                        </td>
+                        <td class="p-5 bg-slate-50/30">${parentInfo}</td>
+                        <td class="p-5 text-sm font-black text-slate-500 bg-slate-50/50">${levelDisplay}</td>
+                        <td class="p-5">
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm font-black ${progPercent > 50 ? 'text-emerald-500' : 'text-amber-500'} w-10">${progPercent}%</span>
+                                <div class="flex-1 h-2.5 bg-slate-100 rounded-full overflow-hidden shadow-inner"><div class="h-full ${progPercent > 50 ? 'bg-emerald-400' : 'bg-amber-400'} transition-all duration-1000" style="width:${progPercent}%"></div></div>
+                            </div>
+                        </td>
+                        <td class="p-5 bg-slate-50/50">
+                            <span class="px-3 py-1.5 rounded-lg text-xs font-black shadow-sm ${data.approved ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : 'bg-amber-100 text-amber-700 border border-amber-200'}">
+                                ${data.approved ? 'مفعل' : 'قيد الانتظار'}
+                            </span>
+                        </td>
+                        <td class="p-5 text-left rounded-tl-3xl">
+                            <div class="flex gap-2 justify-end flex-wrap">
+                                <button onclick="openChat('${d.id}')" class="relative bg-white text-blue-600 px-4 py-2.5 rounded-xl text-xs font-black hover:bg-blue-50 hover:text-blue-700 transition border border-slate-200 shadow-sm btn-modern">مراسلة 💬 ${chatBadge}</button>
+                                <button onclick="toggleUserStatus('${d.id}', ${!data.approved})" class="${data.approved ? 'bg-slate-100 text-slate-600 hover:bg-slate-200 border-slate-200' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border-emerald-200'} px-4 py-2.5 rounded-xl text-xs font-black transition border shadow-sm btn-modern">${data.approved ? 'تعطيل' : 'تفعيل ✅'}</button>
+                                <button onclick="deleteUserAccount('${d.id}')" class="bg-white text-red-400 px-3 py-2.5 rounded-xl text-lg font-black hover:bg-red-50 hover:text-red-600 transition border border-slate-200 shadow-sm btn-modern" title="حذف التلميذ">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>`;
+            });
+            
+            document.getElementById('total-students-count').innerText = studentCount;
+            const statsList = document.getElementById('level-stats-list');
+            statsList.innerHTML = '';
+            if(Object.keys(levelStats).length === 0) {
+                statsList.innerHTML = '<li class="text-slate-400 text-center py-2">لا يوجد تلاميذ مسجلين بعد</li>';
+            } else {
+                for (const [levelId, count] of Object.entries(levelStats)) {
+                    statsList.innerHTML += `
+                        <li class="flex justify-between items-center bg-slate-50 p-2 rounded-lg border border-slate-100">
+                            <span>${levelNames[levelId]}</span>
+                            <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-md font-black">${count}</span>
+                        </li>`;
+                }
+            }
+        };
+
         const startAdminListeners = () => {
             unsubscribeProgram = onSnapshot(doc(programCol, 'main'), (docSnap) => {
                 if(docSnap.exists()) {
                     window.currentSections = docSnap.data().sections;
                     renderProgramUI(window.currentSections, 'admin-program-view', true);
-                    fetchUsersForAdmin(); 
+                    renderAdminTable(); 
                 }
             });
-        };
 
-        const fetchUsersForAdmin = () => {
             if(unsubscribeUsers) unsubscribeUsers();
             unsubscribeUsers = onSnapshot(usersCol, (snapshot) => {
-                const tbody = document.getElementById('students-table-body');
-                tbody.innerHTML = '';
-                
-                let studentCount = 0;
-                let levelStats = {}; 
-
-                snapshot.forEach(d => {
-                    const data = d.data();
-                    if(data.role === 'admin') return;
-                    
-                    studentCount++;
-                    
-                    if(data.level) {
-                        levelStats[data.level] = (levelStats[data.level] || 0) + 1;
-                    }
-                    
-                    let levelDisplay = data.level ? (levelNames[data.level] || data.level) : "غير محدد";
-                    let progPercent = calculateProgress(data.level, data.progress || [], window.currentSections);
-                    
-                    // تنسيق معلومات الولي
-                    let parentInfo = data.parentName ? 
-                        `<div class="font-bold text-slate-700">${data.parentName}</div>
-                         <div class="text-xs text-slate-500 mt-1 flex items-center gap-1 font-bold">
-                            <span class="opacity-50 text-base">📱</span> <span dir="ltr">${data.phoneNumber || 'لا يوجد'}</span>
-                         </div>` 
-                        : '<div class="text-xs text-slate-400 font-bold">غير متوفر (حساب قديم)</div>';
-
-                    tbody.innerHTML += `
-                        <tr class="hover:bg-blue-50/30 transition duration-200 border-b border-slate-100 group">
-                            <td class="p-5">
-                                <div class="font-black text-slate-800 text-lg group-hover:text-blue-600 transition">${d.id}</div>
-                                <div class="text-xs text-slate-500 font-bold mt-1.5 flex items-center gap-1">
-                                    <span class="opacity-50">🔑</span> 
-                                    <span class="text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100/50">${data.password}</span>
-                                </div>
-                            </td>
-                            <td class="p-5 bg-slate-50/30">
-                                ${parentInfo}
-                            </td>
-                            <td class="p-5 text-sm font-black text-slate-500 bg-slate-50/50">${levelDisplay}</td>
-                            <td class="p-5">
-                                <div class="flex items-center gap-3">
-                                    <span class="text-sm font-black ${progPercent > 50 ? 'text-emerald-500' : 'text-amber-500'} w-10">${progPercent}%</span>
-                                    <div class="flex-1 h-2.5 bg-slate-100 rounded-full overflow-hidden shadow-inner"><div class="h-full ${progPercent > 50 ? 'bg-emerald-400' : 'bg-amber-400'} transition-all duration-1000" style="width:${progPercent}%"></div></div>
-                                </div>
-                            </td>
-                            <td class="p-5 bg-slate-50/50">
-                                <span class="px-3 py-1.5 rounded-lg text-xs font-black shadow-sm ${data.approved ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : 'bg-amber-100 text-amber-700 border border-amber-200'}">
-                                    ${data.approved ? 'مفعل' : 'قيد الانتظار'}
-                                </span>
-                            </td>
-                            <td class="p-5 text-left rounded-tl-3xl">
-                                <div class="flex gap-2 justify-end flex-wrap">
-                                    <button onclick="openChat('${d.id}')" class="bg-white text-blue-600 px-4 py-2.5 rounded-xl text-xs font-black hover:bg-blue-50 hover:text-blue-700 transition border border-slate-200 shadow-sm btn-modern">مراسلة 💬</button>
-                                    <button onclick="toggleUserStatus('${d.id}', ${!data.approved})" class="${data.approved ? 'bg-slate-100 text-slate-600 hover:bg-slate-200 border-slate-200' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border-emerald-200'} px-4 py-2.5 rounded-xl text-xs font-black transition border shadow-sm btn-modern">${data.approved ? 'تعطيل' : 'تفعيل ✅'}</button>
-                                    <button onclick="deleteUserAccount('${d.id}')" class="bg-white text-red-400 px-3 py-2.5 rounded-xl text-lg font-black hover:bg-red-50 hover:text-red-600 transition border border-slate-200 shadow-sm btn-modern" title="حذف التلميذ">🗑️</button>
-                                </div>
-                            </td>
-                        </tr>`;
-                });
-                
-                // تحديث العداد الإجمالي
-                document.getElementById('total-students-count').innerText = studentCount;
-                
-                // تحديث قائمة إحصائيات المستويات
-                const statsList = document.getElementById('level-stats-list');
-                statsList.innerHTML = '';
-                if(Object.keys(levelStats).length === 0) {
-                    statsList.innerHTML = '<li class="text-slate-400 text-center py-2">لا يوجد تلاميذ مسجلين بعد</li>';
-                } else {
-                    for (const [levelId, count] of Object.entries(levelStats)) {
-                        statsList.innerHTML += `
-                            <li class="flex justify-between items-center bg-slate-50 p-2 rounded-lg border border-slate-100">
-                                <span>${levelNames[levelId]}</span>
-                                <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-md font-black">${count}</span>
-                            </li>
-                        `;
-                    }
-                }
+                window.adminUsersList = [];
+                snapshot.forEach(d => { if(d.data().role !== 'admin') window.adminUsersList.push({id: d.id, data: d.data()}); });
+                renderAdminTable();
             });
-        }
+
+            if(unsubscribeChatMeta) unsubscribeChatMeta();
+            unsubscribeChatMeta = onSnapshot(collection(db, chatsPath), (snapshot) => {
+                window.adminChatsData = {};
+                snapshot.forEach(d => { window.adminChatsData[d.id] = d.data(); });
+                renderAdminTable();
+            });
+        };
 
         const startStudentListeners = () => {
             unsubscribeProgram = onSnapshot(doc(programCol, 'main'), (docSnap) => {
@@ -695,11 +687,23 @@
                 }
             });
             
-            onSnapshot(doc(usersCol, window.currentUserRecord.username), (docSnap) => {
+            if(unsubscribeUsers) unsubscribeUsers();
+            unsubscribeUsers = onSnapshot(doc(usersCol, window.currentUserRecord.username), (docSnap) => {
                 if(docSnap.exists()) {
                     window.currentUserRecord.progress = docSnap.data().progress || [];
                     updateProgressUI(window.currentSections || []);
                     renderProgramUI(window.currentSections || [], 'student-program-view', false);
+                }
+            });
+
+            if(unsubscribeChatMeta) unsubscribeChatMeta();
+            unsubscribeChatMeta = onSnapshot(doc(db, chatsPath, window.currentUserRecord.username), (docSnap) => {
+                const badge = document.getElementById('student-chat-badge');
+                if(docSnap.exists() && docSnap.data().unreadStudent > 0) {
+                    badge.innerText = docSnap.data().unreadStudent;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
                 }
             });
         };
@@ -712,9 +716,9 @@
         };
 
         // --- نظام الدردشة والروابط ---
-        window.openChat = (targetUser) => {
+        window.openChat = async (targetUser) => {
             window.activeChatUser = targetUser; 
-            let displayTarget = window.currentUserRecord.role === 'admin' ? targetUser : "الأستاذ";
+            let displayTarget = window.currentUserRecord.role === 'admin' ? targetUser : "الأستاذ (مدير المنصة)";
             document.getElementById('chat-target-name').innerText = displayTarget;
             
             const modal = document.getElementById('chat-modal');
@@ -723,6 +727,10 @@
             
             let chatRoomId = window.currentUserRecord.role === 'admin' ? targetUser : window.currentUserRecord.username;
             let messagesRef = collection(db, chatsPath, chatRoomId, 'messages');
+            
+            // تصفير العداد عند الفتح
+            const chatDocRef = doc(db, chatsPath, chatRoomId);
+            await setDoc(chatDocRef, { [window.currentUserRecord.role === 'admin' ? 'unreadAdmin' : 'unreadStudent']: 0 }, { merge: true });
 
             if(unsubscribeChat) unsubscribeChat();
             unsubscribeChat = onSnapshot(messagesRef, (snapshot) => {
@@ -755,6 +763,11 @@
                         </div>
                     </div>`;
                 msgBox.scrollTop = msgBox.scrollHeight;
+                
+                // إذا كانت الدردشة مفتوحة وجاءت رسالة جديدة، صفر العداد فورا
+                if (window.activeChatUser) {
+                    setDoc(doc(db, chatsPath, chatRoomId), { [window.currentUserRecord.role === 'admin' ? 'unreadAdmin' : 'unreadStudent']: 0 }, { merge: true });
+                }
             }, e => { console.error("Chat Error", e); });
         };
 
@@ -776,13 +789,20 @@
 
             try {
                 let chatRoomId = window.currentUserRecord.role === 'admin' ? window.activeChatUser : window.currentUserRecord.username;
+                let chatDocRef = doc(db, chatsPath, chatRoomId);
                 let messagesRef = collection(db, chatsPath, chatRoomId, 'messages');
                 
+                // إضافة الرسالة
                 await setDoc(doc(messagesRef, Date.now().toString()), {
                     sender: window.currentUserRecord.role,
                     text: text,
                     timestamp: Date.now()
                 });
+                
+                // تحديث عداد الإشعارات للطرف الآخر
+                await setDoc(chatDocRef, {
+                    [window.currentUserRecord.role === 'admin' ? 'unreadStudent' : 'unreadAdmin']: increment(1)
+                }, { merge: true });
 
                 inputEl.value = '';
                 
