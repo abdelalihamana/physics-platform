@@ -75,6 +75,13 @@
         .theme-lessons { background-color: #f0f9ff; border-color: #bae6fd; }
         .theme-exercises { background-color: #fff7ed; border-color: #fed7aa; }
         .theme-exams { background-color: #faf5ff; border-color: #e9d5ff; }
+
+        /* تأثيرات لوحة الصدارة */
+        .leaderboard-row { transition: all 0.3s ease; }
+        .leaderboard-row:hover { transform: scale(1.02); background-color: #f8fafc; z-index: 10; position: relative; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .rank-1 { background: linear-gradient(to left, #fffbeb, #ffffff); border-right: 4px solid #fbbf24; }
+        .rank-2 { background: linear-gradient(to left, #f1f5f9, #ffffff); border-right: 4px solid #94a3b8; }
+        .rank-3 { background: linear-gradient(to left, #fff7ed, #ffffff); border-right: 4px solid #fb923c; }
     </style>
 </head>
 <body class="text-slate-800 antialiased p-3 md:p-6 pb-24 selection:bg-blue-200 selection:text-blue-900 relative">
@@ -160,7 +167,7 @@
         </div>
     </div>
 
-    <div class="max-w-6xl mx-auto">
+    <div class="max-w-7xl mx-auto">
         
         <!-- 1. شاشة تسجيل الدخول -->
         <div id="auth-screen" class="screen active max-w-md mx-auto mt-8 md:mt-12 bg-white/90 backdrop-blur-xl p-8 md:p-10 rounded-[2.5rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-white/60 relative overflow-hidden interactive-card">
@@ -297,7 +304,7 @@
             </div>
         </div>
 
-        <!-- 4. شاشة التلميذ (وهنا زر العودة للأستاذ) -->
+        <!-- 4. شاشة التلميذ -->
         <div id="app-screen" class="screen">
             <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 backdrop-blur-xl p-4 md:p-6 rounded-[2.5rem] shadow-lg border border-white/50 mb-6 gap-5 sticky top-4 z-40">
                 <div class="flex items-center gap-4 w-full md:w-auto">
@@ -312,7 +319,6 @@
                 </div>
                 <div class="flex items-center gap-3 w-full md:w-auto justify-end flex-wrap">
                     
-                    <!-- زر العودة الخاص بالمدير -->
                     <button id="return-admin-btn" onclick="returnToAdmin()" class="hidden relative bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-3.5 rounded-2xl font-black text-lg hover:from-amber-600 hover:to-orange-600 transition btn-modern shadow-md shadow-amber-500/30 flex items-center gap-2">
                         <span class="hidden sm:inline">العودة للإدارة</span> 🔙
                     </button>
@@ -327,18 +333,32 @@
                 </div>
             </header>
 
-            <div class="bg-white/95 backdrop-blur-xl p-8 md:p-10 rounded-[2.5rem] shadow-lg border border-white/50 mb-8 relative overflow-hidden interactive-card group">
-                <div class="absolute -right-10 -top-10 w-56 h-56 bg-gradient-to-br from-emerald-400 to-teal-400 rounded-full opacity-10 blur-3xl group-hover:opacity-20 transition duration-500"></div>
-                <div class="flex justify-between items-end mb-8 relative z-10">
-                    <h3 class="font-black text-slate-700 text-2xl flex items-center gap-3">
-                        <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-2xl shadow-inner">🚀</div>
-                        مستوى تقدمك الدراسي
-                    </h3>
-                    <span id="progress-text" class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500 tracking-tighter drop-shadow-sm">0%</span>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
+                <!-- بطاقة التقدم الخاصة بالتلميذ -->
+                <div class="lg:col-span-8 bg-white/95 backdrop-blur-xl p-8 md:p-10 rounded-[2.5rem] shadow-lg border border-white/50 relative overflow-hidden interactive-card group h-full">
+                    <div class="absolute -right-10 -top-10 w-56 h-56 bg-gradient-to-br from-emerald-400 to-teal-400 rounded-full opacity-10 blur-3xl group-hover:opacity-20 transition duration-500"></div>
+                    <div class="flex justify-between items-end mb-8 relative z-10">
+                        <h3 class="font-black text-slate-700 text-2xl flex items-center gap-3">
+                            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-2xl shadow-inner">🚀</div>
+                            مستوى تقدمك الدراسي
+                        </h3>
+                        <span id="progress-text" class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500 tracking-tighter drop-shadow-sm">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-8 overflow-hidden shadow-inner p-1 relative z-10">
+                        <div id="progress-bar" class="bg-gradient-to-l from-emerald-400 to-teal-500 h-full rounded-full transition-all duration-1000 w-0 relative shadow-md">
+                            <div class="absolute inset-0 bg-white/20 w-full h-full" style="background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent); background-size: 1.5rem 1.5rem;"></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="w-full bg-slate-100 rounded-full h-8 overflow-hidden shadow-inner p-1 relative z-10">
-                    <div id="progress-bar" class="bg-gradient-to-l from-emerald-400 to-teal-500 h-full rounded-full transition-all duration-1000 w-0 relative shadow-md">
-                        <div class="absolute inset-0 bg-white/20 w-full h-full" style="background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent); background-size: 1.5rem 1.5rem;"></div>
+
+                <!-- لوحة الصدارة (Leaderboard) -->
+                <div class="lg:col-span-4 bg-white/95 backdrop-blur-xl p-6 rounded-[2.5rem] shadow-lg border border-white/50 interactive-card flex flex-col h-full">
+                    <h3 class="font-black text-slate-800 text-xl flex items-center gap-2 mb-4 border-b border-slate-100 pb-3">
+                        <div class="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-xl shadow-inner">🏆</div>
+                        أبطال المستوى 
+                    </h3>
+                    <div class="flex-1 overflow-y-auto pr-2" id="leaderboard-container">
+                        <!-- سيتم حقن ترتيب الأبطال هنا -->
                     </div>
                 </div>
             </div>
@@ -376,7 +396,7 @@
 
         let isAuthReady = false;
         window.currentUserRecord = null;
-        window.originalAdminRecord = null; // لتخزين بيانات الأستاذ عند دخول حساب تلميذ
+        window.originalAdminRecord = null; 
         
         let unsubscribeProgram = null;
         let unsubscribeUsers = null;
@@ -386,6 +406,7 @@
         
         window.adminUsersList = [];
         window.adminChatsData = {};
+        window.allStudentsProgress = []; // قائمة عالمية لترتيب الطلاب
 
         const levelNames = {
             "m_y1": "الأولى متوسط", "m_y2": "الثانية متوسط", "m_y3": "الثالثة متوسط", "m_y4": "الرابعة متوسط",
@@ -555,25 +576,17 @@
             btn.disabled = false; btn.innerText = originalText;
         };
 
-        // --- دالة دخول الأستاذ بحساب التلميذ ---
         window.loginAsStudent = (studentUsername) => {
             const studentObj = window.adminUsersList.find(u => u.id === studentUsername);
             if(!studentObj) return;
 
-            // حفظ بيانات الأستاذ الأصلية قبل التحويل
             window.originalAdminRecord = { ...window.currentUserRecord };
-            
-            // تغيير الهوية إلى هوية التلميذ
             window.currentUserRecord = { username: studentObj.id, ...studentObj.data };
             
-            // تحديث الواجهة
             document.getElementById('display-username').innerText = window.currentUserRecord.username;
             document.getElementById('student-level-badge').innerText = levelNames[window.currentUserRecord.level];
-            
-            // إظهار زر العودة للإدارة
             document.getElementById('return-admin-btn').classList.remove('hidden');
 
-            // إيقاف مستمعات المدير وتشغيل مستمعات التلميذ
             if(unsubscribeUsers) unsubscribeUsers();
             if(unsubscribeChatMeta) unsubscribeChatMeta();
 
@@ -582,18 +595,12 @@
             showToast(`أنت الآن داخل حساب: ${studentUsername}`);
         };
 
-        // --- دالة العودة للوحة الأستاذ ---
         window.returnToAdmin = () => {
             if(!window.originalAdminRecord) return;
-            
-            // استرجاع هوية الأستاذ
             window.currentUserRecord = { ...window.originalAdminRecord };
             window.originalAdminRecord = null;
-            
-            // إخفاء زر العودة
             document.getElementById('return-admin-btn').classList.add('hidden');
 
-            // إيقاف مستمعات التلميذ وتشغيل مستمعات المدير
             if(unsubscribeUsers) unsubscribeUsers();
             if(unsubscribeChatMeta) unsubscribeChatMeta();
 
@@ -652,6 +659,55 @@
             return p > 100 ? 100 : p;
         };
 
+        // --- دالة عرض لوحة الصدارة ---
+        const renderLeaderboard = () => {
+            if(!window.currentUserRecord || window.currentUserRecord.role === 'admin') return;
+            
+            const container = document.getElementById('leaderboard-container');
+            container.innerHTML = '';
+            
+            // فلترة الطلاب من نفس مستوى التلميذ الحالي وترتيبهم حسب التقدم
+            let levelMates = window.allStudentsProgress
+                .filter(s => s.level === window.currentUserRecord.level && s.approved)
+                .sort((a, b) => b.progress - a.progress); // ترتيب تنازلي
+
+            if(levelMates.length === 0) {
+                container.innerHTML = '<div class="text-slate-400 text-center py-4 font-bold">لا يوجد منافسون بعد.. كن أنت المتصدر!</div>';
+                return;
+            }
+
+            let html = '<div class="flex flex-col gap-2 mt-2">';
+            levelMates.forEach((student, index) => {
+                let rank = index + 1;
+                let rankClass = '';
+                let medal = '';
+                
+                if(rank === 1) { rankClass = 'rank-1 font-black'; medal = '🥇'; }
+                else if(rank === 2) { rankClass = 'rank-2 font-black'; medal = '🥈'; }
+                else if(rank === 3) { rankClass = 'rank-3 font-black'; medal = '🥉'; }
+                else { rankClass = 'bg-white font-bold border border-slate-100'; medal = `<span class="text-slate-400 bg-slate-100 rounded-full w-6 h-6 flex items-center justify-center text-xs font-black">${rank}</span>`; }
+                
+                let isMe = student.id === window.currentUserRecord.username;
+                let meClass = isMe ? 'ring-2 ring-blue-500 shadow-md' : '';
+                let nameDisplay = isMe ? 'أنت (بطل المنصة)' : student.id;
+
+                html += `
+                    <div class="leaderboard-row flex items-center justify-between p-3 rounded-2xl ${rankClass} ${meClass}">
+                        <div class="flex items-center gap-3">
+                            <div class="text-xl w-6 text-center">${medal}</div>
+                            <div class="text-slate-700 ${isMe ? 'text-blue-700' : ''}">${nameDisplay}</div>
+                        </div>
+                        <div class="bg-slate-100 text-slate-700 px-3 py-1 rounded-lg text-sm flex items-center gap-1">
+                            <span class="${student.progress > 50 ? 'text-emerald-600' : 'text-amber-500'}">${student.progress}%</span>
+                            <span class="text-xs opacity-50">إنجاز</span>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        };
+
         const renderAdminTable = () => {
             const tbody = document.getElementById('students-table-body');
             tbody.innerHTML = '';
@@ -695,9 +751,7 @@
                         </td>
                         <td class="p-6 text-left rounded-tl-3xl">
                             <div class="flex gap-3 justify-end flex-wrap">
-                                <!-- زر الدخول للحساب الجديد -->
                                 <button onclick="loginAsStudent('${d.id}')" class="bg-indigo-50 text-indigo-700 px-4 py-2.5 rounded-xl text-sm font-black hover:bg-indigo-100 transition border border-indigo-200 shadow-sm btn-modern">دخول للحساب 👁️</button>
-                                
                                 <button onclick="openChat('${d.id}')" class="relative bg-white text-blue-600 px-5 py-3 rounded-xl text-sm font-black hover:bg-blue-50 hover:text-blue-700 transition border-2 border-slate-100 shadow-sm btn-modern">مراسلة 💬 ${chatBadge}</button>
                                 <button onclick="toggleUserStatus('${d.id}', ${!data.approved})" class="${data.approved ? 'bg-slate-50 text-slate-600 hover:bg-slate-100 border-slate-200' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200'} px-5 py-3 rounded-xl text-sm font-black transition border-2 shadow-sm btn-modern">${data.approved ? 'تعطيل' : 'تفعيل ✅'}</button>
                                 <button onclick="deleteUserAccount('${d.id}')" class="bg-white text-red-400 px-4 py-3 rounded-xl text-xl font-black hover:bg-red-50 hover:text-red-600 transition border-2 border-slate-100 shadow-sm btn-modern" title="حذف التلميذ">🗑️</button>
@@ -740,15 +794,32 @@
 
         const startStudentListeners = () => {
             unsubscribeProgram = onSnapshot(doc(programCol, 'main'), (docSnap) => {
-                if(docSnap.exists()) { window.currentSections = docSnap.data().sections; renderProgramUI(window.currentSections, 'student-program-view', false); updateProgressUI(window.currentSections); }
+                if(docSnap.exists()) { 
+                    window.currentSections = docSnap.data().sections; 
+                    renderProgramUI(window.currentSections, 'student-program-view', false); 
+                    updateProgressUI(window.currentSections); 
+                    renderLeaderboard(); // تحديث لوحة الصدارة عند تغيير المنهج
+                }
             });
             
+            // مستمع عام لكل التلاميذ لجمع بيانات لوحة الصدارة
             if(unsubscribeUsers) unsubscribeUsers();
-            unsubscribeUsers = onSnapshot(doc(usersCol, window.currentUserRecord.username), (docSnap) => {
-                if(docSnap.exists()) {
-                    window.currentUserRecord.progress = docSnap.data().progress || [];
-                    updateProgressUI(window.currentSections || []); renderProgramUI(window.currentSections || [], 'student-program-view', false);
-                }
+            unsubscribeUsers = onSnapshot(usersCol, (snapshot) => {
+                window.allStudentsProgress = [];
+                snapshot.forEach(d => {
+                    let data = d.data();
+                    if(data.role !== 'admin') {
+                        let progPercent = calculateProgress(data.level, data.progress || [], window.currentSections);
+                        window.allStudentsProgress.push({ id: d.id, level: data.level, progress: progPercent, approved: data.approved });
+                    }
+                    // تحديث التلميذ الحالي
+                    if(d.id === window.currentUserRecord.username) {
+                        window.currentUserRecord.progress = data.progress || [];
+                        updateProgressUI(window.currentSections || []); 
+                        renderProgramUI(window.currentSections || [], 'student-program-view', false);
+                    }
+                });
+                renderLeaderboard(); // تحديث اللوحة بعد جلب كل تقدم التلاميذ
             });
 
             if(unsubscribeChatMeta) unsubscribeChatMeta();
