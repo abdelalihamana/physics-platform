@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>منصة العلوم الفيزيائية السحابية</title>
-    <!-- مكتبة التصميم Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- خطوط جوجل (Cairo) -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
@@ -30,7 +28,6 @@
 </head>
 <body class="text-gray-800 antialiased p-3 md:p-6 pb-20">
 
-    <!-- نظام الإشعارات والنوافذ المنبثقة -->
     <div id="toast-container" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 w-[90%] md:w-auto"></div>
 
     <div id="confirm-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50">
@@ -55,6 +52,19 @@
             
             <div class="space-y-4">
                 <input type="text" id="username" class="w-full px-4 py-3 rounded-xl border bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500" placeholder="اسم المستخدم (إنجليزي أو أرقام)">
+                
+                <!-- قائمة اختيار المستوى (تظهر فقط عند إنشاء حساب) -->
+                <select id="user-level" class="w-full px-4 py-3 rounded-xl border bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500 hidden">
+                    <option value="" disabled selected>اختر مستواك الدراسي...</option>
+                    <option value="m_y1">السنة الأولى متوسط</option>
+                    <option value="m_y2">السنة الثانية متوسط</option>
+                    <option value="m_y3">السنة الثالثة متوسط</option>
+                    <option value="m_y4">السنة الرابعة متوسط</option>
+                    <option value="h_y1">السنة أولى ثانوي</option>
+                    <option value="h_y2">السنة الثانية ثانوي</option>
+                    <option value="h_y3">السنة الثالثة ثانوي</option>
+                </select>
+
                 <input type="password" id="password" class="w-full px-4 py-3 rounded-xl border bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500" placeholder="كلمة المرور">
                 <button id="auth-action-btn" onclick="handleAuth()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-200 transition">تسجيل الدخول</button>
             </div>
@@ -88,6 +98,7 @@
                         <thead class="bg-gray-50 text-gray-600 text-sm">
                             <tr>
                                 <th class="p-3 border-b">التلميذ</th>
+                                <th class="p-3 border-b">المستوى الدراسي</th>
                                 <th class="p-3 border-b">الحالة</th>
                                 <th class="p-3 border-b text-left">إجراء</th>
                             </tr>
@@ -99,7 +110,7 @@
 
             <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100">
                 <h3 class="text-lg font-bold text-gray-800 mb-2">إدارة البرنامج الدراسي</h3>
-                <p class="text-sm text-gray-500 mb-6">أضف الروابط هنا لتظهر فوراً لدى التلاميذ.</p>
+                <p class="text-sm text-gray-500 mb-6">أضف الروابط هنا لتظهر فوراً لدى التلاميذ (كل تلميذ سيرى مستواه فقط).</p>
                 <div id="admin-program-view" class="space-y-3"></div>
             </div>
         </div>
@@ -115,7 +126,7 @@
 
             <div class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-gray-100 mb-6">
                 <div class="flex justify-between items-end mb-3">
-                    <h3 class="font-bold text-gray-700">تقدمك الدراسي:</h3>
+                    <h3 class="font-bold text-gray-700">تقدمك في مستواك الدراسي:</h3>
                     <span id="progress-text" class="text-2xl font-extrabold text-green-500">0%</span>
                 </div>
                 <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
@@ -147,12 +158,10 @@
         };
         // =========================================================================================
 
-        // التهيئة
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        // مسارات قاعدة البيانات
         const usersCol = collection(db, 'physics_db', 'public', 'profiles');
         const programCol = collection(db, 'physics_db', 'public', 'curriculum');
 
@@ -161,7 +170,11 @@
         let unsubscribeProgram = null;
         let unsubscribeUsers = null;
 
-        // دالة إظهار الإشعارات
+        const levelNames = {
+            "m_y1": "الأولى متوسط", "m_y2": "الثانية متوسط", "m_y3": "الثالثة متوسط", "m_y4": "الرابعة متوسط",
+            "h_y1": "أولى ثانوي", "h_y2": "الثانية ثانوي", "h_y3": "الثالثة ثانوي"
+        };
+
         window.showToast = (msg, type = 'success') => {
             const toast = document.createElement('div');
             toast.className = `px-5 py-3 rounded-lg shadow-lg text-white font-bold text-sm text-center transform transition-all duration-300 translate-y-10 opacity-0 ${type === 'error' ? 'bg-red-500' : 'bg-green-500'}`;
@@ -174,7 +187,6 @@
             }, 4000);
         };
 
-        // دالة تأكيد الحذف
         window.closeConfirm = null;
         const confirmAction = (msg) => {
             return new Promise((resolve) => {
@@ -196,7 +208,6 @@
             document.getElementById(screenId).classList.add('active');
         };
 
-        // الهيكل الدراسي الكامل
         const defaultProgramData = [
             {
                 id: "part_middle", title: "الجزء الأول: التعليم المتوسط", color: "blue",
@@ -247,18 +258,12 @@
             }
         ];
 
-        // الاتصال الأولي الصامت بـ Firebase
         const initAuth = async () => {
-            try {
-                await signInAnonymously(auth);
-            } catch (error) {
-                console.error("Auth Error:", error);
-                showToast("خطأ: يرجى التأكد من تفعيل (Anonymous) في إعدادات Firebase Authentication، وإضافة رابط موقعك في النطاقات المسموح بها.", "error");
-            }
+            try { await signInAnonymously(auth); } 
+            catch (error) { console.error("Auth Error:", error); }
         };
         initAuth();
 
-        // مراقبة حالة الاتصال وتجهيز قاعدة البيانات
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 isAuthReady = true;
@@ -267,21 +272,24 @@
                     if (!progDoc.exists()) await setDoc(doc(programCol, 'main'), { sections: defaultProgramData });
                     
                     const adminDoc = await getDoc(doc(usersCol, 'admin'));
-                    if (!adminDoc.exists()) await setDoc(doc(usersCol, 'admin'), { password: 'admin', role: 'admin', approved: true, progress: [] });
-                } catch(e) {
-                    console.error("Firestore Error:", e);
-                    showToast("خطأ: لا يمكن القراءة من قاعدة البيانات. يرجى التأكد من تعديل قواعد Firestore (Rules) إلى if true;", "error");
-                }
+                    if (!adminDoc.exists()) await setDoc(doc(usersCol, 'admin'), { password: 'adminpassword', role: 'admin', approved: true, progress: [] });
+                } catch(e) { console.error("Firestore Error:", e); }
             }
         });
 
-        // واجهة تسجيل الدخول
         window.isRegistering = false;
         window.toggleAuthMode = () => {
             window.isRegistering = !window.isRegistering;
             document.getElementById('auth-title').innerText = window.isRegistering ? "إنشاء حساب جديد" : "دخول المنصة";
             document.getElementById('auth-action-btn').innerText = window.isRegistering ? "إرسال الطلب" : "تسجيل الدخول";
             document.getElementById('switch-mode-text').innerText = window.isRegistering ? "لديك حساب؟ سجل دخولك" : "إنشاء حساب تلميذ جديد";
+            
+            // إظهار أو إخفاء حقل المستوى
+            if(window.isRegistering) {
+                document.getElementById('user-level').classList.remove('hidden');
+            } else {
+                document.getElementById('user-level').classList.add('hidden');
+            }
         };
 
         window.handleAuth = async () => {
@@ -289,7 +297,10 @@
             
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value.trim();
-            if (!username || !password) return showToast("يرجى ملء جميع الحقول", "error");
+            const level = document.getElementById('user-level').value;
+
+            if (!username || !password) return showToast("يرجى ملء اسم المستخدم وكلمة المرور", "error");
+            if (window.isRegistering && !level) return showToast("يرجى تحديد مستواك الدراسي", "error");
 
             const btn = document.getElementById('auth-action-btn');
             const originalText = btn.innerText;
@@ -303,11 +314,12 @@
                     if (userSnap.exists()) {
                         showToast("اسم المستخدم هذا موجود مسبقاً", "error");
                     } else {
-                        await setDoc(userRef, { password, role: 'student', approved: false, progress: [] });
+                        await setDoc(userRef, { password, role: 'student', approved: false, progress: [], level: level });
                         showToast("تم إرسال الطلب بنجاح");
                         window.toggleAuthMode();
                         document.getElementById('username').value = '';
                         document.getElementById('password').value = '';
+                        document.getElementById('user-level').value = '';
                     }
                 } else {
                     if (!userSnap.exists() || userSnap.data().password !== password) {
@@ -328,7 +340,7 @@
                 }
             } catch (err) {
                 console.error(err);
-                showToast("فشل الاتصال. تحقق من إعدادات الحماية في Firebase", "error");
+                showToast("فشل الاتصال.", "error");
             }
             btn.disabled = false; btn.innerText = originalText;
         };
@@ -341,7 +353,6 @@
             switchScreen('auth-screen');
         };
 
-        // مستمعات الأحداث الحية (Real-time)
         const startAdminListeners = () => {
             unsubscribeUsers = onSnapshot(usersCol, (snapshot) => {
                 const tbody = document.getElementById('students-table-body');
@@ -349,17 +360,21 @@
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     if(data.role === 'admin') return;
+                    
+                    let levelDisplay = data.level ? (levelNames[data.level] || data.level) : "غير محدد";
+
                     tbody.innerHTML += `
-                        <tr class="border-b">
-                            <td class="p-3 font-semibold">${doc.id}</td>
+                        <tr class="border-b hover:bg-gray-50 transition">
+                            <td class="p-3 font-bold text-gray-800">${doc.id}</td>
+                            <td class="p-3 text-sm text-gray-600">${levelDisplay}</td>
                             <td class="p-3">
                                 <span class="px-2 py-1 rounded text-xs font-bold ${data.approved ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
                                     ${data.approved ? 'مفعل' : 'انتظار'}
                                 </span>
                             </td>
                             <td class="p-3 text-left space-x-1 space-x-reverse">
-                                <button onclick="toggleUserStatus('${doc.id}', ${!data.approved})" class="bg-gray-100 px-3 py-1.5 rounded-lg text-xs font-bold">${data.approved ? 'تعطيل' : 'تفعيل'}</button>
-                                <button onclick="deleteUserAccount('${doc.id}')" class="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold">حذف</button>
+                                <button onclick="toggleUserStatus('${doc.id}', ${!data.approved})" class="bg-gray-100 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-gray-200">${data.approved ? 'تعطيل' : 'تفعيل'}</button>
+                                <button onclick="deleteUserAccount('${doc.id}')" class="bg-red-50 text-red-500 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-100">حذف</button>
                             </td>
                         </tr>`;
                 });
@@ -384,7 +399,6 @@
             });
         };
 
-        // وظائف المسؤول 
         window.toggleUserStatus = async (username, status) => { 
             await updateDoc(doc(usersCol, username), { approved: status }); 
             showToast(status ? "تم تفعيل الحساب" : "تم التعطيل");
@@ -423,7 +437,6 @@
             }
         };
 
-        // وظائف التلميذ 
         window.studentToggleComplete = async (branchId) => {
             let progress = [...(window.currentUserRecord.progress || [])];
             const idx = progress.indexOf(branchId);
@@ -433,13 +446,20 @@
 
         const updateProgressUI = (sections) => {
             let progress = window.currentUserRecord.progress || [];
-            let total = 0; sections.forEach(p => p.years.forEach(y => total += y.branches.length));
+            let userLevel = window.currentUserRecord.level;
+            let total = 0; 
+            
+            sections.forEach(p => p.years.forEach(y => {
+                if(y.id === userLevel) total += y.branches.length; // حساب فروع مستواه فقط
+            }));
+
             let percentage = total === 0 ? 0 : Math.round((progress.length / total) * 100);
+            if (percentage > 100) percentage = 100;
+            
             document.getElementById('progress-bar').style.width = `${percentage}%`;
             document.getElementById('progress-text').innerText = `${percentage}%`;
         };
 
-        // بناء الواجهة (HTML Generator)
         const catTitles = { lessons: 'الدروس', exercises: 'التمارين', exams: 'الفروض والاختبارات' };
         
         const renderProgramUI = (sections, containerId, isAdmin) => {
@@ -448,20 +468,27 @@
             
             let html = '';
             let progress = (!isAdmin && window.currentUserRecord) ? (window.currentUserRecord.progress || []) : [];
+            let userLevel = (!isAdmin && window.currentUserRecord) ? window.currentUserRecord.level : null;
 
             sections.forEach((part, pIdx) => {
                 let pColor = part.color === 'blue' ? 'blue' : 'emerald';
-                html += `
-                <details class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-4">
+                let partHasContent = false;
+                let partHtml = `
+                <details class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-4" ${!isAdmin ? 'open' : ''}>
                     <summary class="bg-${pColor}-600 text-white p-4 font-bold text-lg hover:bg-${pColor}-700 transition">
                         ${part.title}
                     </summary>
                     <div class="p-3 md:p-5 space-y-4 bg-gray-50/50">`;
 
                 part.years.forEach((year, yIdx) => {
-                    html += `
-                    <details class="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm">
-                        <summary class="text-${pColor}-700 p-4 font-semibold hover:bg-gray-50 transition border-b border-gray-50">
+                    // ** فلترة المستوى للتلميذ ** : إذا لم يكن مسؤولاً ومستواه لا يطابق هذه السنة، تجاهلها
+                    if (!isAdmin && userLevel && userLevel !== year.id) return;
+                    
+                    partHasContent = true;
+
+                    partHtml += `
+                    <details class="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm" ${!isAdmin ? 'open' : ''}>
+                        <summary class="text-${pColor}-700 p-4 font-bold hover:bg-gray-50 transition border-b border-gray-50">
                             ${year.title}
                         </summary>
                         <div class="p-4 space-y-4">`;
@@ -471,7 +498,7 @@
                         let cardCls = isComp ? 'branch-completed' : 'bg-white border-gray-200';
                         let btnCls = isComp ? 'active' : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-200';
 
-                        html += `
+                        partHtml += `
                         <div class="border rounded-xl p-4 md:p-5 shadow-sm transition-all duration-300 ${cardCls}">
                             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 border-b pb-3 gap-3">
                                 <h4 class="font-bold text-gray-800 text-lg">${branch.title}</h4>
@@ -493,7 +520,7 @@
                                 </li>
                             `).join('') : `<li class="text-xs text-gray-400 text-center p-2">لا يوجد محتوى.</li>`;
 
-                            html += `
+                            partHtml += `
                             <div class="bg-gray-50/80 p-3 rounded-xl border border-gray-100">
                                 <h5 class="font-bold text-gray-700 text-sm mb-3 border-b pb-1 inline-block">${catTitles[cat]}</h5>
                                 <ul class="mb-2">${linksList}</ul>
@@ -506,11 +533,16 @@
                                 </div>` : ''}
                             </div>`;
                         });
-                        html += `</div></div>`; 
+                        partHtml += `</div></div>`; 
                     });
-                    html += `</div></details>`; 
+                    partHtml += `</div></details>`; 
                 });
-                html += `</div></details>`; 
+                partHtml += `</div></details>`; 
+
+                // إذا كان هناك محتوى مسموح له برؤيته، أضف الجزء للـ HTML
+                if (isAdmin || partHasContent) {
+                    html += partHtml;
+                }
             });
             document.getElementById(containerId).innerHTML = html;
         };
