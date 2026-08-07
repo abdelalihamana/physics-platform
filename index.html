@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>منصة العلوم الفيزيائية السحابية</title>
     
-    <!-- إعدادات تحويل الموقع لتطبيق هاتف -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#1e3a8a">
@@ -18,7 +17,6 @@
     <style>
         body { 
             font-family: 'Cairo', sans-serif; 
-            /* جعل صورة الشعار icon.png هي الخلفية للمنصة بالكامل */
             background: linear-gradient(rgba(15, 23, 42, 0.85), rgba(30, 58, 138, 0.85)), url('icon.png');
             background-size: cover;
             background-position: center;
@@ -42,12 +40,50 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        
+        /* تنسيقات الدردشة */
+        .chat-bubble { max-width: 80%; padding: 10px 14px; border-radius: 16px; margin-bottom: 8px; position: relative; word-wrap: break-word;}
+        .chat-mine { background-color: #dcf8c6; margin-right: auto; border-bottom-right-radius: 4px; }
+        .chat-other { background-color: #ffffff; border: 1px solid #e2e8f0; margin-left: auto; border-bottom-left-radius: 4px; }
+        .floating-chat-btn { position: fixed; bottom: 20px; right: 20px; z-index: 40; box-shadow: 0 10px 25px rgba(0,0,0,0.3); animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
     </style>
 </head>
 <body class="text-gray-800 antialiased p-3 md:p-6 pb-20">
 
-    <div id="toast-container" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 w-[90%] md:w-auto"></div>
+    <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[60] flex flex-col gap-2 w-[90%] md:w-auto"></div>
 
+    <!-- نافذة المحادثة (الدردشة النصية) -->
+    <div id="chat-modal" class="fixed inset-0 bg-gray-900 bg-opacity-70 hidden items-center justify-center z-50 backdrop-blur-sm p-3">
+        <div class="bg-slate-50 w-full max-w-lg h-[85vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden">
+            <!-- رأس الدردشة -->
+            <div class="bg-blue-600 text-white p-4 flex justify-between items-center shadow-md z-10">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-xl">👤</div>
+                    <div>
+                        <h3 class="font-bold text-lg leading-tight" id="chat-target-name">الدردشة</h3>
+                        <p class="text-xs text-blue-100">محادثة نصية آمنة ومباشرة</p>
+                    </div>
+                </div>
+                <button onclick="closeChat()" class="bg-white/20 hover:bg-white/30 rounded-full w-8 h-8 flex items-center justify-center transition">✖</button>
+            </div>
+            
+            <!-- مساحة الرسائل -->
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 flex flex-col gap-2 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+                <!-- الرسائل ستظهر هنا -->
+            </div>
+
+            <!-- منطقة الكتابة والإرسال -->
+            <div class="bg-white p-3 border-t flex gap-2 items-end">
+                <div class="flex-1 bg-gray-100 rounded-xl border border-gray-200 p-1 flex flex-col">
+                    <textarea id="chat-input" rows="1" class="w-full bg-transparent px-3 py-3 outline-none resize-none font-semibold text-gray-700" placeholder="اكتب رسالتك هنا..."></textarea>
+                </div>
+                <button id="send-msg-btn" onclick="sendChatMessage()" class="px-5 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition font-bold text-lg">إرسال 🚀</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة تأكيد الإجراءات -->
     <div id="confirm-modal" class="fixed inset-0 bg-gray-900 bg-opacity-70 hidden items-center justify-center z-50 backdrop-blur-sm">
         <div class="bg-white p-6 rounded-2xl max-w-sm w-[90%] mx-auto shadow-2xl">
             <h3 class="text-xl font-bold mb-2 text-gray-800">تأكيد الإجراء</h3>
@@ -59,12 +95,11 @@
         </div>
     </div>
 
-    <div class="max-w-4xl mx-auto">
+    <div class="max-w-5xl mx-auto">
         
         <!-- 1. شاشة تسجيل الدخول -->
         <div id="auth-screen" class="screen active max-w-md mx-auto mt-10 md:mt-16 bg-white/95 backdrop-blur-md p-6 md:p-8 rounded-3xl shadow-2xl border border-white/20">
             <div class="text-center mb-6">
-                <!-- عرض الشعار icon.png كصورة بارزة في أعلى الشاشة -->
                 <div class="w-20 h-20 mx-auto mb-4 rounded-2xl shadow-lg overflow-hidden border-2 border-blue-400/30">
                     <img src="icon.png" alt="شعار المنصة" class="w-full h-full object-cover">
                 </div>
@@ -73,10 +108,10 @@
             </div>
             
             <div class="space-y-4">
-                <input type="text" id="username" class="w-full px-4 py-3 rounded-xl border bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500" placeholder="اسم المستخدم (إنجليزي أو أرقام)">
+                <input type="text" id="username" class="w-full px-4 py-3 rounded-xl border bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500 font-bold" placeholder="اسم المستخدم (بدون مسافات)">
                 
-                <select id="user-level" class="w-full px-4 py-3 rounded-xl border bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500 hidden">
-                    <option value="" disabled selected>اختر مستواك الدراسي...</option>
+                <select id="user-level" class="w-full px-4 py-3 rounded-xl border bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500 hidden font-bold text-blue-700">
+                    <option value="" disabled selected>اختر مستواك الدراسي بدقة...</option>
                     <option value="m_y1">السنة الأولى متوسط</option>
                     <option value="m_y2">السنة الثانية متوسط</option>
                     <option value="m_y3">السنة الثالثة متوسط</option>
@@ -86,79 +121,94 @@
                     <option value="h_y3">السنة الثالثة ثانوي</option>
                 </select>
 
-                <input type="password" id="password" class="w-full px-4 py-3 rounded-xl border bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500" placeholder="كلمة المرور">
-                <button id="auth-action-btn" onclick="handleAuth()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-200 transition">تسجيل الدخول</button>
+                <input type="password" id="password" class="w-full px-4 py-3 rounded-xl border bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500 font-bold" placeholder="كلمة المرور">
+                <button id="auth-action-btn" onclick="handleAuth()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-3.5 rounded-xl shadow-lg shadow-blue-200 transition text-lg">تسجيل الدخول</button>
             </div>
             
             <div class="text-center mt-6">
-                <button onclick="toggleAuthMode()" id="switch-mode-text" class="text-blue-600 font-semibold underline text-sm">إنشاء حساب تلميذ جديد</button>
+                <button onclick="toggleAuthMode()" id="switch-mode-text" class="text-blue-600 font-bold underline text-sm hover:text-blue-800 transition">إنشاء حساب تلميذ جديد</button>
             </div>
         </div>
 
         <!-- 2. شاشة الانتظار -->
-        <div id="pending-screen" class="screen max-w-md mx-auto mt-20 bg-white p-8 rounded-3xl shadow-xl text-center border-t-4 border-yellow-400">
-            <div class="text-5xl mb-4">⏳</div>
+        <div id="pending-screen" class="screen max-w-md mx-auto mt-20 bg-white/95 backdrop-blur-md p-8 rounded-3xl shadow-2xl text-center border-t-8 border-yellow-400">
+            <div class="text-6xl mb-4 animate-pulse">⏳</div>
             <h2 class="text-2xl font-bold text-gray-800 mb-2">حسابك قيد الانتظار</h2>
-            <p class="text-gray-600 mb-8 text-sm">تم تسجيل طلبك بنجاح. يرجى الانتظار حتى يقوم الأستاذ بتفعيل حسابك.</p>
-            <button onclick="logout()" class="w-full bg-gray-100 font-bold py-3 rounded-xl">تسجيل الخروج</button>
+            <p class="text-gray-600 mb-8 font-semibold">تم تسجيل طلبك. يرجى انتظار الأستاذ لتفعيل حسابك.</p>
+            <button onclick="logout()" class="w-full bg-gray-200 font-bold py-3 rounded-xl hover:bg-gray-300 transition">تسجيل الخروج و العودة</button>
         </div>
 
         <!-- 3. شاشة تحكم المسؤول (الأستاذ) -->
         <div id="admin-screen" class="screen">
-            <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-lg mb-6 border border-white/20 gap-4">
-                <div class="text-center md:text-right">
-                    <h1 class="text-2xl font-extrabold text-blue-900">لوحة تحكم الأستاذ 🛠️</h1>
+            <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-lg mb-6 border border-white/20 gap-4 sticky top-4 z-30">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full border-2 border-blue-500 overflow-hidden"><img src="icon.png" class="w-full h-full object-cover"></div>
+                    <div>
+                        <h1 class="text-2xl font-extrabold text-blue-900 leading-tight">لوحة الأستاذ</h1>
+                        <span class="text-xs font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded-full">مدير المنصة</span>
+                    </div>
                 </div>
-                <button onclick="logout()" class="w-full md:w-auto bg-red-50 text-red-600 px-6 py-2 rounded-xl font-bold">خروج</button>
+                <button onclick="logout()" class="w-full md:w-auto bg-red-100 text-red-600 px-6 py-2.5 rounded-xl font-bold hover:bg-red-200 transition shadow-sm border border-red-200">تسجيل الخروج 🚪</button>
             </header>
 
-            <div class="bg-white/95 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-lg mb-6 border border-white/20">
-                <h3 class="text-lg font-bold text-gray-800 mb-4">حسابات التلاميذ</h3>
-                <div class="overflow-x-auto rounded-xl border border-gray-100">
-                    <table class="w-full text-right border-collapse whitespace-nowrap">
-                        <thead class="bg-gray-50 text-gray-600 text-sm">
+            <div class="bg-white/95 backdrop-blur-md p-4 md:p-6 rounded-3xl shadow-lg mb-6 border border-white/20">
+                <h3 class="text-xl font-extrabold text-gray-800 mb-4 border-b pb-2">📋 متابعة التلاميذ</h3>
+                <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-inner">
+                    <table class="w-full text-right border-collapse whitespace-nowrap min-w-[700px]">
+                        <thead class="bg-slate-100 text-slate-700 text-sm font-bold">
                             <tr>
-                                <th class="p-3 border-b">التلميذ</th>
-                                <th class="p-3 border-b">المستوى الدراسي</th>
-                                <th class="p-3 border-b">الحالة</th>
-                                <th class="p-3 border-b text-left">إجراء</th>
+                                <th class="p-4 border-b">التلميذ (كلمة المرور)</th>
+                                <th class="p-4 border-b">المستوى</th>
+                                <th class="p-4 border-b">التقدم</th>
+                                <th class="p-4 border-b">الحالة</th>
+                                <th class="p-4 border-b text-left">إجراءات</th>
                             </tr>
                         </thead>
-                        <tbody id="students-table-body"></tbody>
+                        <tbody id="students-table-body" class="bg-white divide-y divide-gray-100"></tbody>
                     </table>
                 </div>
             </div>
 
-            <div class="bg-white/95 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-lg border border-white/20">
-                <h3 class="text-lg font-bold text-gray-800 mb-2">إدارة البرنامج الدراسي</h3>
-                <p class="text-sm text-gray-500 mb-6">أضف الروابط هنا لتظهر فوراً لدى التلاميذ.</p>
-                <div id="admin-program-view" class="space-y-3"></div>
+            <div class="bg-white/95 backdrop-blur-md p-4 md:p-6 rounded-3xl shadow-lg border border-white/20">
+                <h3 class="text-xl font-extrabold text-gray-800 mb-2 border-b pb-2">📚 إدارة البرنامج الدراسي</h3>
+                <p class="text-sm text-gray-500 mb-6 font-semibold">المحتوى الذي تضيفه هنا يظهر فوراً لتلاميذ كل مستوى.</p>
+                <div id="admin-program-view" class="space-y-4"></div>
             </div>
         </div>
 
         <!-- 4. شاشة التلميذ -->
         <div id="app-screen" class="screen">
-            <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-lg mb-6 border border-white/20 gap-4">
-                <div class="text-center md:text-right">
-                    <h1 class="text-2xl font-extrabold text-blue-900">مرحباً، <span id="display-username" class="text-blue-600"></span> 👋</h1>
+            <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-lg mb-6 border border-white/20 gap-4 sticky top-4 z-30">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full border-2 border-blue-500 overflow-hidden shadow-sm"><img src="icon.png" class="w-full h-full object-cover"></div>
+                    <div>
+                        <h1 class="text-xl font-extrabold text-blue-900 leading-tight">مرحباً، <span id="display-username" class="text-blue-600"></span></h1>
+                        <span id="student-level-badge" class="text-xs font-bold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">تلميذ</span>
+                    </div>
                 </div>
-                <button onclick="logout()" class="w-full md:w-auto bg-red-50 text-red-600 px-6 py-2 rounded-xl font-bold">تسجيل الخروج</button>
+                <button onclick="logout()" class="w-full md:w-auto bg-red-100 text-red-600 px-6 py-2.5 rounded-xl font-bold hover:bg-red-200 transition shadow-sm border border-red-200">تسجيل الخروج 🚪</button>
             </header>
 
-            <div class="bg-white/95 backdrop-blur-md p-5 md:p-6 rounded-2xl shadow-lg mb-6 border border-white/20">
+            <div class="bg-white/95 backdrop-blur-md p-5 md:p-6 rounded-3xl shadow-lg mb-6 border border-white/20">
                 <div class="flex justify-between items-end mb-3">
-                    <h3 class="font-bold text-gray-700">تقدمك في مستواك الدراسي:</h3>
-                    <span id="progress-text" class="text-2xl font-extrabold text-green-500">0%</span>
+                    <h3 class="font-extrabold text-gray-700">تقدمك في مستواك الدراسي 🚀</h3>
+                    <span id="progress-text" class="text-3xl font-black text-emerald-500">0%</span>
                 </div>
-                <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
-                    <div id="progress-bar" class="bg-green-400 h-3 rounded-full transition-all duration-1000 w-0"></div>
+                <div class="w-full bg-slate-200 rounded-full h-4 overflow-hidden shadow-inner">
+                    <div id="progress-bar" class="bg-gradient-to-l from-emerald-400 to-emerald-600 h-4 rounded-full transition-all duration-1000 w-0 shadow"></div>
                 </div>
             </div>
             
-            <div id="student-program-view" class="space-y-3"></div>
+            <div id="student-program-view" class="space-y-4"></div>
+
+            <!-- زر المحادثة العائم للتلميذ -->
+            <button onclick="openChat('admin')" class="floating-chat-btn bg-blue-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-blue-400/50 hover:bg-blue-700 transition">
+                💬
+            </button>
         </div>
     </div>
 
+    <!-- استدعاء مكتبات Firebase الأساسية فقط (بدون التخزين) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -167,7 +217,7 @@
         // =========================================================================================
         // الصق مفاتيح مشروعك الحقيقية هنا
         // =========================================================================================
-const firebaseConfig = {
+           const firebaseConfig = {
              apiKey: "AIzaSyDuuYHwmSW0UV1TO3gDGyETrvOimE7iGLs",
   authDomain: "physique-58073.firebaseapp.com",
   projectId: "physique-58073",
@@ -184,11 +234,14 @@ const firebaseConfig = {
         
         const usersCol = collection(db, 'physics_db', 'public', 'profiles');
         const programCol = collection(db, 'physics_db', 'public', 'curriculum');
+        const chatsPath = 'physics_db/public/chats'; // مسار الدردشات
 
         let isAuthReady = false;
         window.currentUserRecord = null;
         let unsubscribeProgram = null;
         let unsubscribeUsers = null;
+        let unsubscribeChat = null;
+        window.activeChatUser = null; 
 
         const levelNames = {
             "m_y1": "الأولى متوسط", "m_y2": "الثانية متوسط", "m_y3": "الثالثة متوسط", "m_y4": "الرابعة متوسط",
@@ -197,12 +250,12 @@ const firebaseConfig = {
 
         window.showToast = (msg, type = 'success') => {
             const toast = document.createElement('div');
-            toast.className = `px-5 py-3 rounded-lg shadow-lg text-white font-bold text-sm text-center transform transition-all duration-300 translate-y-10 opacity-0 ${type === 'error' ? 'bg-red-500' : 'bg-green-500'}`;
+            toast.className = `px-5 py-3 rounded-lg shadow-xl text-white font-bold text-sm text-center transform transition-all duration-300 translate-y-[-20px] opacity-0 border border-white/20 backdrop-blur-sm ${type === 'error' ? 'bg-red-500/90' : 'bg-green-500/90'}`;
             toast.innerText = msg;
             document.getElementById('toast-container').appendChild(toast);
-            setTimeout(() => { toast.classList.remove('translate-y-10', 'opacity-0'); }, 10);
+            setTimeout(() => { toast.classList.remove('translate-y-[-20px]', 'opacity-0'); }, 10);
             setTimeout(() => { 
-                toast.classList.add('translate-y-10', 'opacity-0'); 
+                toast.classList.add('translate-y-[-20px]', 'opacity-0'); 
                 setTimeout(() => toast.remove(), 300);
             }, 4000);
         };
@@ -229,53 +282,8 @@ const firebaseConfig = {
         };
 
         const defaultProgramData = [
-            {
-                id: "part_middle", title: "الجزء الأول: التعليم المتوسط", color: "blue",
-                years: [
-                    {
-                        id: "m_y1", title: "السنة الأولى متوسط",
-                        branches: [
-                            { id: "m1_b1", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [], exams: [] } },
-                            { id: "m1_b2", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [], exams: [] } },
-                            { id: "m1_b3", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [], exams: [] } }
-                        ]
-                    },
-                    {
-                        id: "m_y2", title: "السنة الثانية متوسط",
-                        branches: [
-                            { id: "m2_b1", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [], exams: [] } },
-                            { id: "m2_b2", title: "الظواهر الميكانيكية", categories: { lessons: [], exercises: [], exams: [] } },
-                            { id: "m2_b3", title: "الظواهر الكهرومغناطيسية", categories: { lessons: [], exercises: [], exams: [] } }
-                        ]
-                    },
-                    {
-                        id: "m_y3", title: "السنة الثالثة متوسط",
-                        branches: [
-                            { id: "m3_b1", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [], exams: [] } },
-                            { id: "m3_b2", title: "الطاقة", categories: { lessons: [], exercises: [], exams: [] } },
-                            { id: "m3_b3", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [], exams: [] } },
-                            { id: "m3_b4", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [], exams: [] } }
-                        ]
-                    },
-                    {
-                        id: "m_y4", title: "السنة الرابعة متوسط",
-                        branches: [
-                            { id: "m4_b1", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [], exams: [] } },
-                            { id: "m4_b2", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [], exams: [] } },
-                            { id: "m4_b3", title: "الظواهر الميكانيكية", categories: { lessons: [], exercises: [], exams: [] } },
-                            { id: "m4_b4", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [], exams: [] } }
-                        ]
-                    }
-                ]
-            },
-            {
-                id: "part_high", title: "الجزء الثاني: التعليم الثانوي", color: "emerald",
-                years: [
-                    { id: "h_y1", title: "السنة أولى ثانوي", branches: [ { id: "h1_b1", title: "الدروس والوحدات", categories: { lessons: [], exercises: [], exams: [] } } ] },
-                    { id: "h_y2", title: "السنة الثانية ثانوي", branches: [ { id: "h2_b1", title: "الدروس والوحدات", categories: { lessons: [], exercises: [], exams: [] } } ] },
-                    { id: "h_y3", title: "السنة الثالثة ثانوي", branches: [ { id: "h3_b1", title: "الدروس والوحدات", categories: { lessons: [], exercises: [], exams: [] } } ] }
-                ]
-            }
+            { id: "part_middle", title: "الجزء الأول: التعليم المتوسط", color: "blue", years: [{ id: "m_y1", title: "السنة الأولى متوسط", branches: [{ id: "m1_b1", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m1_b2", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m1_b3", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [], exams: [] } }] }, { id: "m_y2", title: "السنة الثانية متوسط", branches: [{ id: "m2_b1", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m2_b2", title: "الظواهر الميكانيكية", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m2_b3", title: "الظواهر الكهرومغناطيسية", categories: { lessons: [], exercises: [], exams: [] } }] }, { id: "m_y3", title: "السنة الثالثة متوسط", branches: [{ id: "m3_b1", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m3_b2", title: "الطاقة", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m3_b3", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m3_b4", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [], exams: [] } }] }, { id: "m_y4", title: "السنة الرابعة متوسط", branches: [{ id: "m4_b1", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m4_b2", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m4_b3", title: "الظواهر الميكانيكية", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m4_b4", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [], exams: [] } }] }] },
+            { id: "part_high", title: "الجزء الثاني: التعليم الثانوي", color: "emerald", years: [{ id: "h_y1", title: "السنة أولى ثانوي", branches: [{ id: "h1_b1", title: "الدروس والوحدات", categories: { lessons: [], exercises: [], exams: [] } }] }, { id: "h_y2", title: "السنة الثانية ثانوي", branches: [{ id: "h2_b1", title: "الدروس والوحدات", categories: { lessons: [], exercises: [], exams: [] } }] }, { id: "h_y3", title: "السنة الثالثة ثانوي", branches: [{ id: "h3_b1", title: "الدروس والوحدات", categories: { lessons: [], exercises: [], exams: [] } }] }] }
         ];
 
         const initAuth = async () => {
@@ -290,25 +298,18 @@ const firebaseConfig = {
                 try {
                     const progDoc = await getDoc(doc(programCol, 'main'));
                     if (!progDoc.exists()) await setDoc(doc(programCol, 'main'), { sections: defaultProgramData });
-                    
                     const adminDoc = await getDoc(doc(usersCol, 'admin'));
                     if (!adminDoc.exists()) await setDoc(doc(usersCol, 'admin'), { password: 'adminpassword', role: 'admin', approved: true, progress: [] });
-                } catch(e) { console.error("Firestore Error:", e); }
+                } catch(e) { console.error(e); }
             }
         });
 
-        window.isRegistering = false;
         window.toggleAuthMode = () => {
             window.isRegistering = !window.isRegistering;
             document.getElementById('auth-title').innerText = window.isRegistering ? "إنشاء حساب جديد" : "منصة العلوم الفيزيائية";
             document.getElementById('auth-action-btn').innerText = window.isRegistering ? "إرسال الطلب" : "تسجيل الدخول";
             document.getElementById('switch-mode-text').innerText = window.isRegistering ? "لديك حساب؟ سجل دخولك" : "إنشاء حساب تلميذ جديد";
-            
-            if(window.isRegistering) {
-                document.getElementById('user-level').classList.remove('hidden');
-            } else {
-                document.getElementById('user-level').classList.add('hidden');
-            }
+            document.getElementById('user-level').classList.toggle('hidden', !window.isRegistering);
         };
 
         window.handleAuth = async () => {
@@ -322,7 +323,6 @@ const firebaseConfig = {
             if (window.isRegistering && !level) return showToast("يرجى تحديد مستواك الدراسي", "error");
 
             const btn = document.getElementById('auth-action-btn');
-            const originalText = btn.innerText;
             btn.disabled = true; btn.innerText = "جاري التحقق...";
 
             try {
@@ -331,14 +331,13 @@ const firebaseConfig = {
 
                 if (window.isRegistering) {
                     if (userSnap.exists()) {
-                        showToast("اسم المستخدم هذا موجود مسبقاً", "error");
+                        showToast("اسم المستخدم موجود، اختر اسماً آخر", "error");
                     } else {
                         await setDoc(userRef, { password, role: 'student', approved: false, progress: [], level: level });
-                        showToast("تم إرسال الطلب بنجاح");
+                        showToast("تم إرسال الطلب بنجاح!");
                         window.toggleAuthMode();
                         document.getElementById('username').value = '';
                         document.getElementById('password').value = '';
-                        document.getElementById('user-level').value = '';
                     }
                 } else {
                     if (!userSnap.exists() || userSnap.data().password !== password) {
@@ -352,16 +351,14 @@ const firebaseConfig = {
                             switchScreen('pending-screen');
                         } else {
                             document.getElementById('display-username').innerText = username;
+                            document.getElementById('student-level-badge').innerText = levelNames[window.currentUserRecord.level];
                             switchScreen('app-screen');
                             startStudentListeners();
                         }
                     }
                 }
-            } catch (err) {
-                console.error(err);
-                showToast("فشل الاتصال.", "error");
-            }
-            btn.disabled = false; btn.innerText = originalText;
+            } catch (err) { console.error(err); showToast("خطأ في الاتصال", "error"); }
+            btn.disabled = false; btn.innerText = window.isRegistering ? "إرسال الطلب" : "تسجيل الدخول";
         };
 
         window.logout = () => {
@@ -369,44 +366,79 @@ const firebaseConfig = {
             document.getElementById('password').value = '';
             if(unsubscribeProgram) unsubscribeProgram();
             if(unsubscribeUsers) unsubscribeUsers();
+            if(unsubscribeChat) unsubscribeChat();
             switchScreen('auth-screen');
         };
 
+        // دالة حساب نسبة التقدم 
+        const calculateProgress = (levelId, progressArray, sections) => {
+            if(!sections || !levelId) return 0;
+            let total = 0;
+            sections.forEach(p => p.years.forEach(y => { if(y.id === levelId) total += y.branches.length; }));
+            if(total === 0) return 0;
+            let p = Math.round((progressArray.length / total) * 100);
+            return p > 100 ? 100 : p;
+        };
+
         const startAdminListeners = () => {
+            unsubscribeProgram = onSnapshot(doc(programCol, 'main'), (docSnap) => {
+                if(docSnap.exists()) {
+                    window.currentSections = docSnap.data().sections;
+                    renderProgramUI(window.currentSections, 'admin-program-view', true);
+                    fetchUsersForAdmin(); 
+                }
+            });
+        };
+
+        const fetchUsersForAdmin = () => {
+            if(unsubscribeUsers) unsubscribeUsers();
             unsubscribeUsers = onSnapshot(usersCol, (snapshot) => {
                 const tbody = document.getElementById('students-table-body');
                 tbody.innerHTML = '';
-                snapshot.forEach(doc => {
-                    const data = doc.data();
+                snapshot.forEach(d => {
+                    const data = d.data();
                     if(data.role === 'admin') return;
                     
                     let levelDisplay = data.level ? (levelNames[data.level] || data.level) : "غير محدد";
+                    let progPercent = calculateProgress(data.level, data.progress || [], window.currentSections);
 
                     tbody.innerHTML += `
-                        <tr class="border-b hover:bg-gray-50 transition">
-                            <td class="p-3 font-bold text-gray-800">${doc.id}</td>
-                            <td class="p-3 text-sm text-gray-600">${levelDisplay}</td>
-                            <td class="p-3">
-                                <span class="px-2 py-1 rounded text-xs font-bold ${data.approved ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
+                        <tr class="hover:bg-slate-50 transition border-b border-gray-100">
+                            <td class="p-4">
+                                <div class="font-bold text-gray-800 text-lg">${d.id}</div>
+                                <div class="text-xs text-blue-600 font-bold bg-blue-50 inline-block px-2 py-1 rounded border border-blue-100">🔑 ${data.password}</div>
+                            </td>
+                            <td class="p-4 text-sm font-bold text-slate-600">${levelDisplay}</td>
+                            <td class="p-4">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm font-black ${progPercent > 50 ? 'text-green-600' : 'text-orange-500'}">${progPercent}%</span>
+                                    <div class="w-16 h-2 bg-gray-200 rounded-full overflow-hidden"><div class="h-full bg-green-500" style="width:${progPercent}%"></div></div>
+                                </div>
+                            </td>
+                            <td class="p-4">
+                                <span class="px-3 py-1 rounded-full text-xs font-black ${data.approved ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
                                     ${data.approved ? 'مفعل' : 'انتظار'}
                                 </span>
                             </td>
-                            <td class="p-3 text-left space-x-1 space-x-reverse">
-                                <button onclick="toggleUserStatus('${doc.id}', ${!data.approved})" class="bg-gray-100 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-gray-200">${data.approved ? 'تعطيل' : 'تفعيل'}</button>
-                                <button onclick="deleteUserAccount('${doc.id}')" class="bg-red-50 text-red-500 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-100">حذف</button>
+                            <td class="p-4 text-left">
+                                <div class="flex gap-1 justify-end flex-wrap">
+                                    <button onclick="openChat('${d.id}')" class="bg-blue-100 text-blue-700 px-3 py-2 rounded-lg text-xs font-bold hover:bg-blue-200 shadow-sm">مراسلة 💬</button>
+                                    <button onclick="toggleUserStatus('${d.id}', ${!data.approved})" class="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-xs font-bold hover:bg-gray-200 shadow-sm">${data.approved ? 'تعطيل ⛔' : 'تفعيل ✅'}</button>
+                                    <button onclick="deleteUserAccount('${d.id}')" class="bg-red-50 text-red-600 px-3 py-2 rounded-lg text-xs font-bold hover:bg-red-100 border border-red-100 shadow-sm">حذف 🗑️</button>
+                                </div>
                             </td>
                         </tr>`;
                 });
             });
-
-            unsubscribeProgram = onSnapshot(doc(programCol, 'main'), (doc) => {
-                if(doc.exists()) renderProgramUI(doc.data().sections, 'admin-program-view', true);
-            });
-        };
+        }
 
         const startStudentListeners = () => {
             unsubscribeProgram = onSnapshot(doc(programCol, 'main'), (docSnap) => {
-                if(docSnap.exists()) renderProgramUI(docSnap.data().sections, 'student-program-view', false);
+                if(docSnap.exists()) {
+                    window.currentSections = docSnap.data().sections;
+                    renderProgramUI(window.currentSections, 'student-program-view', false);
+                    updateProgressUI(window.currentSections);
+                }
             });
             
             onSnapshot(doc(usersCol, window.currentUserRecord.username), (docSnap) => {
@@ -418,13 +450,88 @@ const firebaseConfig = {
             });
         };
 
+        // --- نظام الدردشة النصية ---
+        window.openChat = (targetUser) => {
+            window.activeChatUser = targetUser; 
+            let displayTarget = window.currentUserRecord.role === 'admin' ? targetUser : "الأستاذ (المدير)";
+            document.getElementById('chat-target-name').innerText = displayTarget;
+            document.getElementById('chat-modal').classList.remove('hidden');
+            document.getElementById('chat-modal').classList.add('flex');
+            
+            let chatRoomId = window.currentUserRecord.role === 'admin' ? targetUser : window.currentUserRecord.username;
+            let messagesRef = collection(db, chatsPath, chatRoomId, 'messages');
+
+            if(unsubscribeChat) unsubscribeChat();
+            unsubscribeChat = onSnapshot(messagesRef, (snapshot) => {
+                let msgs = [];
+                snapshot.forEach(d => msgs.push({ id: d.id, ...d.data() }));
+                msgs.sort((a, b) => a.timestamp - b.timestamp); 
+                
+                let chatHtml = '';
+                msgs.forEach(m => {
+                    let isMine = m.sender === window.currentUserRecord.role;
+                    let bubbleClass = isMine ? 'chat-mine' : 'chat-other';
+                    let alignment = isMine ? 'self-end' : 'self-start';
+                    
+                    let contentHtml = `<p class="text-sm font-semibold whitespace-pre-wrap">${m.text}</p>`;
+                    let timeStr = new Date(m.timestamp).toLocaleTimeString('ar-DZ', {hour: '2-digit', minute:'2-digit'});
+                    
+                    chatHtml += `
+                    <div class="${bubbleClass} ${alignment} shadow-sm">
+                        ${contentHtml}
+                        <div class="text-[10px] text-gray-400 text-left mt-1" dir="ltr">${timeStr}</div>
+                    </div>`;
+                });
+                
+                const msgBox = document.getElementById('chat-messages');
+                msgBox.innerHTML = chatHtml || '<div class="text-center text-gray-400 text-sm mt-10 font-bold bg-white/50 p-4 rounded-xl">👋 أهلاً بك في المحادثة! الرسائل مشفرة ومحفوظة.</div>';
+                msgBox.scrollTop = msgBox.scrollHeight;
+            }, e => { console.error("Chat Error", e); });
+        };
+
+        window.closeChat = () => {
+            document.getElementById('chat-modal').classList.add('hidden');
+            document.getElementById('chat-modal').classList.remove('flex');
+            if(unsubscribeChat) unsubscribeChat();
+            window.activeChatUser = null;
+        };
+
+        window.sendChatMessage = async () => {
+            let inputEl = document.getElementById('chat-input');
+            let text = inputEl.value.trim();
+            
+            if(!text) return; 
+            
+            let btn = document.getElementById('send-msg-btn');
+            btn.disabled = true; btn.innerText = '⏳';
+
+            try {
+                let chatRoomId = window.currentUserRecord.role === 'admin' ? window.activeChatUser : window.currentUserRecord.username;
+                let messagesRef = collection(db, chatsPath, chatRoomId, 'messages');
+                
+                await setDoc(doc(messagesRef, Date.now().toString()), {
+                    sender: window.currentUserRecord.role,
+                    text: text,
+                    timestamp: Date.now()
+                });
+
+                inputEl.value = '';
+            } catch(e) {
+                console.error(e);
+                showToast("فشل الإرسال. تأكد من اتصالك بالإنترنت", "error");
+            }
+            btn.disabled = false; btn.innerText = 'إرسال 🚀';
+        };
+
+        // --- باقي وظائف المسؤول والتلميذ ---
+
         window.toggleUserStatus = async (username, status) => { 
             await updateDoc(doc(usersCol, username), { approved: status }); 
             showToast(status ? "تم تفعيل الحساب" : "تم التعطيل");
         };
         
         window.deleteUserAccount = async (username) => { 
-            if(await confirmAction(`سيتم حذف حساب ${username} نهائياً.`)) {
+            if(await confirmAction(`سيتم حذف حساب التلميذ نهائياً.`)) {
                 await deleteDoc(doc(usersCol, username)); 
                 showToast("تم الحذف بنجاح");
             }
@@ -437,22 +544,19 @@ const firebaseConfig = {
             if(!url.startsWith('http')) url = 'https://' + url;
 
             const docRef = doc(programCol, 'main');
-            const docSnap = await getDoc(docRef);
-            let sections = docSnap.data().sections;
+            let sections = window.currentSections;
             sections[pIdx].years[yIdx].branches[bIdx].categories[cat].push({title, url});
-            
             await updateDoc(docRef, { sections });
-            showToast("تمت إضافة الرابط بنجاح");
+            showToast("تمت الإضافة بنجاح");
         };
 
         window.adminDeleteLink = async (pIdx, yIdx, bIdx, cat, lIdx) => {
             if(await confirmAction("هل أنت متأكد من مسح الرابط؟")) {
                 const docRef = doc(programCol, 'main');
-                const docSnap = await getDoc(docRef);
-                let sections = docSnap.data().sections;
+                let sections = window.currentSections;
                 sections[pIdx].years[yIdx].branches[bIdx].categories[cat].splice(lIdx, 1);
                 await updateDoc(docRef, { sections });
-                showToast("تم مسح الرابط");
+                showToast("تم المسح");
             }
         };
 
@@ -464,27 +568,16 @@ const firebaseConfig = {
         };
 
         const updateProgressUI = (sections) => {
-            let progress = window.currentUserRecord.progress || [];
-            let userLevel = window.currentUserRecord.level;
-            let total = 0; 
-            
-            sections.forEach(p => p.years.forEach(y => {
-                if(y.id === userLevel) total += y.branches.length;
-            }));
-
-            let percentage = total === 0 ? 0 : Math.round((progress.length / total) * 100);
-            if (percentage > 100) percentage = 100;
-            
-            document.getElementById('progress-bar').style.width = `${percentage}%`;
-            document.getElementById('progress-text').innerText = `${percentage}%`;
+            let progPercent = calculateProgress(window.currentUserRecord.level, window.currentUserRecord.progress || [], sections);
+            document.getElementById('progress-bar').style.width = `${progPercent}%`;
+            document.getElementById('progress-text').innerText = `${progPercent}%`;
         };
 
-        const catTitles = { lessons: 'الدروس', exercises: 'التمارين', exams: 'الفروض والاختبارات' };
+        const catTitles = { lessons: 'الدروس 📘', exercises: 'التمارين 📝', exams: 'الفروض والاختبارات 🏆' };
         
         const renderProgramUI = (sections, containerId, isAdmin) => {
+            if(!sections) return;
             window.currentSections = sections;
-            if(!isAdmin) updateProgressUI(sections);
-            
             let html = '';
             let progress = (!isAdmin && window.currentUserRecord) ? (window.currentUserRecord.progress || []) : [];
             let userLevel = (!isAdmin && window.currentUserRecord) ? window.currentUserRecord.level : null;
@@ -493,61 +586,60 @@ const firebaseConfig = {
                 let pColor = part.color === 'blue' ? 'blue' : 'emerald';
                 let partHasContent = false;
                 let partHtml = `
-                <details class="bg-white/95 backdrop-blur-md rounded-2xl shadow-lg border border-white/20 overflow-hidden mb-4" ${!isAdmin ? 'open' : ''}>
-                    <summary class="bg-${pColor}-600 text-white p-4 font-bold text-lg hover:bg-${pColor}-700 transition">
+                <details class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden mb-4" ${!isAdmin ? 'open' : ''}>
+                    <summary class="bg-${pColor}-600 text-white p-4 font-black text-lg hover:bg-${pColor}-700 transition">
                         ${part.title}
                     </summary>
-                    <div class="p-3 md:p-5 space-y-4 bg-gray-50/50">`;
+                    <div class="p-3 md:p-5 space-y-4 bg-slate-50/50">`;
 
                 part.years.forEach((year, yIdx) => {
                     if (!isAdmin && userLevel && userLevel !== year.id) return;
-                    
                     partHasContent = true;
 
                     partHtml += `
-                    <details class="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm" ${!isAdmin ? 'open' : ''}>
-                        <summary class="text-${pColor}-700 p-4 font-bold hover:bg-gray-50 transition border-b border-gray-50">
+                    <details class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm" ${!isAdmin ? 'open' : ''}>
+                        <summary class="text-${pColor}-800 p-4 font-black hover:bg-slate-50 transition border-b border-gray-100 text-lg">
                             ${year.title}
                         </summary>
-                        <div class="p-4 space-y-4">`;
+                        <div class="p-4 space-y-5">`;
 
                     year.branches.forEach((branch, bIdx) => {
                         let isComp = progress.includes(branch.id);
-                        let cardCls = isComp ? 'branch-completed' : 'bg-white border-gray-200';
-                        let btnCls = isComp ? 'active' : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-200';
+                        let cardCls = isComp ? 'branch-completed shadow-md' : 'bg-white border-gray-200';
+                        let btnCls = isComp ? 'active shadow-lg' : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300';
 
                         partHtml += `
-                        <div class="border rounded-xl p-4 md:p-5 shadow-sm transition-all duration-300 ${cardCls}">
-                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 border-b pb-3 gap-3">
-                                <h4 class="font-bold text-gray-800 text-lg">${branch.title}</h4>
+                        <div class="border-2 rounded-2xl p-4 md:p-5 transition-all duration-300 ${cardCls}">
+                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-5 border-b-2 border-dashed pb-3 gap-3">
+                                <h4 class="font-extrabold text-gray-800 text-xl flex items-center gap-2"><span class="text-${pColor}-500">▪</span> ${branch.title}</h4>
                                 ${!isAdmin ? `
-                                <button onclick="studentToggleComplete('${branch.id}')" class="w-full md:w-auto border px-5 py-2 rounded-lg text-sm font-bold transition ${btnCls}">
-                                    ${isComp ? '✔ مكتمل' : 'تحديد كمكتمل'}
+                                <button onclick="studentToggleComplete('${branch.id}')" class="w-full md:w-auto border-2 px-6 py-2.5 rounded-xl text-sm font-black transition ${btnCls}">
+                                    ${isComp ? '✅ مكتمل رائع!' : 'تحديد كمكتمل'}
                                 </button>` : ''}
                             </div>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">`;
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">`;
 
                         ['lessons', 'exercises', 'exams'].forEach(cat => {
                             let links = branch.categories[cat] || [];
                             let linksList = links.length ? links.map((lnk, lIdx) => `
-                                <li class="flex justify-between items-center bg-white p-2.5 rounded-lg border border-gray-100 shadow-sm text-sm mb-2 group">
-                                    <a href="${lnk.url}" target="_blank" class="text-blue-600 font-semibold truncate w-3/4 hover:underline">
-                                        • ${lnk.title}
+                                <li class="flex justify-between items-center bg-white p-3 rounded-xl border border-gray-100 shadow-sm text-sm mb-2 hover:shadow-md transition group">
+                                    <a href="${lnk.url}" target="_blank" class="text-blue-700 font-bold truncate w-3/4 hover:underline decoration-2 underline-offset-4">
+                                        🔗 ${lnk.title}
                                     </a>
-                                    ${isAdmin ? `<button onclick="adminDeleteLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" class="text-red-500 hover:bg-red-50 px-2 py-1 rounded text-xs transition">حذف</button>` : ''}
+                                    ${isAdmin ? `<button onclick="adminDeleteLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" class="text-red-500 hover:bg-red-50 p-1.5 rounded-lg text-lg transition" title="حذف">🗑️</button>` : ''}
                                 </li>
-                            `).join('') : `<li class="text-xs text-gray-400 text-center p-2">لا يوجد محتوى.</li>`;
+                            `).join('') : `<li class="text-xs text-gray-400 text-center p-4 font-bold bg-gray-50 rounded-xl border border-dashed">لا يوجد محتوى بعد.</li>`;
 
                             partHtml += `
-                            <div class="bg-gray-50/80 p-3 rounded-xl border border-gray-100">
-                                <h5 class="font-bold text-gray-700 text-sm mb-3 border-b pb-1 inline-block">${catTitles[cat]}</h5>
-                                <ul class="mb-2">${linksList}</ul>
+                            <div class="bg-slate-100/70 p-4 rounded-2xl border border-slate-200">
+                                <h5 class="font-extrabold text-slate-800 text-base mb-4 border-b-2 border-slate-300 pb-2 inline-block">${catTitles[cat]}</h5>
+                                <ul class="mb-3">${linksList}</ul>
                                 
                                 ${isAdmin ? `
-                                <div class="mt-3 pt-3 border-t border-gray-200 space-y-2">
-                                    <input type="text" id="title_${branch.id}_${cat}" class="w-full text-xs p-2.5 border rounded-lg outline-none" placeholder="عنوان الدرس...">
-                                    <input type="text" id="url_${branch.id}_${cat}" class="w-full text-xs p-2.5 border rounded-lg outline-none" placeholder="الرابط (http...)">
-                                    <button onclick="adminAddLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', '${branch.id}')" class="w-full bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold py-2 rounded-lg transition">إضافة الرابط</button>
+                                <div class="mt-4 pt-4 border-t-2 border-slate-200 border-dashed space-y-3">
+                                    <input type="text" id="title_${branch.id}_${cat}" class="w-full text-sm font-bold p-3 border-2 rounded-xl outline-none focus:border-blue-500 transition" placeholder="عنوان الدرس...">
+                                    <input type="text" id="url_${branch.id}_${cat}" class="w-full text-sm p-3 border-2 rounded-xl outline-none focus:border-blue-500 transition" placeholder="الرابط (http...)">
+                                    <button onclick="adminAddLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', '${branch.id}')" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-black py-3 rounded-xl transition shadow-md">➕ إضافة الرابط</button>
                                 </div>` : ''}
                             </div>`;
                         });
@@ -557,9 +649,7 @@ const firebaseConfig = {
                 });
                 partHtml += `</div></details>`; 
 
-                if (isAdmin || partHasContent) {
-                    html += partHtml;
-                }
+                if (isAdmin || partHasContent) { html += partHtml; }
             });
             document.getElementById(containerId).innerHTML = html;
         };
