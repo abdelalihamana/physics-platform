@@ -56,8 +56,8 @@
         
         .chat-bubble { max-width: 85%; padding: 10px 14px; border-radius: 16px; margin-bottom: 8px; position: relative; word-wrap: break-word; line-height: 1.5; font-size: 0.95rem; animation: popIn 0.3s ease;}
         @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-        .chat-mine { background-color: transparent; border: 1px solid #bae6fd; margin-right: auto; border-bottom-right-radius: 4px; color: #1e3a8a;}
-        .chat-other { background-color: transparent; border: 1px solid #e2e8f0; margin-left: auto; border-bottom-left-radius: 4px; color: #334155;}
+        .chat-mine { background-color: transparent; border: none; margin-right: auto; border-bottom-right-radius: 4px; color: #1e3a8a;}
+        .chat-other { background-color: transparent; border: none; margin-left: auto; border-bottom-left-radius: 4px; color: #334155;}
         
         .stats-dropdown {
             position: absolute; top: 100%; left: 0; margin-top: 0.5rem; width: 280px; background: white;
@@ -488,7 +488,13 @@
             "أنت قادر على تحقيق المستحيل، ثق بقدراتك وانطلق! 💪",
             "التعلم هو الكنز الوحيد الذي سيرافقك أينما ذهبت. 📚",
             "طريق الألف ميل يبدأ بخطوة واحدة، وأنت الآن في المسار الصحيح. 🚶‍♂️",
-            "المحاولة فوز حتى وإن لم تصل، فكيف بك وأنت تجتهد للوصول! 🏆"
+            "المحاولة فوز حتى وإن لم تصل، فكيف بك وأنت تجتهد للوصول! 🏆",
+            "العقول العظيمة تبدأ بشغف التعلم، فاجعل شغفك محركك. 💡",
+            "كل مسألة فيزيائية هي لغز ممتع ينتظر ذكاءك لحله. 🧩",
+            "لا تخشَ الخطأ، فكل خطأ هو خطوة نحو الفهم العميق. 📈",
+            "إنجازات الغد تُبنى بجهد اليوم، واصل المسير نحو القمة. 🎯",
+            "الفهم العميق يأتي بالتدرج، لا تستعجل النتائج وكن صبوراً. 🐢",
+            "أعظم العلماء كانوا تلاميذ مثلك، لا يملون من المحاولة والتجربة. 🔬"
         ];
 
         const getBranchIcon = (title) => {
@@ -646,8 +652,20 @@
                         } else {
                             document.getElementById('display-username').innerText = username;
                             document.getElementById('student-level-badge').innerText = levelNames[window.currentUserRecord.level];
-                            const randomQuote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
-                            document.getElementById('welcome-quote-text').innerText = randomQuote;
+                            
+                            // نظام ذكي لعدم تكرار المقولات حتى انتهائها
+                            let availableQuotes = JSON.parse(localStorage.getItem('available_quotes')) || [];
+                            if (availableQuotes.length === 0) {
+                                availableQuotes = [...Array(motivationalQuotes.length).keys()];
+                            }
+                            let randomIndex = Math.floor(Math.random() * availableQuotes.length);
+                            let quoteIndex = availableQuotes[randomIndex];
+                            availableQuotes.splice(randomIndex, 1);
+                            localStorage.setItem('available_quotes', JSON.stringify(availableQuotes));
+
+                            const selectedQuote = motivationalQuotes[quoteIndex];
+                            document.getElementById('welcome-quote-text').innerText = selectedQuote;
+                            
                             switchScreen('app-screen');
                             window.showWelcomeScreen(); 
                             startStudentListeners();
@@ -702,6 +720,7 @@
             if(unsubscribeChatMeta) unsubscribeChatMeta();
             document.getElementById('welcome-quote-screen').classList.remove('welcome-visible');
             document.getElementById('welcome-quote-screen').classList.add('welcome-hidden');
+            if (typeof closeChat === 'function') closeChat(); // إخفاء نافذة الدردشة فور الخروج
             switchScreen('auth-screen');
         };
 
@@ -1019,7 +1038,7 @@
                     let isMine = m.sender === window.currentUserRecord.role;
                     let bubbleClass = isMine ? 'chat-mine' : 'chat-other';
                     let alignment = isMine ? 'self-end' : 'self-start';
-                    let contentHtml = `<p class="text-[13px] font-bold whitespace-pre-wrap" dir="auto">${linkify(m.text)}</p>`;
+                    let contentHtml = `<p class="text-[14px] font-normal whitespace-pre-wrap" dir="auto">${linkify(m.text)}</p>`;
                     
                     chatHtml += `<div class="${bubbleClass} ${alignment} shadow-sm transition hover:shadow-md">${contentHtml}</div>`;
                 });
