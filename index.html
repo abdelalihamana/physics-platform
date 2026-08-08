@@ -103,8 +103,7 @@
         </div>
         
         <!-- مساحة الرسائل -->
-        <div id="chat-messages" class="flex-1 overflow-y-auto p-3 flex flex-col gap-2 bg-slate-50/80 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] scroll-smooth">
-        </div>
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-3 flex flex-col gap-2 bg-slate-50/80 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] scroll-smooth"></div>
 
         <!-- منطقة الكتابة -->
         <div class="bg-white p-2 border-t border-slate-100 flex gap-2 items-end shadow-[0_-5px_10px_-5px_rgba(0,0,0,0.05)]">
@@ -149,11 +148,26 @@
                     <label class="block text-base font-bold text-slate-600 mb-2">🔒 كلمة المرور الجديدة</label>
                     <input type="text" id="settings-new-password" class="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none font-black transition shadow-sm text-lg">
                 </div>
-                <div>
+                <div id="settings-phone-container">
                     <label class="block text-base font-bold text-slate-600 mb-2">📱 هاتف ولي الأمر</label>
                     <input type="tel" id="settings-new-phone" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-white focus:border-blue-500 outline-none font-black transition shadow-sm text-left tracking-[0.2em] text-lg" dir="auto" placeholder="05/06/07...">
                 </div>
                 <button onclick="saveSettingsData()" class="w-full bg-gradient-to-r from-slate-800 to-slate-900 text-white font-black py-4 rounded-xl transition btn-modern mt-2 shadow-lg shadow-slate-900/20 text-xl">💾 حفظ التغييرات</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة تعديل المحتوى للأستاذ -->
+    <div id="edit-modal" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-[80] backdrop-blur-md transition-opacity duration-300">
+        <div class="bg-white p-8 rounded-[2rem] max-w-sm w-[90%] mx-auto shadow-2xl border border-white/50">
+            <h3 class="text-2xl font-black mb-4 text-slate-800 flex items-center gap-2">✏️ تعديل المحتوى</h3>
+            <div class="space-y-4">
+                <input type="text" id="edit-link-title" class="w-full text-base font-bold p-3 border-2 border-slate-200 rounded-xl outline-none focus:border-blue-500 transition bg-slate-50" placeholder="عنوان المحتوى...">
+                <input type="text" id="edit-link-url" class="w-full text-base p-3 border-2 border-slate-200 rounded-xl outline-none focus:border-blue-500 transition bg-slate-50 text-left font-bold text-slate-600" dir="ltr" placeholder="https://...">
+            </div>
+            <div class="flex justify-center gap-3 mt-6">
+                <button onclick="closeEditModal()" class="flex-1 py-3 bg-slate-100 text-slate-700 rounded-xl font-black text-lg hover:bg-slate-200 transition btn-modern">إلغاء</button>
+                <button onclick="saveEditedLink()" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-black text-lg hover:bg-blue-700 transition shadow-lg shadow-blue-500/30 btn-modern">تحديث</button>
             </div>
         </div>
     </div>
@@ -267,7 +281,7 @@
             <div class="w-24 h-24 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center text-6xl mx-auto mb-6 shadow-inner animate-pulse">⏳</div>
             <h2 class="text-3xl font-black text-slate-800 mb-4 drop-shadow-sm">طلبك قيد المراجعة</h2>
             <p class="text-slate-500 mb-8 font-bold leading-relaxed text-lg">تم تسجيل حسابك بنجاح في منصة المجتهد. يرجى الانتظار حتى يقوم الأستاذ بتفعيل حسابك لتبدأ التعلم.</p>
-            <button onclick="logout()" class="w-full bg-slate-100 text-slate-700 font-black py-4 rounded-2xl hover:bg-slate-200 transition btn-modern text-lg border border-slate-200">العودة للرئيسية</button>
+            <button onclick="logout()" class="w-full bg-slate-100 text-slate-700 font-black py-4 rounded-2xl hover:bg-slate-200 transition btn-modern text-lg border border-slate-200">تسجيل الخروج</button>
         </div>
 
         <!-- 3. شاشة تحكم المسؤول (الأستاذ) -->
@@ -292,13 +306,15 @@
                             <ul id="level-stats-list" class="space-y-3 text-sm font-bold text-slate-600"></ul>
                         </div>
                     </div>
-                    <button onclick="openSettings()" class="bg-slate-100 text-slate-700 px-4 py-2.5 rounded-2xl font-black hover:bg-slate-200 transition btn-modern shadow-sm border border-slate-200 text-lg" title="الإعدادات">⚙️</button>
-                    <button onclick="logout()" class="bg-red-50 text-red-600 px-4 py-2.5 rounded-2xl font-black hover:bg-red-100 transition btn-modern border border-red-100 shadow-sm flex items-center gap-2 text-sm"><span class="hidden md:inline">تسجيل الخروج</span> 🚪</button>
+                    <!-- تغيير أيقونة الإعدادات إلى نص -->
+                    <button onclick="openSettings()" class="bg-slate-100 text-slate-700 px-4 py-2.5 rounded-2xl font-black hover:bg-slate-200 transition btn-modern shadow-sm border border-slate-200 text-sm flex items-center gap-2" title="الإعدادات">الإعدادات ⚙️</button>
+                    <!-- تغيير أيقونة الخروج إلى نص -->
+                    <button onclick="logout()" class="bg-red-50 text-red-600 px-4 py-2.5 rounded-2xl font-black hover:bg-red-100 transition btn-modern border border-red-100 shadow-sm flex items-center gap-2 text-sm">تسجيل الخروج 🚪</button>
                 </div>
             </header>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                <!-- قسم متابعة التلاميذ (مخفي تحت بطاقة منسدلة لتنظيم الواجهة) -->
+                <!-- قسم متابعة التلاميذ -->
                 <div class="lg:col-span-12">
                     <details class="bg-white/95 backdrop-blur-xl rounded-[2.5rem] shadow-lg border border-white/50 interactive-card overflow-hidden group">
                         <summary class="p-6 md:p-8 flex items-center justify-between outline-none">
@@ -369,21 +385,39 @@
                         <span id="student-chat-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-[11px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm hidden animate-bounce">0</span>
                     </button>
 
-                    <button onclick="openSettings()" class="bg-slate-100 text-slate-700 px-4 py-2.5 rounded-xl font-black hover:bg-slate-200 transition btn-modern shadow-sm border border-slate-200 flex items-center gap-2 text-lg" title="الإعدادات">⚙️</button>
+                    <button onclick="openSettings()" class="bg-slate-100 text-slate-700 px-4 py-2.5 rounded-xl font-black hover:bg-slate-200 transition btn-modern shadow-sm border border-slate-200 flex items-center gap-2 text-sm" title="الإعدادات">الإعدادات ⚙️</button>
                     <!-- نص واضح لتسجيل الخروج -->
-                    <button onclick="logout()" class="bg-red-50 text-red-600 px-4 py-2.5 rounded-xl font-black hover:bg-red-100 transition btn-modern border border-red-100 shadow-sm flex items-center gap-2 text-sm"><span class="hidden md:inline">تسجيل الخروج</span> 🚪</button>
+                    <button onclick="logout()" class="bg-red-50 text-red-600 px-4 py-2.5 rounded-xl font-black hover:bg-red-100 transition btn-modern border border-red-100 shadow-sm flex items-center gap-2 text-sm">تسجيل الخروج 🚪</button>
                 </div>
             </header>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
                 <!-- شريط تقدم عام مصغر وأنيق -->
-                <div class="lg:col-span-8 bg-white/95 backdrop-blur-xl p-5 md:p-6 rounded-[2rem] shadow-sm border border-slate-200 relative overflow-hidden interactive-card flex flex-col justify-center">
+                <div class="lg:col-span-12 bg-white/95 backdrop-blur-xl p-5 md:p-6 rounded-[2rem] shadow-sm border border-slate-200 relative overflow-hidden interactive-card flex flex-col justify-center">
                     <div class="absolute -right-10 -top-10 w-32 h-32 bg-gradient-to-br from-emerald-400 to-teal-400 rounded-full opacity-10 blur-2xl group-hover:opacity-20 transition duration-500"></div>
                     <div class="flex justify-between items-end mb-3 relative z-10">
-                        <h3 class="font-black text-slate-700 text-lg flex items-center gap-2">
-                            <div class="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center text-sm shadow-inner">🚀</div>
-                            تقدمك الإجمالي
-                        </h3>
+                        <div class="flex items-center gap-3">
+                             <h3 class="font-black text-slate-700 text-lg flex items-center gap-2">
+                                <div class="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center text-sm shadow-inner">🚀</div>
+                                تقدمك الإجمالي
+                            </h3>
+                            
+                            <!-- القائمة المنسدلة لأبطال المستوى -->
+                            <div class="relative inline-block z-50">
+                                <details class="group" id="leaderboard-dropdown-details">
+                                    <summary class="bg-amber-50 text-amber-700 px-3 py-1.5 rounded-xl text-sm font-black hover:bg-amber-100 transition border border-amber-200 shadow-sm flex items-center gap-2 cursor-pointer outline-none">
+                                        🏆 أبطال المستوى
+                                    </summary>
+                                    <div class="absolute top-full right-0 mt-2 w-[300px] md:w-80 bg-white/95 backdrop-blur-md rounded-[2rem] shadow-2xl border border-slate-100 p-4 z-[60] max-h-[350px] overflow-y-auto">
+                                        <h4 class="font-black text-slate-800 text-lg mb-3 border-b border-slate-100 pb-2 flex items-center gap-2">
+                                            ترتيب المتفوقين
+                                        </h4>
+                                        <div id="leaderboard-container"></div>
+                                    </div>
+                                </details>
+                            </div>
+
+                        </div>
                         <span id="progress-text" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500 tracking-tighter drop-shadow-sm">0%</span>
                     </div>
                     <div class="w-full bg-slate-100 rounded-full h-4 overflow-hidden shadow-inner p-0.5 relative z-10 border border-slate-200">
@@ -392,25 +426,10 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- لوحة الصدارة قابلة للطي -->
-                <div class="lg:col-span-4">
-                    <details class="bg-white/95 backdrop-blur-xl rounded-[2rem] shadow-sm border border-slate-200 interactive-card overflow-hidden h-full flex flex-col">
-                        <summary class="p-5 font-black text-slate-800 text-lg flex items-center justify-between outline-none bg-slate-50/50 hover:bg-slate-100 transition">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-xl shadow-inner">🏆</div>
-                                أبطال المستوى 
-                            </div>
-                        </summary>
-                        <div class="p-5 pt-0 border-t border-slate-100 flex-1 overflow-y-auto max-h-[250px]" id="leaderboard-container">
-                            <!-- سيتم حقن الترتيب هنا -->
-                        </div>
-                    </details>
-                </div>
             </div>
             
             <!-- حاوية واجهة الدروس للتلميذ -->
-            <div id="student-program-view" class="space-y-6 pb-20"></div>
+            <div id="student-program-view" class="pb-20"></div>
         </div>
     </div>
 
@@ -451,6 +470,7 @@
         let unsubscribeChatMeta = null;
         window.activeChatUser = null; 
         window.currentSections = [];
+        window.currentEditParams = null; // لتخزين بيانات الرابط الجاري تعديله
         
         window.adminUsersList = [];
         window.adminChatsData = {};
@@ -552,7 +572,7 @@
                     const progDoc = await getDoc(doc(programCol, 'main'));
                     if (!progDoc.exists()) await setDoc(doc(programCol, 'main'), { sections: defaultProgramData });
                     const adminDoc = await getDoc(doc(usersCol, 'admin'));
-                    if (!adminDoc.exists()) await setDoc(doc(usersCol, 'admin'), { password: 'adminpassword', role: 'admin', approved: true, progress: [], clickedLinks: [] });
+                    if (!adminDoc.exists()) await setDoc(doc(usersCol, 'admin'), { password: 'adminpassword', role: 'admin', approved: true, clickedLinks: [] });
                 } catch(e) { console.error(e); }
             }
         });
@@ -561,7 +581,7 @@
             window.isRegistering = !window.isRegistering;
             document.getElementById('auth-title').innerText = window.isRegistering ? "حساب جديد" : "منصة المجتهد";
             document.getElementById('auth-action-btn').innerText = window.isRegistering ? "إرسال الطلب" : "تسجيل الدخول";
-            document.getElementById('switch-mode-text').innerText = window.isRegistering ? "لديك حساب بالفعل؟ سجل دخولك" : "إنشاء حساب تلميذ جديد";
+            document.getElementById('switch-mode-text').innerText = window.isRegistering ? "لديك حساب بالفعل؟ سجل دخولك" : "إنشاء حساب تلميذ جديد 🚀";
             
             const levelSelect = document.getElementById('user-level');
             const levelIcon = document.getElementById('level-icon');
@@ -606,7 +626,7 @@
                         showToast("اسم المستخدم مستخدم مسبقاً، اختر اسماً آخر", "error");
                     } else {
                         await setDoc(userRef, { 
-                            password: password, role: 'student', approved: false, progress: [], clickedLinks: [],
+                            password: password, role: 'student', approved: false, clickedLinks: [],
                             level: level, parentName: parentName, phoneNumber: phoneNumber
                         });
                         document.getElementById('registration-success-modal').classList.remove('hidden');
@@ -689,9 +709,18 @@
         window.openSettings = () => {
             document.getElementById('settings-username').value = window.currentUserRecord.username;
             document.getElementById('settings-new-password').value = window.currentUserRecord.password;
-            if(document.getElementById('settings-new-phone')) {
-                document.getElementById('settings-new-phone').value = window.currentUserRecord.phoneNumber || '';
+            
+            const phoneContainer = document.getElementById('settings-phone-container');
+            const phoneInput = document.getElementById('settings-new-phone');
+            
+            // إخفاء حقل هاتف الولي إذا كان المستخدم هو المدير
+            if(window.currentUserRecord.role === 'admin') {
+                phoneContainer.style.display = 'none';
+            } else {
+                phoneContainer.style.display = 'block';
+                phoneInput.value = window.currentUserRecord.phoneNumber || '';
             }
+
             const modal = document.getElementById('settings-modal');
             const content = document.getElementById('settings-content');
             modal.classList.remove('hidden'); modal.classList.add('flex');
@@ -707,14 +736,14 @@
 
         window.saveSettingsData = async () => {
             const newPass = document.getElementById('settings-new-password').value.trim();
-            const newPhoneInput = document.getElementById('settings-new-phone');
+            const phoneInput = document.getElementById('settings-new-phone');
             let updates = {};
             
             if(!newPass) return showToast("كلمة المرور لا يمكن أن تكون فارغة", "error");
             updates.password = newPass;
 
-            if(newPhoneInput) {
-                const newPhone = newPhoneInput.value.trim();
+            if(window.currentUserRecord.role !== 'admin') {
+                const newPhone = phoneInput.value.trim();
                 const phoneRegex = /^(05|06|07)\d{8}$/;
                 if(newPhone && !phoneRegex.test(newPhone)) return showToast("رقم الهاتف غير صحيح! يجب أن يبدأ بـ 05، 06، أو 07", "error");
                 updates.phoneNumber = newPhone;
@@ -729,7 +758,7 @@
             } catch(e) { showToast("حدث خطأ أثناء الحفظ", "error"); }
         }
 
-        // دالة تتبع النقرات على الروابط (للتلميذ)
+        // دالة تتبع النقرات على الروابط
         window.trackLinkClick = async (branchId, cat, lIdx, url) => {
             window.open(url, '_blank');
             if (window.currentUserRecord && window.currentUserRecord.role !== 'admin') {
@@ -742,46 +771,29 @@
             }
         };
 
-        // حساب التقدم بناءً على عدد الروابط المقروءة
+        // حساب التقدم بناءً على عدد الروابط المقروءة لكل وحدة
         const calculateProgress = (levelId, data, sections) => {
             if(!sections || !levelId) return 0;
             let totalLinks = 0;
             let clickedCount = 0;
             let clickedLinks = data.clickedLinks || [];
-            let oldProgress = data.progress || []; // لدعم التقدم القديم (بالزر)
 
             sections.forEach(p => p.years.forEach(y => {
                 if(y.id === levelId) {
-                    y.branches.forEach(branch => {
-                        let branchTotal = 0;
-                        let branchClicked = 0;
+                    y.branches.forEach(b => {
                         ['lessons', 'exercises', 'exams'].forEach(cat => {
-                            let links = branch.categories[cat] || [];
-                            branchTotal += links.length;
+                            let links = b.categories[cat] || [];
+                            totalLinks += links.length;
                             links.forEach((_, lIdx) => {
-                                if(clickedLinks.includes(`${branch.id}_${cat}_${lIdx}`)) branchClicked++;
+                                if(clickedLinks.includes(`${b.id}_${cat}_${lIdx}`)) clickedCount++;
                             });
                         });
-                        
-                        // إذا كان الفرع مكتمل بالطريقة القديمة، نعتبر كل روابطه الحالية مقروءة
-                        if(branchTotal > 0) {
-                            totalLinks += branchTotal;
-                            clickedCount += branchClicked;
-                            if(oldProgress.includes(branch.id) && branchClicked === 0) clickedCount += branchTotal; 
-                        }
                     });
                 }
             }));
             
-            if(totalLinks === 0) {
-                // توافقية للإصدار القديم إذا لم تكن هناك روابط
-                let totalBranches = 0;
-                sections.forEach(p => p.years.forEach(y => { if(y.id === levelId) totalBranches += y.branches.length; }));
-                if(totalBranches === 0) return 0;
-                return Math.round((oldProgress.length / totalBranches) * 100);
-            }
-            let p = Math.round((clickedCount / totalLinks) * 100);
-            return p > 100 ? 100 : p;
+            if(totalLinks === 0) return 0; // تصفير التقدم إذا لم يكن هناك روابط إطلاقاً
+            return Math.round((clickedCount / totalLinks) * 100);
         };
 
         const renderLeaderboard = () => {
@@ -841,23 +853,12 @@
                 let levelDisplay = data.level ? (levelNames[data.level] || data.level) : "غير محدد";
                 let progPercent = calculateProgress(data.level, data, window.currentSections);
                 
-                let waMessage = "";
-                if(progPercent >= 70) {
-                    waMessage = `السلام عليكم السيد(ة) ${data.parentName}، نود إعلامكم أن ابنكم/ابنتكم ${d.id} يحقق نتائج ممتازة وتقدماً رائعاً بنسبة (${progPercent}%) في منصة المجتهد للفيزياء 🌟. شكراً لمتابعتكم!`;
-                } else if(progPercent >= 40) {
-                    waMessage = `السلام عليكم السيد(ة) ${data.parentName}، التلميذ(ة) ${d.id} يتابع دروسه في منصة الفيزياء (بنسبة تقدم: ${progPercent}%). نرجو منكم تشجيعه لتقديم المزيد من الجهد 👍.`;
-                } else {
-                    waMessage = `السلام عليكم السيد(ة) ${data.parentName}، لاحظنا تأخراً في استكمال دروس التلميذ(ة) ${d.id} في منصة الفيزياء (التقدم: ${progPercent}% فقط). يرجى التدخل لمتابعته وتحفيزه للمراجعة ⚠️.`;
-                }
-                let encodedWaMessage = encodeURIComponent(waMessage);
-                let formattedPhone = data.phoneNumber ? "213" + data.phoneNumber.substring(1) : ""; 
-
                 let parentInfo = data.parentName ? 
                     `<div class="font-black text-slate-800">${data.parentName}</div>
                      <div class="mt-1.5">
-                        <a href="https://wa.me/${formattedPhone}?text=${encodedWaMessage}" target="_blank" class="bg-[#25D366] hover:bg-[#128C7E] text-white px-3 py-1.5 rounded-lg text-sm font-black shadow-sm transition inline-flex items-center gap-2">
+                        <a href="https://wa.me/213${(data.phoneNumber||'').substring(1)}" target="_blank" class="bg-[#25D366] hover:bg-[#128C7E] text-white px-3 py-1.5 rounded-lg text-sm font-black shadow-sm transition inline-flex items-center gap-2">
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                            رسالة واتساب
+                            واتساب الولي
                         </a>
                      </div>` : '<div class="text-sm text-slate-400 font-bold">غير متوفر</div>';
 
@@ -881,11 +882,16 @@
                             </div>
                         </td>
                         <td class="p-4 bg-slate-50/70 text-center">
-                            <div class="flex gap-2 justify-center">
-                                <button onclick="loginAsStudent('${d.id}')" class="icon-btn w-10 h-10 bg-indigo-50 text-indigo-700 text-xl shadow-sm border border-indigo-200" title="دخول لحساب التلميذ">👁️</button>
-                                <button onclick="openChat('${d.id}')" class="relative icon-btn w-10 h-10 bg-blue-50 text-blue-600 text-xl shadow-sm border border-blue-200" title="مراسلة التلميذ">💬 ${chatBadge}</button>
-                                <button onclick="toggleUserStatus('${d.id}', ${!data.approved})" class="icon-btn w-10 h-10 ${data.approved ? 'bg-slate-100 text-slate-600 border-slate-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'} text-xl shadow-sm border" title="${data.approved ? 'تعطيل الحساب' : 'تفعيل الحساب'}">${data.approved ? '⛔' : '✅'}</button>
-                                <button onclick="deleteUserAccount('${d.id}')" class="icon-btn w-10 h-10 bg-red-50 text-red-500 text-xl shadow-sm border border-red-200" title="حذف نهائي">🗑️</button>
+                            <span class="px-3 py-1 rounded-full text-xs font-black ${data.approved ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">
+                                ${data.approved ? 'مفعل' : 'انتظار'}
+                            </span>
+                        </td>
+                        <td class="p-4 text-left">
+                            <div class="flex gap-2 justify-end">
+                                <button onclick="loginAsStudent('${d.id}')" class="icon-btn w-9 h-9 bg-indigo-50 text-indigo-700 text-lg shadow-sm border border-indigo-200" title="دخول لحساب التلميذ">👁️</button>
+                                <button onclick="openChat('${d.id}')" class="relative icon-btn w-9 h-9 bg-blue-50 text-blue-600 text-lg shadow-sm border border-blue-200" title="مراسلة التلميذ">💬 ${chatBadge}</button>
+                                <button onclick="toggleUserStatus('${d.id}', ${!data.approved})" class="icon-btn w-9 h-9 ${data.approved ? 'bg-slate-100 text-slate-600 border-slate-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'} text-lg shadow-sm border" title="${data.approved ? 'تعطيل الحساب' : 'تفعيل الحساب'}">${data.approved ? '⛔' : '✅'}</button>
+                                <button onclick="deleteUserAccount('${d.id}')" class="icon-btn w-9 h-9 bg-red-50 text-red-500 text-lg shadow-sm border border-red-200" title="حذف نهائي">🗑️</button>
                             </div>
                         </td>
                     </tr>`;
@@ -905,7 +911,15 @@
 
         const startAdminListeners = () => {
             unsubscribeProgram = onSnapshot(doc(programCol, 'main'), (docSnap) => {
-                if(docSnap.exists()) { window.currentSections = docSnap.data().sections; renderProgramUI(window.currentSections, 'admin-program-view', true); renderAdminTable(); }
+                if(docSnap.exists()) {
+                    // حفظ حالة فتح/غلق النوافذ قبل إعادة الرسم
+                    const openDetails = Array.from(document.querySelectorAll('details[open]')).map(el => el.id);
+                    window.currentSections = docSnap.data().sections; 
+                    renderProgramUI(window.currentSections, 'admin-program-view', true);
+                    // إعادة فتح النوافذ
+                    openDetails.forEach(id => { const el = document.getElementById(id); if(el) el.open = true; });
+                    renderAdminTable(); 
+                }
             });
 
             if(unsubscribeUsers) unsubscribeUsers();
@@ -951,7 +965,6 @@
                         window.allStudentsProgress.push({ id: d.id, level: data.level, progress: progPercent, approved: data.approved });
                     }
                     if(d.id === window.currentUserRecord.username) {
-                        window.currentUserRecord.progress = data.progress || [];
                         window.currentUserRecord.clickedLinks = data.clickedLinks || [];
                         window.currentUserRecord.phoneNumber = data.phoneNumber || ''; 
                         updateProgressUI(window.currentSections || []); 
@@ -1044,7 +1057,21 @@
             btn.disabled = false; btn.innerHTML = 'إرسال';
         };
 
-        window.toggleUserStatus = async (username, status) => { await updateDoc(doc(usersCol, username), { approved: status }); showToast(status ? "تم تفعيل حساب التلميذ" : "تم تعطيل الحساب"); };
+        window.toggleUserStatus = async (username, status) => { 
+            await updateDoc(doc(usersCol, username), { approved: status }); 
+            showToast(status ? "تم تفعيل حساب التلميذ" : "تم تعطيل الحساب");
+            if (status) {
+                const userObj = window.adminUsersList.find(u => u.id === username);
+                if (userObj && userObj.data && userObj.data.phoneNumber) {
+                    let phone = userObj.data.phoneNumber;
+                    if(phone.startsWith('0')) phone = '213' + phone.substring(1);
+                    let msg = "السلام عليكم اما بعد, تم قبول إبنكم لمزاولة الدراسة على منصتنا نتمنى له التوفيق والنجاح";
+                    let waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+                    window.open(waUrl, '_blank');
+                }
+            }
+        };
+
         window.deleteUserAccount = async (username) => { if(await confirmAction(`سيتم حذف حساب التلميذ وكل تقدمه نهائياً.`)) { await deleteDoc(doc(usersCol, username)); showToast("تم الحذف بنجاح"); } };
 
         window.adminAddLink = async (pIdx, yIdx, bIdx, cat, branchId) => {
@@ -1058,7 +1085,7 @@
             sections[pIdx].years[yIdx].branches[bIdx].categories[cat].push({title, url});
             await updateDoc(docRef, { sections });
             showToast("تمت الإضافة بنجاح للمنهج 📚");
-            document.getElementById(`title_${branchId}_${cat}`).value = ''; document.getElementById(`url_${branchId}_${cat}`).value = '';
+            // لن يتم إعادة التوجيه بسبب تحديث onSnapshot وسيحافظ على النوافذ مفتوحة بفضل الكود أعلاه
         };
 
         window.adminDeleteLink = async (pIdx, yIdx, bIdx, cat, lIdx) => {
@@ -1071,6 +1098,41 @@
             }
         };
 
+        window.adminEditLinkModal = (pIdx, yIdx, bIdx, cat, lIdx) => {
+            let currentLink = window.currentSections[pIdx].years[yIdx].branches[bIdx].categories[cat][lIdx];
+            document.getElementById('edit-link-title').value = currentLink.title;
+            document.getElementById('edit-link-url').value = currentLink.url;
+            
+            window.currentEditParams = { pIdx, yIdx, bIdx, cat, lIdx };
+            
+            const modal = document.getElementById('edit-modal');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+        };
+
+        window.closeEditModal = () => {
+            document.getElementById('edit-modal').classList.add('hidden');
+            document.getElementById('edit-modal').classList.remove('flex');
+            window.currentEditParams = null;
+        };
+
+        window.saveEditedLink = async () => {
+            let newTitle = document.getElementById('edit-link-title').value.trim();
+            let newUrl = document.getElementById('edit-link-url').value.trim();
+            if(!newTitle || !newUrl) return showToast("يرجى إدخال العنوان والرابط", "error");
+            if(!newUrl.startsWith('http')) newUrl = 'https://' + newUrl;
+
+            if(window.currentEditParams) {
+                let { pIdx, yIdx, bIdx, cat, lIdx } = window.currentEditParams;
+                let sections = window.currentSections;
+                sections[pIdx].years[yIdx].branches[bIdx].categories[cat][lIdx] = { title: newTitle, url: newUrl };
+                
+                const docRef = doc(programCol, 'main');
+                await updateDoc(docRef, { sections });
+                showToast("تم التعديل بنجاح ✏️");
+                closeEditModal();
+            }
+        };
+
         const updateProgressUI = (sections) => {
             let progPercent = calculateProgress(window.currentUserRecord.level, window.currentUserRecord, sections);
             document.getElementById('progress-bar').style.width = `${progPercent}%`; 
@@ -1080,7 +1142,7 @@
         const catConfig = {
             lessons: { title: 'الدروس', icon: '📘', bg: 'bg-blue-50/50', text: 'text-blue-700' },
             exercises: { title: 'التمارين', icon: '📝', bg: 'bg-orange-50/50', text: 'text-orange-700' },
-            exams: { title: 'الفروض', icon: '🏆', bg: 'bg-purple-50/50', text: 'text-purple-700' }
+            exams: { title: 'الفروض والإختبارات', icon: '🏆', bg: 'bg-purple-50/50', text: 'text-purple-700' }
         };
         
         const renderProgramUI = (sections, containerId, isAdmin) => {
@@ -1088,19 +1150,15 @@
             window.currentSections = sections;
             let html = '';
             let clickedLinks = (!isAdmin && window.currentUserRecord) ? (window.currentUserRecord.clickedLinks || []) : [];
-            let oldProgress = (!isAdmin && window.currentUserRecord) ? (window.currentUserRecord.progress || []) : [];
             let userLevel = (!isAdmin && window.currentUserRecord) ? window.currentUserRecord.level : null;
 
             if (!isAdmin && userLevel) {
-                // واجهة الأيقونات للطالب
-                html += `<h3 class="text-2xl font-black text-slate-800 mb-4 flex items-center gap-2"><span class="text-3xl">🗂️</span> وحداتك الدراسية</h3>`;
-                html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-6">`;
+                html += `<div class="flex flex-col gap-6">`;
                 
                 sections.forEach((part, pIdx) => {
                     part.years.forEach((year, yIdx) => {
                         if (year.id === userLevel) {
                             year.branches.forEach((branch, bIdx) => {
-                                // حساب تقدم الفرع الحالي
                                 let branchLinksTotal = 0;
                                 let branchLinksClicked = 0;
                                 ['lessons', 'exercises', 'exams'].forEach(cat => {
@@ -1110,17 +1168,14 @@
                                         if(clickedLinks.includes(`${branch.id}_${cat}_${lIdx}`)) branchLinksClicked++;
                                     });
                                 });
-                                // التوافق مع التقدم القديم
-                                if(oldProgress.includes(branch.id) && branchLinksTotal > 0 && branchLinksClicked === 0) branchLinksClicked = branchLinksTotal;
-
-                                let unitProg = branchLinksTotal === 0 ? (oldProgress.includes(branch.id) ? 100 : 0) : Math.round((branchLinksClicked / branchLinksTotal) * 100);
-                                let isComp = unitProg === 100;
+                                let unitProg = branchLinksTotal === 0 ? 0 : Math.round((branchLinksClicked / branchLinksTotal) * 100);
+                                let isComp = branchLinksTotal > 0 && unitProg === 100;
                                 
                                 let branchIcon = getBranchIcon(branch.title);
                                 let cardCls = isComp ? 'border-emerald-400 bg-emerald-50/30' : 'border-slate-200 bg-white/90';
                                 
                                 html += `
-                                <details class="rounded-3xl shadow-sm border-2 overflow-hidden interactive-card group backdrop-blur-xl ${cardCls}">
+                                <details class="rounded-3xl shadow-sm border-2 overflow-hidden interactive-card group backdrop-blur-xl ${cardCls}" id="details_student_${branch.id}">
                                     <summary class="p-5 flex items-center gap-4 outline-none cursor-pointer">
                                         <div class="w-16 h-16 rounded-2xl bg-white shadow-inner border border-slate-100 flex items-center justify-center text-4xl group-hover:scale-110 transition duration-300 relative">
                                             ${branchIcon}
@@ -1145,12 +1200,18 @@
                                     let links = branch.categories[cat] || [];
                                     let conf = catConfig[cat];
                                     
-                                    let linksList = links.length ? links.map((lnk, lIdx) => `
-                                        <a href="#" onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}'); return false;" class="flex items-center gap-3 bg-white p-3 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition group/link">
-                                            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl group-hover/link:bg-blue-600 group-hover/link:text-white transition shadow-inner">🔗</div>
-                                            <span class="${conf.text} font-bold text-sm truncate w-3/4 group-hover/link:underline decoration-2 underline-offset-4">${lnk.title}</span>
-                                        </a>
-                                    `).join('') : `<div class="text-sm text-slate-400 font-bold bg-white/50 p-3 rounded-2xl border-2 border-dashed border-slate-200 text-center">لا يوجد محتوى بعد</div>`;
+                                    let linksList = links.length ? links.map((lnk, lIdx) => {
+                                        let linkId = `${branch.id}_${cat}_${lIdx}`;
+                                        let isRead = clickedLinks.includes(linkId);
+                                        return `
+                                        <a href="#" onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}'); return false;" class="flex items-center justify-between gap-3 bg-white p-3 rounded-2xl border ${isRead ? 'border-emerald-200' : 'border-slate-100'} shadow-sm hover:shadow-md transition group/link relative overflow-hidden">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl group-hover/link:bg-blue-600 group-hover/link:text-white transition shadow-inner">🔗</div>
+                                                <span class="${conf.text} font-bold text-sm truncate max-w-[200px] sm:max-w-xs group-hover/link:underline decoration-2 underline-offset-4">${lnk.title}</span>
+                                            </div>
+                                            ${isRead ? `<span class="bg-emerald-100 text-emerald-600 text-[10px] font-black px-2 py-1 rounded-full">مقروء ✅</span>` : ''}
+                                        </a>`;
+                                    }).join('') : `<div class="text-sm text-slate-400 font-bold bg-white/50 p-3 rounded-2xl border-2 border-dashed border-slate-200 text-center">لا يوجد محتوى بعد</div>`;
 
                                     html += `
                                     <div class="${conf.bg} p-4 rounded-2xl border border-slate-200">
@@ -1165,13 +1226,12 @@
                 });
                 html += `</div>`;
             } else {
-                // واجهة الإدارة (هرمية لسهولة الوصول)
                 sections.forEach((part, pIdx) => {
                     let pColor = part.color === 'blue' ? 'blue' : 'indigo';
                     let partHasContent = false;
                     let partHtml = `
-                    <details class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden mb-8 interactive-card" open>
-                        <summary class="bg-slate-50 text-slate-800 p-6 font-black text-xl hover:bg-slate-100 transition border-b border-slate-200 flex items-center gap-3">
+                    <details class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden mb-8 interactive-card" id="details_admin_p_${pIdx}">
+                        <summary class="bg-slate-50 text-slate-800 p-6 font-black text-xl hover:bg-slate-100 transition border-b border-slate-200 flex items-center gap-3 outline-none">
                             <div class="w-10 h-10 rounded-xl bg-${pColor}-100 text-${pColor}-600 flex items-center justify-center text-xl shadow-inner">🗂️</div>
                             ${part.title}
                         </summary>
@@ -1180,8 +1240,8 @@
                     part.years.forEach((year, yIdx) => {
                         partHasContent = true;
                         partHtml += `
-                        <details class="bg-slate-50/50 rounded-2xl border border-slate-100 overflow-hidden shadow-sm interactive-card">
-                            <summary class="text-slate-700 p-5 font-black hover:bg-slate-100 transition border-b border-slate-100 text-lg flex items-center gap-2">
+                        <details class="bg-slate-50/50 rounded-2xl border border-slate-100 overflow-hidden shadow-sm interactive-card" id="details_admin_p_${pIdx}_y_${yIdx}">
+                            <summary class="text-slate-700 p-5 font-black hover:bg-slate-100 transition border-b border-slate-100 text-lg flex items-center gap-2 outline-none">
                                 <span class="w-3 h-3 rounded-full bg-${pColor}-500 shadow-sm"></span> ${year.title}
                             </summary>
                             <div class="p-5 space-y-6 bg-white/50 backdrop-blur-sm">`;
@@ -1202,10 +1262,13 @@
                                 
                                 let linksList = links.length ? links.map((lnk, lIdx) => `
                                     <li class="flex justify-between items-center bg-white p-3 rounded-xl border border-white/50 shadow-sm text-sm mb-2 hover:shadow-md transition group interactive-card">
-                                        <a href="${lnk.url}" target="_blank" class="${conf.text} font-bold truncate w-3/4 hover:opacity-80 hover:underline decoration-2 underline-offset-4 flex items-center gap-2">
+                                        <a href="${lnk.url}" target="_blank" class="${conf.text} font-bold truncate w-2/3 hover:opacity-80 hover:underline decoration-2 underline-offset-4 flex items-center gap-2">
                                             <span class="text-lg opacity-80">🔗</span> ${lnk.title}
                                         </a>
-                                        <button onclick="adminDeleteLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" class="text-slate-400 hover:bg-red-50 hover:text-red-500 p-1.5 rounded-md text-lg transition" title="حذف">✖</button>
+                                        <div class="flex gap-1">
+                                            <button onclick="adminEditLinkModal(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" class="text-slate-400 hover:bg-blue-50 hover:text-blue-500 p-1.5 rounded-md text-lg transition" title="تعديل">✏️</button>
+                                            <button onclick="adminDeleteLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" class="text-slate-400 hover:bg-red-50 hover:text-red-500 p-1.5 rounded-md text-lg transition" title="حذف">✖</button>
+                                        </div>
                                     </li>
                                 `).join('') : `<li class="text-sm text-slate-500 text-center p-4 font-bold bg-white/50 rounded-xl border-2 border-dashed border-slate-200">لم يتم إضافة محتوى بعد</li>`;
 
