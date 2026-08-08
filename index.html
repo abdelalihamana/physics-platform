@@ -29,7 +29,7 @@
         }
         
         .screen { display: none; }
-        .screen.active { display: block; animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        .screen.active { display: block; animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes slideUpFade { 
             from { opacity: 0; transform: translateY(40px) scale(0.98); } 
             to { opacity: 1; transform: translateY(0) scale(1); } 
@@ -42,21 +42,20 @@
         .btn-modern:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -3px rgba(0, 0, 0, 0.1); filter: brightness(1.05); }
         .btn-modern:active { transform: translateY(1px); filter: brightness(0.95); box-shadow: none;}
 
+        .icon-btn { transition: all 0.2s; display: flex; align-items: center; justify-content: center; border-radius: 1rem; cursor: pointer; }
+        .icon-btn:hover { transform: scale(1.1) rotate(5deg); }
+        .icon-btn:active { transform: scale(0.95); }
+
         details > summary { list-style: none; cursor: pointer; user-select: none; transition: background-color 0.3s ease; }
         details > summary::-webkit-details-marker { display: none; }
-        details > summary::after { content: '▼'; float: left; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        details[open] > summary::after { transform: rotate(180deg); }
-        
-        .branch-completed { background-color: #f0fdf4 !important; border-color: #22c55e !important; }
-        .btn-complete.active { background-color: #22c55e; color: white; border-color: #22c55e; }
         
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: rgba(255,255,255,0.5); border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #64748b; }
         
-        .chat-bubble { max-width: 85%; padding: 14px 18px; border-radius: 20px; margin-bottom: 10px; position: relative; word-wrap: break-word; line-height: 1.6; font-size: 1.05rem; animation: popIn 0.3s ease;}
-        @keyframes popIn { from { opacity: 0; transform: scale(0.9) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .chat-bubble { max-width: 85%; padding: 12px 16px; border-radius: 20px; margin-bottom: 8px; position: relative; word-wrap: break-word; line-height: 1.5; animation: popIn 0.3s ease;}
+        @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
         .chat-mine { background-color: #e0f2fe; border: 1px solid #bae6fd; margin-right: auto; border-bottom-right-radius: 4px; color: #1e3a8a;}
         .chat-other { background-color: #ffffff; border: 1px solid #e2e8f0; margin-left: auto; border-bottom-left-radius: 4px; color: #334155;}
         
@@ -72,25 +71,14 @@
         .welcome-visible { opacity: 1 !important; transform: scale(1) !important; pointer-events: auto !important;}
         .welcome-hidden { opacity: 0 !important; transform: scale(1.05) !important; pointer-events: none !important;}
 
-        .theme-lessons { background-color: #f0f9ff; border-color: #bae6fd; }
-        .theme-exercises { background-color: #fff7ed; border-color: #fed7aa; }
-        .theme-exams { background-color: #faf5ff; border-color: #e9d5ff; }
-
         .leaderboard-row { transition: all 0.3s ease; }
         .leaderboard-row:hover { transform: scale(1.02); background-color: #f8fafc; z-index: 10; position: relative; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-        .rank-1 { background: linear-gradient(to left, #fffbeb, #ffffff); border-right: 4px solid #fbbf24; }
-        .rank-2 { background: linear-gradient(to left, #f1f5f9, #ffffff); border-right: 4px solid #94a3b8; }
-        .rank-3 { background: linear-gradient(to left, #fff7ed, #ffffff); border-right: 4px solid #fb923c; }
-        
-        .whatsapp-btn { background-color: #25D366; color: white; transition: all 0.2s ease;}
-        .whatsapp-btn:hover { background-color: #128C7E; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);}
     </style>
 </head>
 <body class="text-slate-800 antialiased p-3 md:p-6 pb-24 selection:bg-blue-200 selection:text-blue-900 relative">
 
     <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[80] flex flex-col gap-2 w-[90%] md:w-auto"></div>
 
-    <!-- شاشة التحفيز الإجبارية -->
     <div id="welcome-quote-screen" class="fixed inset-0 bg-slate-900/95 backdrop-blur-2xl z-[75] flex-col items-center justify-center p-6 welcome-hidden flex">
         <div class="absolute top-1/4 left-1/4 w-72 h-72 bg-emerald-500/20 rounded-full blur-[80px] animate-pulse"></div>
         <div class="absolute bottom-1/4 right-1/4 w-72 h-72 bg-blue-500/20 rounded-full blur-[80px] animate-pulse" style="animation-delay: 1.5s;"></div>
@@ -108,32 +96,30 @@
         </div>
     </div>
 
-    <!-- نافذة الإعدادات (محدثة لتشمل كلمة المرور ورقم الهاتف) -->
     <div id="settings-modal" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-[60] backdrop-blur-md p-4 transition-opacity duration-300">
         <div class="bg-white/95 p-8 rounded-3xl max-w-sm w-full shadow-2xl border border-white/50 transform transition-transform duration-300 scale-95" id="settings-content">
             <div class="flex justify-between items-center mb-6 border-b pb-3 border-slate-100">
-                <h3 class="text-2xl font-black text-slate-800">الإعدادات ⚙️</h3>
+                <h3 class="text-2xl font-black text-slate-800 flex items-center gap-2">⚙️ الإعدادات</h3>
                 <button onclick="closeSettings()" class="text-slate-400 hover:text-red-500 font-bold text-3xl transition hover:rotate-90">✖</button>
             </div>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-bold text-slate-600 mb-1">اسم المستخدم (للقراءة فقط)</label>
-                    <input type="text" id="settings-username" disabled class="w-full px-4 py-3 rounded-xl border-2 border-slate-100 bg-slate-50 text-slate-400 font-black outline-none cursor-not-allowed shadow-inner">
+                    <label class="block text-base font-bold text-slate-600 mb-2">👤 اسم المستخدم</label>
+                    <input type="text" id="settings-username" disabled class="w-full px-5 py-4 rounded-xl border-2 border-slate-100 bg-slate-50 text-slate-400 font-black outline-none cursor-not-allowed shadow-inner text-lg">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-slate-600 mb-1">كلمة المرور الجديدة</label>
-                    <input type="text" id="settings-new-password" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-white focus:border-blue-500 outline-none font-black transition shadow-sm">
+                    <label class="block text-base font-bold text-slate-600 mb-2">🔒 كلمة المرور الجديدة</label>
+                    <input type="text" id="settings-new-password" class="w-full px-5 py-4 rounded-xl border-2 border-slate-200 bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none font-black transition shadow-sm text-lg">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-slate-600 mb-1">رقم هاتف ولي الأمر</label>
-                    <input type="tel" id="settings-new-phone" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-white focus:border-blue-500 outline-none font-black transition shadow-sm text-left tracking-[0.2em]" dir="auto" placeholder="05/06/07...">
+                    <label class="block text-base font-bold text-slate-600 mb-2">📱 هاتف ولي الأمر</label>
+                    <input type="tel" id="settings-new-phone" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full px-5 py-4 rounded-xl border-2 border-slate-200 bg-white focus:border-blue-500 outline-none font-black transition shadow-sm text-left tracking-[0.2em] text-lg" dir="auto" placeholder="05/06/07...">
                 </div>
-                <button onclick="saveSettingsData()" class="w-full bg-gradient-to-r from-slate-800 to-slate-900 text-white font-black py-4 rounded-xl transition btn-modern mt-2 shadow-lg shadow-slate-900/20 text-lg">حفظ التغييرات</button>
+                <button onclick="saveSettingsData()" class="w-full bg-gradient-to-r from-slate-800 to-slate-900 text-white font-black py-4 rounded-xl transition btn-modern mt-2 shadow-lg shadow-slate-900/20 text-xl">💾 حفظ التغييرات</button>
             </div>
         </div>
     </div>
 
-    <!-- نافذة المحادثة -->
     <div id="chat-modal" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-[60] backdrop-blur-md p-2 md:p-4 transition-opacity duration-300">
         <div class="bg-white/95 w-full max-w-xl h-[90vh] rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden border border-white/50">
             <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-5 flex justify-between items-center shadow-md z-10 relative overflow-hidden">
@@ -142,25 +128,23 @@
                     <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center text-3xl shadow-inner backdrop-blur-sm border border-white/10">💬</div>
                     <div>
                         <h3 class="font-black text-2xl leading-tight drop-shadow-md" id="chat-target-name">الدردشة</h3>
-                        <p class="text-base text-blue-100 font-bold mt-1 opacity-90">مساحة التواصل التفاعلية</p>
+                        <p class="text-base text-blue-100 font-bold mt-1 opacity-90">مساحة التواصل والروابط</p>
                     </div>
                 </div>
                 <button onclick="closeChat()" class="bg-black/10 hover:bg-black/20 rounded-2xl w-12 h-12 flex items-center justify-center transition text-2xl relative z-10 backdrop-blur-sm border border-white/10">✖</button>
             </div>
             
-            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 md:p-6 flex flex-col gap-4 bg-slate-50/80 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] scroll-smooth">
-            </div>
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 md:p-6 flex flex-col gap-4 bg-slate-50/80 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] scroll-smooth"></div>
 
             <div class="bg-white p-3 md:p-5 border-t border-slate-100 flex gap-3 items-end shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.05)]">
                 <div class="flex-1 bg-slate-100 rounded-2xl border-2 border-slate-100 p-1 flex flex-col focus-within:border-blue-400 focus-within:bg-white transition-all shadow-inner">
                     <textarea id="chat-input" rows="1" class="w-full bg-transparent px-4 py-4 outline-none resize-none font-bold text-slate-700 placeholder-slate-400 leading-relaxed text-lg" placeholder="اكتب رسالة أو الصق رابطاً هنا..."></textarea>
                 </div>
-                <button id="send-msg-btn" onclick="sendChatMessage()" class="px-8 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl font-black text-xl btn-modern flex items-center justify-center shadow-lg shadow-blue-500/30">إرسال</button>
+                <button id="send-msg-btn" onclick="sendChatMessage()" class="px-6 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl font-black text-xl btn-modern flex items-center justify-center shadow-lg shadow-blue-500/30">إرسال 🚀</button>
             </div>
         </div>
     </div>
 
-    <!-- نافذة تأكيد الإجراءات -->
     <div id="confirm-modal" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-[80] backdrop-blur-md transition-opacity duration-300">
         <div class="bg-white p-8 rounded-[2rem] max-w-sm w-[90%] mx-auto shadow-2xl text-center border border-white/50">
             <div class="w-24 h-24 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center text-5xl mx-auto mb-6 shadow-inner">⚠️</div>
@@ -174,8 +158,6 @@
     </div>
 
     <div class="max-w-7xl mx-auto">
-        
-        <!-- 1. شاشة تسجيل الدخول -->
         <div id="auth-screen" class="screen active max-w-md mx-auto mt-8 md:mt-12 bg-white/90 backdrop-blur-xl p-8 md:p-10 rounded-[2.5rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-white/60 relative overflow-hidden interactive-card">
             <div class="absolute -top-32 -right-32 w-64 h-64 bg-blue-400 rounded-full opacity-20 blur-3xl"></div>
             <div class="absolute -bottom-32 -left-32 w-64 h-64 bg-indigo-400 rounded-full opacity-20 blur-3xl"></div>
@@ -188,7 +170,7 @@
                 <div class="inline-block bg-blue-50 text-blue-700 px-5 py-2 rounded-full text-base font-bold border border-blue-100 shadow-sm tracking-wide">للعلوم الفيزيائية</div>
             </div>
             
-            <div class="space-y-5 relative z-10">
+            <div class="space-y-4 relative z-10">
                 <div class="relative group">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-xl">👤</div>
                     <input type="text" id="username" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50/50 outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all font-black text-slate-700 text-lg placeholder-slate-400" placeholder="اسم المستخدم">
@@ -223,15 +205,14 @@
                     <input type="password" id="password" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50/50 outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all font-black text-slate-700 text-lg placeholder-slate-400" placeholder="كلمة المرور">
                 </div>
                 
-                <button id="auth-action-btn" onclick="handleAuth()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black py-5 rounded-2xl btn-modern text-2xl mt-4 shadow-xl shadow-blue-600/30 tracking-wide">تسجيل الدخول</button>
+                <button id="auth-action-btn" onclick="handleAuth()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black py-4.5 rounded-2xl btn-modern text-2xl mt-4 shadow-xl shadow-blue-600/30 tracking-wide">تسجيل الدخول</button>
             </div>
             
             <div class="text-center mt-8 relative z-10">
-                <button onclick="toggleAuthMode()" id="switch-mode-text" class="text-slate-500 font-bold hover:text-blue-600 transition underline decoration-2 underline-offset-4 decoration-slate-300 hover:decoration-blue-400 text-lg">إنشاء حساب تلميذ جديد</button>
+                <button onclick="toggleAuthMode()" id="switch-mode-text" class="text-slate-500 font-bold hover:text-blue-600 transition underline decoration-2 underline-offset-4 decoration-slate-300 hover:decoration-blue-400 text-lg">إنشاء حساب تلميذ جديد 🚀</button>
             </div>
         </div>
 
-        <!-- 2. شاشة الانتظار -->
         <div id="pending-screen" class="screen max-w-md mx-auto mt-20 bg-white/95 backdrop-blur-md p-10 rounded-[2.5rem] shadow-2xl text-center border-t-8 border-amber-400 border border-white/50 interactive-card">
             <div class="w-28 h-28 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center text-6xl mx-auto mb-6 shadow-inner animate-pulse">⏳</div>
             <h2 class="text-4xl font-black text-slate-800 mb-4 drop-shadow-sm">طلبك قيد المراجعة</h2>
@@ -239,34 +220,30 @@
             <button onclick="logout()" class="w-full bg-slate-100 text-slate-700 font-black py-4.5 rounded-2xl hover:bg-slate-200 transition btn-modern text-xl border border-slate-200">العودة للرئيسية</button>
         </div>
 
-        <!-- 3. شاشة تحكم المسؤول (الأستاذ) -->
         <div id="admin-screen" class="screen">
-            <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 backdrop-blur-xl p-4 md:p-6 rounded-[2.5rem] shadow-lg border border-white/50 mb-8 gap-5 sticky top-4 z-40 transition-all duration-300">
+            <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 backdrop-blur-xl p-4 md:p-5 rounded-[2rem] shadow-lg border border-white/50 mb-8 gap-5 sticky top-4 z-40 transition-all duration-300">
                 <div class="flex items-center gap-4 w-full md:w-auto">
-                    <div class="w-16 h-16 rounded-2xl shadow-lg overflow-hidden bg-white p-1 border border-slate-100 transform transition hover:scale-105"><img src="icon.png" class="w-full h-full object-cover rounded-xl"></div>
+                    <div class="w-14 h-14 rounded-2xl shadow-lg overflow-hidden bg-white p-1 border border-slate-100"><img src="icon.png" class="w-full h-full object-cover rounded-xl"></div>
                     <div>
-                        <h1 class="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-800 to-slate-600 leading-tight">منصة المجتهد</h1>
-                        <div class="flex items-center gap-2 mt-2">
-                            <span class="text-base font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 px-3 py-1 rounded-lg shadow-sm">لوحة الأستاذ 👨‍🏫</span>
+                        <h1 class="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-800 to-slate-600 leading-tight">منصة المجتهد</h1>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 px-3 py-1 rounded-lg shadow-sm">لوحة الأستاذ 👨‍🏫</span>
                         </div>
                     </div>
                 </div>
                 <div class="flex items-center gap-3 w-full md:w-auto justify-end flex-wrap">
-                    
                     <div class="stats-container relative">
-                        <div class="bg-blue-50 border border-blue-100 text-blue-700 px-5 py-3.5 rounded-2xl font-black text-base flex items-center gap-2 cursor-help transition hover:bg-blue-100 shadow-sm">
-                            <span class="text-xl">👥</span> 
-                            <span class="hidden md:inline">التلاميذ:</span> 
-                            <span id="total-students-count" class="text-2xl bg-white px-3 rounded-lg shadow-sm">0</span>
+                        <div class="bg-blue-50 border border-blue-100 text-blue-700 px-4 py-3 rounded-2xl font-black text-base flex items-center gap-2 cursor-help transition hover:bg-blue-100 shadow-sm">
+                            <span class="text-xl">👥</span> <span class="hidden md:inline">التلاميذ:</span> <span id="total-students-count" class="text-xl bg-white px-3 rounded-lg shadow-sm">0</span>
                         </div>
                         <div class="stats-dropdown p-5">
                             <h4 class="font-black text-slate-800 mb-4 border-b pb-3 flex items-center gap-2 text-lg">📊 تفاصيل المستويات</h4>
                             <ul id="level-stats-list" class="space-y-3 text-base font-bold text-slate-600"></ul>
                         </div>
                     </div>
-
-                    <button onclick="openSettings()" class="bg-slate-100 text-slate-700 px-5 py-3.5 rounded-2xl font-black hover:bg-slate-200 transition btn-modern shadow-sm border border-slate-200 text-xl" title="الإعدادات">⚙️</button>
-                    <button onclick="logout()" class="bg-red-50 text-red-600 px-6 py-3.5 rounded-2xl font-black hover:bg-red-100 transition btn-modern border border-red-100 shadow-sm flex items-center gap-2 text-lg"><span class="hidden md:inline">خروج</span> 🚪</button>
+                    <!-- أزرار الأيقونات للأستاذ -->
+                    <button onclick="openSettings()" class="icon-btn w-12 h-12 bg-slate-100 text-slate-700 text-2xl shadow-sm border border-slate-200" title="الإعدادات">⚙️</button>
+                    <button onclick="logout()" class="icon-btn w-12 h-12 bg-red-50 text-red-600 text-2xl shadow-sm border border-red-100" title="تسجيل الخروج">🚪</button>
                 </div>
             </header>
 
@@ -285,15 +262,14 @@
                         </summary>
                         <div class="p-5 md:p-8 pt-0 border-t border-slate-100/50">
                             <div class="overflow-x-auto rounded-3xl border border-slate-100 shadow-inner bg-slate-50/50 mt-6">
-                                <table class="w-full text-right border-collapse whitespace-nowrap min-w-[1200px]">
+                                <table class="w-full text-right border-collapse whitespace-nowrap min-w-[1100px]">
                                     <thead class="bg-slate-100 text-slate-600 text-base font-black border-b border-slate-200">
                                         <tr>
                                             <th class="p-6 rounded-tr-3xl">التلميذ (وكلمة المرور)</th>
-                                            <th class="p-6">معلومات الولي (واتساب)</th>
+                                            <th class="p-6">معلومات الولي</th>
                                             <th class="p-6">المستوى</th>
-                                            <th class="p-6 w-56">التقدم الدراسي</th>
-                                            <th class="p-6">الحالة</th>
-                                            <th class="p-6 text-left rounded-tl-3xl">الإجراءات</th>
+                                            <th class="p-6 w-48">التقدم</th>
+                                            <th class="p-6 text-center">إجراءات الأيقونات</th>
                                         </tr>
                                     </thead>
                                     <tbody id="students-table-body" class="bg-white divide-y divide-slate-100 text-base"></tbody>
@@ -307,24 +283,23 @@
                 <div class="lg:col-span-12 bg-white/95 backdrop-blur-xl p-5 md:p-8 rounded-[2.5rem] shadow-lg border border-white/50 mb-10">
                     <div class="mb-8 border-b border-slate-100 pb-6">
                         <h3 class="text-3xl font-black text-slate-800 flex items-center gap-4 mb-3">
-                            <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center text-2xl shadow-inner">📚</div>
+                            <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center text-2xl shadow-inner">🗂️</div>
                             إدارة محتوى المنصة
                         </h3>
-                        <p class="text-slate-500 font-bold mr-16 text-lg">أضف الدروس، التمارين، والروابط لتظهر فوراً في حسابات تلاميذ كل مستوى.</p>
+                        <p class="text-slate-500 font-bold mr-16 text-lg">أضف الدروس، التمارين، والروابط. التعديلات تظهر فوراً.</p>
                     </div>
                     <div id="admin-program-view" class="space-y-8"></div>
                 </div>
             </div>
         </div>
 
-        <!-- 4. شاشة التلميذ -->
         <div id="app-screen" class="screen">
-            <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 backdrop-blur-xl p-4 md:p-6 rounded-[2.5rem] shadow-lg border border-white/50 mb-6 gap-5 sticky top-4 z-40">
+            <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 backdrop-blur-xl p-4 md:p-6 rounded-[2rem] shadow-lg border border-white/50 mb-8 gap-5 sticky top-4 z-40">
                 <div class="flex items-center gap-4 w-full md:w-auto">
-                    <div class="w-16 h-16 rounded-2xl shadow-lg overflow-hidden bg-white p-1 border border-slate-100 transform transition hover:scale-105"><img src="icon.png" class="w-full h-full object-cover rounded-xl"></div>
+                    <div class="w-14 h-14 rounded-2xl shadow-lg overflow-hidden bg-white p-1 border border-slate-100 transform transition hover:scale-105"><img src="icon.png" class="w-full h-full object-cover rounded-xl"></div>
                     <div>
-                        <h1 class="text-2xl md:text-3xl font-black text-slate-800 leading-tight">مرحباً، <span id="display-username" class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600"></span> 👋</h1>
-                        <div class="flex items-center gap-2 mt-2">
+                        <h1 class="text-2xl md:text-3xl font-black text-slate-800 leading-tight"><span id="display-username" class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600"></span></h1>
+                        <div class="flex items-center gap-2 mt-1">
                             <span class="text-sm font-black text-slate-500 bg-slate-100 px-3 py-1 rounded-lg border border-slate-200">منصة المجتهد</span>
                             <span id="student-level-badge" class="text-sm font-black text-emerald-700 bg-emerald-100 px-3 py-1 rounded-lg border border-emerald-200 shadow-sm">تلميذ</span>
                         </div>
@@ -332,28 +307,26 @@
                 </div>
                 <div class="flex items-center gap-3 w-full md:w-auto justify-end flex-wrap">
                     
-                    <button id="return-admin-btn" onclick="returnToAdmin()" class="hidden relative bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-3.5 rounded-2xl font-black text-lg hover:from-amber-600 hover:to-orange-600 transition btn-modern shadow-md shadow-amber-500/30 flex items-center gap-2">
-                        <span class="hidden sm:inline">العودة للإدارة</span> 🔙
-                    </button>
+                    <button id="return-admin-btn" onclick="returnToAdmin()" class="hidden icon-btn w-12 h-12 bg-amber-100 text-amber-600 text-2xl shadow-sm border border-amber-200" title="العودة للإدارة">🔙</button>
 
-                    <button onclick="openChat('admin')" class="relative bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3.5 rounded-2xl font-black text-lg hover:from-blue-700 hover:to-indigo-700 transition btn-modern shadow-md shadow-blue-500/30 flex items-center gap-2">
-                        <span class="hidden sm:inline">الدردشة والروابط</span> <span class="text-xl">💬</span>
-                        <span id="student-chat-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-[12px] font-black w-7 h-7 rounded-full flex items-center justify-center border-2 border-white shadow-sm hidden animate-bounce">0</span>
+                    <!-- أزرار الأيقونات للتلميذ -->
+                    <button onclick="openChat('admin')" class="relative icon-btn w-12 h-12 bg-blue-100 text-blue-600 text-2xl shadow-sm border border-blue-200" title="الدردشة والروابط">
+                        💬
+                        <span id="student-chat-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-[12px] font-black w-6 h-6 rounded-full flex items-center justify-center border-2 border-white shadow-sm hidden animate-bounce">0</span>
                     </button>
-
-                    <button onclick="openSettings()" class="bg-slate-100 text-slate-700 px-5 py-3.5 rounded-2xl font-black hover:bg-slate-200 transition btn-modern shadow-sm border border-slate-200 flex items-center gap-2 text-xl" title="الإعدادات">⚙️</button>
-                    <button onclick="logout()" class="bg-red-50 text-red-600 px-6 py-3.5 rounded-2xl font-black hover:bg-red-100 transition btn-modern border border-red-100 shadow-sm flex items-center gap-2 text-lg"><span class="hidden md:inline">خروج</span> 🚪</button>
+                    <button onclick="openSettings()" class="icon-btn w-12 h-12 bg-slate-100 text-slate-700 text-2xl shadow-sm border border-slate-200" title="الإعدادات">⚙️</button>
+                    <button onclick="logout()" class="icon-btn w-12 h-12 bg-red-50 text-red-600 text-2xl shadow-sm border border-red-100" title="تسجيل الخروج">🚪</button>
                 </div>
             </header>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
-                <!-- بطاقة التقدم الخاصة بالتلميذ -->
+                <!-- بطاقة التقدم -->
                 <div class="lg:col-span-8 bg-white/95 backdrop-blur-xl p-8 md:p-10 rounded-[2.5rem] shadow-lg border border-white/50 relative overflow-hidden interactive-card group h-full">
                     <div class="absolute -right-10 -top-10 w-56 h-56 bg-gradient-to-br from-emerald-400 to-teal-400 rounded-full opacity-10 blur-3xl group-hover:opacity-20 transition duration-500"></div>
                     <div class="flex justify-between items-end mb-8 relative z-10">
                         <h3 class="font-black text-slate-700 text-2xl flex items-center gap-3">
-                            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-2xl shadow-inner">🚀</div>
-                            مستوى تقدمك الدراسي
+                            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-2xl shadow-inner">📈</div>
+                            مستوى تقدمك
                         </h3>
                         <span id="progress-text" class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500 tracking-tighter drop-shadow-sm">0%</span>
                     </div>
@@ -370,12 +343,12 @@
                         <div class="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-xl shadow-inner">🏆</div>
                         أبطال المستوى 
                     </h3>
-                    <div class="flex-1 overflow-y-auto pr-2" id="leaderboard-container">
-                    </div>
+                    <div class="flex-1 overflow-y-auto pr-2" id="leaderboard-container"></div>
                 </div>
             </div>
             
-            <div id="student-program-view" class="space-y-8 pb-20"></div>
+            <!-- حاوية واجهة الأيقونات للتلميذ -->
+            <div id="student-program-view" class="pb-20"></div>
         </div>
     </div>
 
@@ -437,6 +410,17 @@
             "سر العبقرية هو الفضول.. لا تتوقف عن طرح الأسئلة! 🧠",
             "الفيزياء تعلمنا أن لكل فعل رد فعل.. اجعل فعلك هو الاجتهاد. ⚡"
         ];
+
+        // دالة ذكية لإعطاء أيقونة مناسبة لكل وحدة
+        const getBranchIcon = (title) => {
+            if(title.includes('الكهرباء') || title.includes('كهربائية')) return '⚡';
+            if(title.includes('المادة') || title.includes('كيمياء') || title.includes('تحولات')) return '🧪';
+            if(title.includes('ميكانيك') || title.includes('حركة')) return '⚙️';
+            if(title.includes('ضوء') || title.includes('بصريات') || title.includes('الضوئية')) return '💡';
+            if(title.includes('طاقة') || title.includes('عمل')) return '🔋';
+            if(title.includes('مغناطيس') || title.includes('كهرومغناطيسية')) return '🧲';
+            return '📘'; 
+        };
 
         window.showToast = (msg, type = 'success') => {
             const toast = document.createElement('div');
@@ -509,7 +493,7 @@
         window.toggleAuthMode = () => {
             window.isRegistering = !window.isRegistering;
             document.getElementById('auth-title').innerText = window.isRegistering ? "حساب جديد" : "منصة المجتهد";
-            document.getElementById('auth-action-btn').innerText = window.isRegistering ? "إرسال طلب التسجيل" : "تسجيل الدخول";
+            document.getElementById('auth-action-btn').innerText = window.isRegistering ? "إرسال الطلب" : "تسجيل الدخول";
             document.getElementById('switch-mode-text').innerText = window.isRegistering ? "لديك حساب بالفعل؟ سجل دخولك" : "إنشاء حساب تلميذ جديد";
             
             const levelSelect = document.getElementById('user-level');
@@ -538,7 +522,7 @@
             if (!username || !password) return showToast("يرجى ملء اسم المستخدم وكلمة المرور", "error");
             if (window.isRegistering) {
                 if (!level || !parentName || !phoneNumber) {
-                    return showToast("يرجى تعبئة جميع الحقول بدقة (المستوى، واسم ورقم ولي الأمر)", "error");
+                    return showToast("يرجى تعبئة جميع الحقول بدقة", "error");
                 }
                 const phoneRegex = /^(05|06|07)\d{8}$/;
                 if(!phoneRegex.test(phoneNumber)) {
@@ -644,9 +628,9 @@
         window.openSettings = () => {
             document.getElementById('settings-username').value = window.currentUserRecord.username;
             document.getElementById('settings-new-password').value = window.currentUserRecord.password;
-            // تعبئة حقل الهاتف برقم الولي الحالي للتلميذ
-            document.getElementById('settings-new-phone').value = window.currentUserRecord.phoneNumber || '';
-            
+            if(document.getElementById('settings-new-phone')) {
+                document.getElementById('settings-new-phone').value = window.currentUserRecord.phoneNumber || '';
+            }
             const modal = document.getElementById('settings-modal');
             const content = document.getElementById('settings-content');
             modal.classList.remove('hidden'); modal.classList.add('flex');
@@ -660,32 +644,31 @@
             setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
         }
 
-        // --- تحديث دالة الحفظ لتشمل كلمة المرور ورقم الهاتف معاً مع التحقق ---
-        window.saveSettingsData = async () => {
+        window.saveNewPassword = async () => {
             const newPass = document.getElementById('settings-new-password').value.trim();
-            const newPhone = document.getElementById('settings-new-phone').value.trim();
-
-            if(!newPass) return showToast("كلمة المرور لا يمكن أن تكون فارغة", "error");
+            const newPhoneInput = document.getElementById('settings-new-phone');
+            let updates = {};
             
-            // التحقق من صحة رقم الهاتف الجديد
-            const phoneRegex = /^(05|06|07)\d{8}$/;
-            if(!phoneRegex.test(newPhone)) {
-                return showToast("رقم الهاتف غير صحيح! يجب أن يتكون من 10 أرقام ويبدأ بـ 05، 06، أو 07", "error");
+            if(!newPass) return showToast("كلمة المرور لا يمكن أن تكون فارغة", "error");
+            updates.password = newPass;
+
+            if(newPhoneInput) {
+                const newPhone = newPhoneInput.value.trim();
+                const phoneRegex = /^(05|06|07)\d{8}$/;
+                if(newPhone && !phoneRegex.test(newPhone)) {
+                    return showToast("رقم الهاتف غير صحيح! يجب أن يبدأ بـ 05، 06، أو 07", "error");
+                }
+                updates.phoneNumber = newPhone;
             }
 
             try {
-                await updateDoc(doc(usersCol, window.currentUserRecord.username), { 
-                    password: newPass,
-                    phoneNumber: newPhone 
-                });
-                window.currentUserRecord.password = newPass;
-                window.currentUserRecord.phoneNumber = newPhone;
+                await updateDoc(doc(usersCol, window.currentUserRecord.username), updates);
+                window.currentUserRecord.password = updates.password;
+                if(updates.phoneNumber) window.currentUserRecord.phoneNumber = updates.phoneNumber;
                 
-                showToast("تم تحديث الإعدادات بنجاح 🔒📱");
+                showToast("تم تحديث الإعدادات بنجاح 💾");
                 closeSettings();
-            } catch(e) { 
-                showToast("حدث خطأ أثناء الحفظ", "error"); 
-            }
+            } catch(e) { showToast("حدث خطأ أثناء החفظ", "error"); }
         }
 
         const calculateProgress = (levelId, progressArray, sections) => {
@@ -757,55 +740,38 @@
                 let levelDisplay = data.level ? (levelNames[data.level] || data.level) : "غير محدد";
                 let progPercent = calculateProgress(data.level, data.progress || [], window.currentSections);
                 
-                let waMessage = "";
-                if(progPercent >= 70) {
-                    waMessage = `السلام عليكم السيد(ة) ${data.parentName}، نود إعلامكم أن ابنكم/ابنتكم ${d.id} يحقق نتائج ممتازة وتقدماً رائعاً بنسبة (${progPercent}%) في منصة المجتهد للفيزياء 🌟. شكراً لمتابعتكم!`;
-                } else if(progPercent >= 40) {
-                    waMessage = `السلام عليكم السيد(ة) ${data.parentName}، التلميذ(ة) ${d.id} يتابع دروسه في منصة الفيزياء (بنسبة تقدم: ${progPercent}%). نرجو منكم تشجيعه لتقديم المزيد من الجهد 👍.`;
-                } else {
-                    waMessage = `السلام عليكم السيد(ة) ${data.parentName}، لاحظنا تأخراً في استكمال دروس التلميذ(ة) ${d.id} في منصة الفيزياء (التقدم: ${progPercent}% فقط). يرجى التدخل لمتابعته وتحفيزه للمراجعة ⚠️.`;
-                }
-                
-                let encodedWaMessage = encodeURIComponent(waMessage);
-                let formattedPhone = data.phoneNumber ? "213" + data.phoneNumber.substring(1) : ""; 
-
                 let parentInfo = data.parentName ? 
                     `<div class="font-black text-slate-800">${data.parentName}</div>
-                     <div class="mt-2">
-                        <a href="https://wa.me/${formattedPhone}?text=${encodedWaMessage}" target="_blank" class="whatsapp-btn inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-black shadow-sm">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                            واتساب الولي
-                        </a>
+                     <div class="text-sm text-slate-500 mt-1 flex items-center gap-2 font-bold">
+                        <span class="opacity-70 text-lg">📱</span> <span dir="ltr">${data.phoneNumber || 'لا يوجد'}</span>
                      </div>` : '<div class="text-sm text-slate-400 font-bold">غير متوفر</div>';
 
                 let unreadCount = window.adminChatsData[d.id]?.unreadAdmin || 0;
-                let chatBadge = unreadCount > 0 ? `<span class="absolute -top-2 -right-2 bg-red-500 text-white text-[12px] font-black w-7 h-7 flex items-center justify-center rounded-full animate-bounce shadow-md border-2 border-white">${unreadCount}</span>` : '';
+                let chatBadge = unreadCount > 0 ? `<span class="absolute -top-2 -right-2 bg-red-500 text-white text-[12px] font-black w-6 h-6 flex items-center justify-center rounded-full animate-bounce shadow-md border-2 border-white">${unreadCount}</span>` : '';
 
+                // أزرار أيقونات للأستاذ لتوفير المساحة
                 tbody.innerHTML += `
                     <tr class="hover:bg-blue-50/40 transition duration-200 border-b border-slate-100 group">
-                        <td class="p-6">
+                        <td class="p-4">
                             <div class="font-black text-slate-800 text-xl group-hover:text-blue-600 transition">${d.id}</div>
-                            <div class="text-sm text-slate-500 font-bold mt-2 flex items-center gap-2">
-                                <span class="opacity-70">🔑</span> <span class="text-blue-700 bg-blue-50 px-3 py-1 rounded-lg border border-blue-200/50">${data.password}</span>
+                            <div class="text-sm text-slate-500 font-bold mt-1.5 flex items-center gap-2">
+                                <span class="opacity-70">🔑</span> <span class="text-blue-700 bg-blue-50 px-2 py-0.5 rounded-lg border border-blue-200/50">${data.password}</span>
                             </div>
                         </td>
-                        <td class="p-6 bg-slate-50/40">${parentInfo}</td>
-                        <td class="p-6 text-base font-black text-slate-600 bg-slate-50/70">${levelDisplay}</td>
-                        <td class="p-6">
-                            <div class="flex items-center gap-4">
-                                <span class="text-base font-black ${progPercent > 50 ? 'text-emerald-500' : 'text-amber-500'} w-12">${progPercent}%</span>
-                                <div class="flex-1 h-3 bg-slate-100 rounded-full overflow-hidden shadow-inner"><div class="h-full ${progPercent > 50 ? 'bg-emerald-400' : 'bg-amber-400'} transition-all duration-1000" style="width:${progPercent}%"></div></div>
+                        <td class="p-4 bg-slate-50/40">${parentInfo}</td>
+                        <td class="p-4 text-base font-black text-slate-600 bg-slate-50/70">${levelDisplay}</td>
+                        <td class="p-4">
+                            <div class="flex items-center gap-3">
+                                <span class="text-base font-black ${progPercent > 50 ? 'text-emerald-500' : 'text-amber-500'} w-10">${progPercent}%</span>
+                                <div class="flex-1 h-2.5 bg-slate-100 rounded-full overflow-hidden shadow-inner"><div class="h-full ${progPercent > 50 ? 'bg-emerald-400' : 'bg-amber-400'} transition-all duration-1000" style="width:${progPercent}%"></div></div>
                             </div>
                         </td>
-                        <td class="p-6 bg-slate-50/70">
-                            <span class="px-4 py-2 rounded-xl text-sm font-black shadow-sm ${data.approved ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-amber-100 text-amber-800 border border-amber-200'}">${data.approved ? 'مفعل' : 'قيد الانتظار'}</span>
-                        </td>
-                        <td class="p-6 text-left rounded-tl-3xl">
-                            <div class="flex gap-3 justify-end flex-wrap">
-                                <button onclick="loginAsStudent('${d.id}')" class="bg-indigo-50 text-indigo-700 px-5 py-3 rounded-xl text-sm font-black hover:bg-indigo-100 transition border-2 border-indigo-200 shadow-sm btn-modern">دخول للحساب 👁️</button>
-                                <button onclick="openChat('${d.id}')" class="relative bg-white text-blue-600 px-5 py-3 rounded-xl text-sm font-black hover:bg-blue-50 hover:text-blue-700 transition border-2 border-slate-100 shadow-sm btn-modern">مراسلة 💬 ${chatBadge}</button>
-                                <button onclick="toggleUserStatus('${d.id}', ${!data.approved})" class="${data.approved ? 'bg-slate-50 text-slate-600 hover:bg-slate-100 border-slate-200' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200'} px-5 py-3 rounded-xl text-sm font-black transition border-2 shadow-sm btn-modern">${data.approved ? 'تعطيل' : 'تفعيل ✅'}</button>
-                                <button onclick="deleteUserAccount('${d.id}')" class="bg-white text-red-400 px-4 py-3 rounded-xl text-xl font-black hover:bg-red-50 hover:text-red-600 transition border-2 border-slate-100 shadow-sm btn-modern" title="حذف التلميذ">🗑️</button>
+                        <td class="p-4 bg-slate-50/70 text-center">
+                            <div class="flex gap-2 justify-center">
+                                <button onclick="loginAsStudent('${d.id}')" class="icon-btn w-10 h-10 bg-indigo-50 text-indigo-700 text-xl shadow-sm border border-indigo-200" title="دخول لحساب التلميذ">👁️</button>
+                                <button onclick="openChat('${d.id}')" class="relative icon-btn w-10 h-10 bg-blue-50 text-blue-600 text-xl shadow-sm border border-blue-200" title="مراسلة التلميذ">💬 ${chatBadge}</button>
+                                <button onclick="toggleUserStatus('${d.id}', ${!data.approved})" class="icon-btn w-10 h-10 ${data.approved ? 'bg-slate-100 text-slate-600 border-slate-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'} text-xl shadow-sm border" title="${data.approved ? 'تعطيل החساب' : 'تفعيل الحساب'}">${data.approved ? '⛔' : '✅'}</button>
+                                <button onclick="deleteUserAccount('${d.id}')" class="icon-btn w-10 h-10 bg-red-50 text-red-500 text-xl shadow-sm border border-red-200" title="حذف نهائي">🗑️</button>
                             </div>
                         </td>
                     </tr>`;
@@ -872,7 +838,7 @@
                     }
                     if(d.id === window.currentUserRecord.username) {
                         window.currentUserRecord.progress = data.progress || [];
-                        window.currentUserRecord.phoneNumber = data.phoneNumber || ''; // تحديث الهاتف محلياً
+                        window.currentUserRecord.phoneNumber = data.phoneNumber || ''; // تحديث محلي
                         updateProgressUI(window.currentSections || []); 
                         renderProgramUI(window.currentSections || [], 'student-program-view', false);
                     }
@@ -1002,10 +968,11 @@
             document.getElementById('progress-bar').style.width = `${progPercent}%`; document.getElementById('progress-text').innerText = `${progPercent}%`;
         };
 
+        // --- واجهة الأيقونات الجديدة للتلميذ (Icon Interface) ---
         const catConfig = {
-            lessons: { title: 'الدروس 📘', bg: 'theme-lessons', text: 'text-blue-800' },
-            exercises: { title: 'التمارين 📝', bg: 'theme-exercises', text: 'text-orange-800' },
-            exams: { title: 'الفروض والاختبارات 🏆', bg: 'theme-exams', text: 'text-purple-800' }
+            lessons: { title: 'الدروس', icon: '📘', bg: 'bg-blue-50/50', text: 'text-blue-700' },
+            exercises: { title: 'التمارين', icon: '📝', bg: 'bg-orange-50/50', text: 'text-orange-700' },
+            exams: { title: 'الفروض', icon: '🏆', bg: 'bg-purple-50/50', text: 'text-purple-700' }
         };
         
         const renderProgramUI = (sections, containerId, isAdmin) => {
@@ -1015,80 +982,126 @@
             let progress = (!isAdmin && window.currentUserRecord) ? (window.currentUserRecord.progress || []) : [];
             let userLevel = (!isAdmin && window.currentUserRecord) ? window.currentUserRecord.level : null;
 
-            sections.forEach((part, pIdx) => {
-                let pColor = part.color === 'blue' ? 'blue' : 'indigo';
-                let partHasContent = false;
-                let partHtml = `
-                <details class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden mb-8 interactive-card" ${!isAdmin ? 'open' : ''}>
-                    <summary class="bg-slate-50 text-slate-800 p-6 md:p-8 font-black text-2xl hover:bg-slate-100 transition border-b border-slate-200 flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-xl bg-${pColor}-100 text-${pColor}-600 flex items-center justify-center text-xl shadow-inner">📚</div>
-                        ${part.title}
-                    </summary>
-                    <div class="p-5 md:p-8 space-y-8 bg-white">`;
-
-                part.years.forEach((year, yIdx) => {
-                    if (!isAdmin && userLevel && userLevel !== year.id) return;
-                    partHasContent = true;
-
-                    partHtml += `
-                    <details class="bg-slate-50/50 rounded-3xl border border-slate-100 overflow-hidden shadow-sm interactive-card" ${!isAdmin ? 'open' : ''}>
-                        <summary class="text-slate-700 p-6 font-black hover:bg-slate-100 transition border-b border-slate-100 text-xl flex items-center gap-3">
-                            <span class="w-4 h-4 rounded-full bg-${pColor}-500 shadow-sm"></span> ${year.title}
-                        </summary>
-                        <div class="p-5 md:p-8 space-y-8 bg-white/50 backdrop-blur-sm">`;
-
-                    year.branches.forEach((branch, bIdx) => {
-                        let isComp = progress.includes(branch.id);
-                        let cardCls = isComp ? 'branch-completed shadow-md' : 'bg-white border-slate-200 shadow-sm hover:shadow-md';
-                        let btnCls = isComp ? 'active shadow-lg shadow-emerald-500/30' : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-800 border-slate-200';
-
-                        partHtml += `
-                        <div class="border-2 rounded-[2rem] p-6 md:p-8 transition-all duration-300 ${cardCls}">
-                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b-2 border-slate-100 pb-6 gap-5">
-                                <h4 class="font-black text-slate-800 text-2xl flex items-center gap-3">
-                                    <span class="text-${pColor}-500 text-3xl">▪</span> ${branch.title}
-                                </h4>
-                                ${!isAdmin ? `
-                                <button onclick="studentToggleComplete('${branch.id}')" class="w-full md:w-auto px-8 py-4 rounded-2xl text-base font-black transition btn-modern border-2 ${btnCls} flex justify-center items-center gap-3">
-                                    ${isComp ? '✅ مكتمل' : 'تحديد كمكتمل'}
-                                </button>` : ''}
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">`;
-
-                        ['lessons', 'exercises', 'exams'].forEach(cat => {
-                            let links = branch.categories[cat] || [];
-                            let conf = catConfig[cat];
-                            
-                            let linksList = links.length ? links.map((lnk, lIdx) => `
-                                <li class="flex justify-between items-center bg-white p-4 rounded-xl border border-white/50 shadow-sm text-base mb-3 hover:shadow-md transition group interactive-card">
-                                    <a href="${lnk.url}" target="_blank" class="${conf.text} font-black truncate w-3/4 hover:opacity-80 hover:underline decoration-2 underline-offset-4 flex items-center gap-3">
-                                        <span class="text-xl opacity-80">🔗</span> ${lnk.title}
-                                    </a>
-                                    ${isAdmin ? `<button onclick="adminDeleteLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" class="text-slate-400 hover:bg-red-50 hover:text-red-500 p-2 rounded-lg text-xl transition" title="حذف">✖</button>` : ''}
-                                </li>
-                            `).join('') : `<li class="text-base text-slate-500 text-center p-6 font-bold bg-white/50 rounded-2xl border-2 border-dashed border-slate-200">لم يتم إضافة محتوى بعد</li>`;
-
-                            partHtml += `
-                            <div class="${conf.bg} p-6 md:p-8 rounded-[2rem] border-2">
-                                <h5 class="font-black ${conf.text} text-xl mb-6 inline-block bg-white/80 backdrop-blur-sm px-5 py-2.5 rounded-xl shadow-sm border border-white">${conf.title}</h5>
-                                <ul class="mb-2">${linksList}</ul>
+            if (!isAdmin && userLevel) {
+                // واجهة الأيقونات (الشبكة) للطالب
+                html += `<h3 class="text-3xl font-black text-slate-800 mb-6 flex items-center gap-3"><span class="text-4xl">🗂️</span> وحداتك الدراسية</h3>`;
+                html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-8">`;
+                
+                sections.forEach((part, pIdx) => {
+                    part.years.forEach((year, yIdx) => {
+                        if (year.id === userLevel) {
+                            year.branches.forEach((branch, bIdx) => {
+                                let isComp = progress.includes(branch.id);
+                                let branchIcon = getBranchIcon(branch.title);
+                                let cardCls = isComp ? 'border-emerald-400 bg-emerald-50/30' : 'border-slate-200 bg-white/90';
                                 
-                                ${isAdmin ? `
-                                <div class="mt-6 pt-6 border-t-2 border-black/5 border-dashed space-y-4">
-                                    <input type="text" id="title_${branch.id}_${cat}" class="w-full text-base font-black p-4 border-2 border-white/50 rounded-xl outline-none focus:border-blue-400 focus:bg-white transition bg-white/60 shadow-inner text-slate-700" placeholder="عنوان المحتوى...">
-                                    <input type="text" id="url_${branch.id}_${cat}" class="w-full text-base p-4 border-2 border-white/50 rounded-xl outline-none focus:border-blue-400 focus:bg-white transition bg-white/60 shadow-inner text-left font-bold text-slate-600" dir="ltr" placeholder="https://...">
-                                    <button onclick="adminAddLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', '${branch.id}')" class="w-full bg-slate-800 hover:bg-slate-900 text-white text-base font-black py-4 rounded-xl transition btn-modern shadow-md">إضافة محتوى ➕</button>
-                                </div>` : ''}
-                            </div>`;
+                                html += `
+                                <details class="rounded-[2rem] shadow-lg border-2 overflow-hidden interactive-card group backdrop-blur-xl ${cardCls}">
+                                    <summary class="p-6 md:p-8 flex items-center gap-5 outline-none cursor-pointer">
+                                        <div class="w-20 h-20 rounded-2xl bg-white shadow-inner border border-slate-100 flex items-center justify-center text-5xl group-hover:scale-110 transition duration-300 relative">
+                                            ${branchIcon}
+                                            ${isComp ? `<div class="absolute -top-3 -right-3 bg-emerald-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-black shadow-md border-2 border-white">✔</div>` : ''}
+                                        </div>
+                                        <div class="flex-1">
+                                            <h3 class="text-2xl md:text-3xl font-black text-slate-800">${branch.title}</h3>
+                                            <p class="text-slate-500 font-bold mt-2 text-base">${isComp ? 'تم الإنجاز بنجاح 🌟' : 'قيد الدراسة...'}</p>
+                                        </div>
+                                        <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition transform group-open:rotate-180 text-xl shadow-inner">▼</div>
+                                    </summary>
+                                    <div class="p-6 md:p-8 border-t-2 border-slate-100 bg-slate-50/80">
+                                        <button onclick="studentToggleComplete('${branch.id}')" class="w-full mb-8 py-4 rounded-2xl text-lg font-black transition btn-modern border-2 ${isComp ? 'bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-500/30' : 'bg-white text-slate-700 hover:bg-slate-50 border-slate-300'} flex justify-center items-center gap-3">
+                                            ${isComp ? '✅ تم إنجاز هذه الوحدة' : '🎯 تحديد كوحدة مكتملة'}
+                                        </button>
+                                        <div class="grid grid-cols-1 gap-6">
+                                `;
+
+                                ['lessons', 'exercises', 'exams'].forEach(cat => {
+                                    let links = branch.categories[cat] || [];
+                                    let conf = catConfig[cat];
+                                    
+                                    let linksList = links.length ? links.map((lnk, lIdx) => `
+                                        <a href="${lnk.url}" target="_blank" class="flex items-center gap-4 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition group/link">
+                                            <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl group-hover/link:bg-blue-600 group-hover/link:text-white transition shadow-inner">🔗</div>
+                                            <span class="${conf.text} font-black text-lg truncate w-3/4 group-hover/link:underline decoration-2 underline-offset-4">${lnk.title}</span>
+                                        </a>
+                                    `).join('') : `<div class="text-base text-slate-400 font-bold bg-white/50 p-4 rounded-2xl border-2 border-dashed border-slate-200 text-center">لا يوجد محتوى بعد</div>`;
+
+                                    html += `
+                                    <div class="${conf.bg} p-6 rounded-3xl border border-slate-200">
+                                        <h5 class="font-black ${conf.text} text-xl mb-4 flex items-center gap-2"><span class="text-2xl">${conf.icon}</span> ${conf.title}</h5>
+                                        <div class="space-y-3">${linksList}</div>
+                                    </div>`;
+                                });
+                                html += `</div></div></details>`; 
+                            });
+                        }
+                    });
+                });
+                html += `</div>`;
+            } else {
+                // واجهة الإدارة (تبقى هرمية لسهولة الوصول)
+                sections.forEach((part, pIdx) => {
+                    let pColor = part.color === 'blue' ? 'blue' : 'indigo';
+                    let partHasContent = false;
+                    let partHtml = `
+                    <details class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden mb-8 interactive-card" open>
+                        <summary class="bg-slate-50 text-slate-800 p-6 md:p-8 font-black text-2xl hover:bg-slate-100 transition border-b border-slate-200 flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-${pColor}-100 text-${pColor}-600 flex items-center justify-center text-xl shadow-inner">🗂️</div>
+                            ${part.title}
+                        </summary>
+                        <div class="p-5 md:p-8 space-y-8 bg-white">`;
+
+                    part.years.forEach((year, yIdx) => {
+                        partHasContent = true;
+                        partHtml += `
+                        <details class="bg-slate-50/50 rounded-3xl border border-slate-100 overflow-hidden shadow-sm interactive-card">
+                            <summary class="text-slate-700 p-6 font-black hover:bg-slate-100 transition border-b border-slate-100 text-xl flex items-center gap-3">
+                                <span class="w-4 h-4 rounded-full bg-${pColor}-500 shadow-sm"></span> ${year.title}
+                            </summary>
+                            <div class="p-5 md:p-8 space-y-8 bg-white/50 backdrop-blur-sm">`;
+
+                        year.branches.forEach((branch, bIdx) => {
+                            partHtml += `
+                            <div class="border-2 rounded-[2rem] p-6 md:p-8 transition-all duration-300 bg-white border-slate-200 shadow-sm">
+                                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b-2 border-slate-100 pb-6 gap-5">
+                                    <h4 class="font-black text-slate-800 text-2xl flex items-center gap-3">
+                                        <span class="text-${pColor}-500 text-4xl">${getBranchIcon(branch.title)}</span> ${branch.title}
+                                    </h4>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">`;
+
+                            ['lessons', 'exercises', 'exams'].forEach(cat => {
+                                let links = branch.categories[cat] || [];
+                                let conf = catConfig[cat];
+                                
+                                let linksList = links.length ? links.map((lnk, lIdx) => `
+                                    <li class="flex justify-between items-center bg-white p-4 rounded-xl border border-white/50 shadow-sm text-base mb-3 hover:shadow-md transition group interactive-card">
+                                        <a href="${lnk.url}" target="_blank" class="${conf.text} font-black truncate w-3/4 hover:opacity-80 hover:underline decoration-2 underline-offset-4 flex items-center gap-3">
+                                            <span class="text-xl opacity-80">🔗</span> ${lnk.title}
+                                        </a>
+                                        <button onclick="adminDeleteLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" class="text-slate-400 hover:bg-red-50 hover:text-red-500 p-2 rounded-lg text-xl transition" title="حذف">✖</button>
+                                    </li>
+                                `).join('') : `<li class="text-base text-slate-500 text-center p-6 font-bold bg-white/50 rounded-2xl border-2 border-dashed border-slate-200">لم يتم إضافة محتوى بعد</li>`;
+
+                                partHtml += `
+                                <div class="${conf.bg} p-6 md:p-8 rounded-[2rem] border-2 border-slate-200">
+                                    <h5 class="font-black ${conf.text} text-xl mb-6 flex items-center gap-2 bg-white px-5 py-2.5 rounded-xl shadow-sm border border-slate-100 w-max"><span class="text-2xl">${conf.icon}</span> ${conf.title}</h5>
+                                    <ul class="mb-2">${linksList}</ul>
+                                    <div class="mt-6 pt-6 border-t-2 border-black/5 border-dashed space-y-4">
+                                        <input type="text" id="title_${branch.id}_${cat}" class="w-full text-base font-black p-4 border-2 border-white/50 rounded-xl outline-none focus:border-blue-400 focus:bg-white transition bg-white/60 shadow-inner text-slate-700" placeholder="عنوان المحتوى...">
+                                        <input type="text" id="url_${branch.id}_${cat}" class="w-full text-base p-4 border-2 border-white/50 rounded-xl outline-none focus:border-blue-400 focus:bg-white transition bg-white/60 shadow-inner text-left font-bold text-slate-600" dir="ltr" placeholder="https://...">
+                                        <button onclick="adminAddLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', '${branch.id}')" class="w-full bg-slate-800 hover:bg-slate-900 text-white text-base font-black py-4 rounded-xl transition btn-modern shadow-md">إضافة ➕</button>
+                                    </div>
+                                </div>`;
+                            });
+                            partHtml += `</div></div>`; 
                         });
-                        partHtml += `</div></div>`; 
+                        partHtml += `</div></details>`; 
                     });
                     partHtml += `</div></details>`; 
+                    if (partHasContent) html += partHtml;
                 });
-                partHtml += `</div></details>`; 
-
-                if (isAdmin || partHasContent) { html += partHtml; }
-            });
+            }
             document.getElementById(containerId).innerHTML = html;
         };
     </script>
