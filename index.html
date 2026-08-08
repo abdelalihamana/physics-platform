@@ -89,7 +89,7 @@
     <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 w-[90%] md:w-auto"></div>
 
     <!-- نافذة المحادثة (على شكل نافذة منبثقة عائمة كالفايسبوك) -->
-    <div id="chat-modal" class="fixed bottom-4 right-4 z-[90] hidden flex-col w-[350px] h-[450px] bg-white/95 backdrop-blur-xl rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] border border-slate-200 overflow-hidden transform transition-all duration-300">
+    <div id="chat-modal" class="fixed bottom-4 right-4 z-[90] hidden flex-col w-[350px] h-[450px] bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] border border-slate-200 overflow-hidden transform transition-all duration-300">
         <!-- رأس الدردشة -->
         <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-3 flex justify-between items-center shadow-sm z-10 relative">
             <div class="flex items-center gap-2 relative z-10">
@@ -103,7 +103,7 @@
         </div>
         
         <!-- مساحة الرسائل -->
-        <div id="chat-messages" class="flex-1 overflow-y-auto p-3 flex flex-col gap-2 bg-slate-50/80 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] scroll-smooth"></div>
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-3 flex flex-col gap-2 bg-white scroll-smooth"></div>
 
         <!-- منطقة الكتابة -->
         <div class="bg-white p-2 border-t border-slate-100 flex gap-2 items-end shadow-[0_-5px_10px_-5px_rgba(0,0,0,0.05)]">
@@ -379,9 +379,24 @@
                         <span class="hidden sm:inline">العودة للإدارة</span> 🔙
                     </button>
 
+                    <!-- القائمة المنسدلة لأبطال المستوى -->
+                    <div class="relative inline-block z-50">
+                        <details class="group" id="leaderboard-dropdown-details">
+                            <summary class="bg-amber-50 text-amber-700 px-3 py-2.5 rounded-xl text-sm font-black hover:bg-amber-100 transition border border-amber-200 shadow-sm flex items-center gap-2 cursor-pointer outline-none">
+                                <span class="hidden sm:inline">أبطال المستوى</span> 🏆
+                            </summary>
+                            <div class="absolute top-full right-0 mt-2 w-[300px] md:w-80 bg-white rounded-[1.5rem] shadow-2xl border border-slate-100 p-4 z-[60] max-h-[350px] overflow-y-auto">
+                                <h4 class="font-black text-slate-800 text-lg mb-3 border-b border-slate-100 pb-2 flex items-center gap-2">
+                                    ترتيب المتفوقين
+                                </h4>
+                                <div id="leaderboard-container"></div>
+                            </div>
+                        </details>
+                    </div>
+
                     <!-- زر الدردشة في الأعلى مع الإشعار -->
                     <button onclick="openChat('admin')" class="relative bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2.5 rounded-xl font-black text-sm hover:from-blue-700 hover:to-indigo-700 transition btn-modern shadow-md shadow-blue-500/30 flex items-center gap-2">
-                        <span class="hidden sm:inline">الدردشة والروابط</span> <span class="text-lg">💬</span>
+                        <span class="hidden sm:inline">الدردشة</span> <span class="text-lg">💬</span>
                         <span id="student-chat-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-[11px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm hidden animate-bounce">0</span>
                     </button>
 
@@ -401,22 +416,6 @@
                                 <div class="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center text-sm shadow-inner">🚀</div>
                                 تقدمك الإجمالي
                             </h3>
-                            
-                            <!-- القائمة المنسدلة لأبطال المستوى -->
-                            <div class="relative inline-block z-50">
-                                <details class="group" id="leaderboard-dropdown-details">
-                                    <summary class="bg-amber-50 text-amber-700 px-3 py-1.5 rounded-xl text-sm font-black hover:bg-amber-100 transition border border-amber-200 shadow-sm flex items-center gap-2 cursor-pointer outline-none">
-                                        🏆 أبطال المستوى
-                                    </summary>
-                                    <div class="absolute top-full right-0 mt-2 w-[300px] md:w-80 bg-white/95 backdrop-blur-md rounded-[2rem] shadow-2xl border border-slate-100 p-4 z-[60] max-h-[350px] overflow-y-auto">
-                                        <h4 class="font-black text-slate-800 text-lg mb-3 border-b border-slate-100 pb-2 flex items-center gap-2">
-                                            ترتيب المتفوقين
-                                        </h4>
-                                        <div id="leaderboard-container"></div>
-                                    </div>
-                                </details>
-                            </div>
-
                         </div>
                         <span id="progress-text" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500 tracking-tighter drop-shadow-sm">0%</span>
                     </div>
