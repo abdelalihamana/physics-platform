@@ -49,9 +49,10 @@
         details > summary { list-style: none; cursor: pointer; user-select: none; transition: background-color 0.3s ease; }
         details > summary::-webkit-details-marker { display: none; }
         
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.5); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
+        /* شريط التمرير المحسن والواضح دائماً */
+        ::-webkit-scrollbar { width: 10px; display: block; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; border: 1px solid #e2e8f0; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; border: 2px solid #f1f5f9; }
         ::-webkit-scrollbar-thumb:hover { background: #64748b; }
         
         .chat-bubble { max-width: 85%; padding: 10px 14px; border-radius: 16px; margin-bottom: 8px; position: relative; word-wrap: break-word; line-height: 1.5; font-size: 0.95rem; animation: popIn 0.3s ease;}
@@ -83,7 +84,7 @@
         .theme-exams { background-color: #faf5ff; border-color: #e9d5ff; }
     </style>
 </head>
-<body class="text-slate-800 antialiased p-3 md:p-6 pb-24 selection:bg-blue-200 selection:text-blue-900 relative overflow-x-hidden">
+<body class="text-slate-800 antialiased p-3 md:p-6 pb-24 selection:bg-blue-200 selection:text-blue-900 relative overflow-x-hidden overflow-y-scroll">
 
     <!-- نافذة الإشعارات -->
     <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 w-[90%] md:w-auto"></div>
@@ -103,7 +104,7 @@
         </div>
         
         <!-- مساحة الرسائل -->
-        <div id="chat-messages" class="flex-1 overflow-y-auto p-3 flex flex-col gap-2 bg-white scroll-smooth"></div>
+        <div id="chat-messages" class="flex-1 overflow-y-scroll p-3 flex flex-col gap-2 bg-white scroll-smooth"></div>
 
         <!-- منطقة الكتابة -->
         <div class="bg-white p-2 border-t border-slate-100 flex gap-2 items-end shadow-[0_-5px_10px_-5px_rgba(0,0,0,0.05)]">
@@ -1036,9 +1037,17 @@
                 let chatHtml = '';
                 msgs.forEach(m => {
                     let isMine = m.sender === window.currentUserRecord.role;
+                    let isAdminMsg = m.sender === 'admin';
                     let bubbleClass = isMine ? 'chat-mine' : 'chat-other';
                     let alignment = isMine ? 'self-end' : 'self-start';
-                    let contentHtml = `<p class="text-[14px] font-normal whitespace-pre-wrap" dir="auto">${linkify(m.text)}</p>`;
+                    
+                    // تلوين رسائل الأستاذ بالأحمر
+                    let textColor = isAdminMsg ? 'text-red-600 font-bold' : '';
+                    // إضافة التوقيت
+                    let timeStr = new Date(m.timestamp).toLocaleTimeString('ar-DZ', {hour: '2-digit', minute:'2-digit'});
+                    let timeHtml = `<span class="inline-block text-[10px] text-slate-400 mx-2 opacity-80" dir="ltr">${timeStr}</span>`;
+                    
+                    let contentHtml = `<p class="text-[14px] font-normal whitespace-pre-wrap ${textColor}" dir="auto">${linkify(m.text)} ${timeHtml}</p>`;
                     
                     chatHtml += `<div class="${bubbleClass} ${alignment} shadow-sm transition hover:shadow-md">${contentHtml}</div>`;
                 });
