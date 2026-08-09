@@ -55,7 +55,7 @@
         ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; border: 2px solid #f1f5f9; }
         ::-webkit-scrollbar-thumb:hover { background: #64748b; }
         
-        .chat-bubble { max-width: 85%; padding: 10px 14px; border-radius: 16px; margin-bottom: 8px; position: relative; word-wrap: break-word; line-height: 1.5; font-size: 0.95rem; animation: popIn 0.3s ease;}
+        .chat-bubble { max-width: 85%; padding: 10px 14px; border-radius: 16px; margin-bottom: 8px; position: relative; word-wrap: break-word; overflow-wrap: anywhere; line-height: 1.5; font-size: 0.95rem; animation: popIn 0.3s ease;}
         @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
         .chat-mine { background-color: transparent; border: none; margin-right: auto; border-bottom-right-radius: 4px; color: #1e3a8a;}
         .chat-other { background-color: transparent; border: none; margin-left: auto; border-bottom-left-radius: 4px; color: #334155;}
@@ -104,7 +104,7 @@
         </div>
         
         <!-- مساحة الرسائل -->
-        <div id="chat-messages" class="flex-1 overflow-y-scroll p-3 flex flex-col gap-2 bg-white scroll-smooth"></div>
+        <div id="chat-messages" class="flex-1 overflow-y-auto overflow-x-hidden p-3 flex flex-col gap-2 bg-white scroll-smooth"></div>
 
         <!-- منطقة الكتابة -->
         <div class="bg-white p-2 border-t border-slate-100 flex gap-2 items-end shadow-[0_-5px_10px_-5px_rgba(0,0,0,0.05)]">
@@ -1047,9 +1047,9 @@
                     let timeStr = new Date(m.timestamp).toLocaleTimeString('ar-DZ', {hour: '2-digit', minute:'2-digit'});
                     let timeHtml = `<span class="inline-block text-[10px] text-slate-400 mx-2 opacity-80" dir="ltr">${timeStr}</span>`;
                     
-                    let contentHtml = `<p class="text-[14px] font-normal whitespace-pre-wrap ${textColor}" dir="auto">${linkify(m.text)} ${timeHtml}</p>`;
+                    let contentHtml = `<p class="text-[14px] font-normal whitespace-pre-wrap break-words ${textColor}" dir="auto">${linkify(m.text)} ${timeHtml}</p>`;
                     
-                    chatHtml += `<div class="${bubbleClass} ${alignment} shadow-sm transition hover:shadow-md">${contentHtml}</div>`;
+                    chatHtml += `<div class="chat-bubble ${bubbleClass} ${alignment} shadow-sm transition hover:shadow-md">${contentHtml}</div>`;
                 });
                 
                 const msgBox = document.getElementById('chat-messages');
