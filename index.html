@@ -11,61 +11,73 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
 
+    <!-- Tailwind CSS with Dark Mode config -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' };
+        // Check local storage for dark mode preference
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-    <!-- استدعاء مكتبة الاحتفالات البصرية -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.4/confetti.browser.min.js"></script>
     
+    <!-- Phosphor Icons (Professional Icon Library) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Chart.js for Admin Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         body { 
             font-family: 'Tajawal', sans-serif; 
             background: linear-gradient(rgba(248, 250, 252, 0.94), rgba(226, 232, 240, 0.97)), url('icon.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            min-height: 100vh;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed;
+            min-height: 100vh; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased;
         }
         
+        .dark body {
+            background: linear-gradient(rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.98)), url('icon.png');
+            background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed;
+        }
+
         .screen { display: none; }
         .screen.active { display: block; animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes slideUpFade { 
-            from { opacity: 0; transform: translateY(40px) scale(0.98); } 
-            to { opacity: 1; transform: translateY(0) scale(1); } 
-        }
+        @keyframes slideUpFade { from { opacity: 0; transform: translateY(40px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
         
         .interactive-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .interactive-card:hover { transform: translateY(-4px); box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.1), 0 15px 15px -5px rgba(0, 0, 0, 0.04); }
+        .dark .interactive-card:hover { box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.3); }
         
         .btn-modern { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
         .btn-modern:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -3px rgba(0, 0, 0, 0.1); filter: brightness(1.05); }
         .btn-modern:active { transform: translateY(1px); filter: brightness(0.95); box-shadow: none;}
 
         .icon-btn { transition: all 0.2s; display: flex; align-items: center; justify-content: center; border-radius: 1rem; cursor: pointer; }
-        .icon-btn:hover { transform: scale(1.1) rotate(5deg); }
+        .icon-btn:hover { transform: scale(1.1); }
         .icon-btn:active { transform: scale(0.95); }
 
         details > summary { list-style: none; cursor: pointer; user-select: none; transition: background-color 0.3s ease; }
         details > summary::-webkit-details-marker { display: none; }
         
-        /* شريط التمرير المحسن والواضح دائماً */
         ::-webkit-scrollbar { width: 10px; display: block; }
         ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; border: 1px solid #e2e8f0; }
         ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; border: 2px solid #f1f5f9; }
         ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        .dark ::-webkit-scrollbar-track { background: #1e293b; border-color: #334155; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; border-color: #1e293b; }
         
-        .chat-bubble { max-width: 85%; padding: 10px 14px; border-radius: 16px; margin-bottom: 8px; position: relative; word-wrap: break-word; overflow-wrap: anywhere; line-height: 1.5; font-size: 0.95rem; animation: popIn 0.3s ease;}
-        @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-        .chat-mine { background-color: transparent; border: none; margin-right: auto; border-bottom-right-radius: 4px; color: #1e3a8a;}
-        .chat-other { background-color: transparent; border: none; margin-left: auto; border-bottom-left-radius: 4px; color: #334155;}
+        .chat-bubble { max-width: 85%; padding: 12px 18px; border-radius: 1.5rem; margin-bottom: 8px; position: relative; word-wrap: break-word; overflow-wrap: anywhere; line-height: 1.6; font-size: 1rem; animation: popIn 0.3s ease;}
+        @keyframes popIn { from { opacity: 0; transform: scale(0.9) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
         
         .stats-dropdown {
-            position: absolute; top: 100%; left: 0; margin-top: 0.5rem; width: 280px; background: white;
+            position: absolute; top: 100%; left: 0; margin-top: 0.5rem; width: 280px;
             border-radius: 1.5rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            border: 1px solid #e2e8f0; z-index: 50; opacity: 0; visibility: hidden; transform: translateY(-10px);
+            z-index: 50; opacity: 0; visibility: hidden; transform: translateY(-10px);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .stats-container:hover .stats-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
@@ -75,194 +87,193 @@
         .welcome-hidden { opacity: 0 !important; transform: scale(1.05) !important; pointer-events: none !important;}
 
         .leaderboard-row { transition: all 0.3s ease; }
-        .leaderboard-row:hover { transform: scale(1.02); background-color: #f8fafc; z-index: 10; position: relative; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .leaderboard-row:hover { transform: scale(1.02); z-index: 10; position: relative; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        
         .rank-1 { background: linear-gradient(to left, #fffbeb, #ffffff); border-right: 4px solid #fbbf24; }
         .rank-2 { background: linear-gradient(to left, #f1f5f9, #ffffff); border-right: 4px solid #94a3b8; }
         .rank-3 { background: linear-gradient(to left, #fff7ed, #ffffff); border-right: 4px solid #fb923c; }
+        .dark .rank-1 { background: linear-gradient(to left, rgba(251, 191, 36, 0.1), #1e293b); }
+        .dark .rank-2 { background: linear-gradient(to left, rgba(148, 163, 184, 0.1), #1e293b); }
+        .dark .rank-3 { background: linear-gradient(to left, rgba(251, 146, 60, 0.1), #1e293b); }
 
-        /* ألوان تصنيفات الدروس */
-        .theme-lessons { background-color: #f0f9ff; border-color: #bae6fd; }
-        .theme-exercises { background-color: #fff7ed; border-color: #fed7aa; }
-        .theme-exams { background-color: #faf5ff; border-color: #e9d5ff; }
-
-        /* شارة نقاط الخبرة XP */
-        .xp-badge {
-            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-            color: white;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-            box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
-        }
+        /* Hide tabs smoothly */
+        .tab-content { display: none; animation: fadeInTab 0.3s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeInTab { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Custom checkbox */
+        .custom-cb { width: 1.25rem; height: 1.25rem; cursor: pointer; accent-color: #2563eb; }
     </style>
 </head>
-<body class="text-slate-800 antialiased p-3 md:p-6 pb-24 selection:bg-blue-200 selection:text-blue-900 relative overflow-x-hidden overflow-y-scroll">
+<body class="text-slate-800 dark:text-slate-200 antialiased p-3 md:p-6 pb-24 selection:bg-blue-200 selection:text-blue-900 dark:selection:bg-blue-900 dark:selection:text-blue-200 relative overflow-x-hidden overflow-y-scroll transition-colors duration-300">
 
     <!-- نافذة الإشعارات -->
     <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 w-[90%] md:w-auto"></div>
 
-    <!-- نافذة المحادثة (على شكل نافذة منبثقة عائمة كالفايسبوك) -->
-    <div id="chat-modal" class="fixed bottom-4 right-4 z-[90] hidden flex-col w-[350px] h-[450px] bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] border border-slate-200 overflow-hidden transform transition-all duration-300">
-        <!-- رأس الدردشة -->
-        <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-3 flex justify-between items-center shadow-sm z-10 relative">
-            <div class="flex items-center gap-2 relative z-10">
-                <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-lg shadow-inner backdrop-blur-sm">💬</div>
+    <!-- نافذة المحادثة (على شكل نافذة منبثقة عائمة) -->
+    <div id="chat-modal" class="fixed bottom-4 right-4 z-[90] hidden flex-col w-[350px] h-[450px] bg-white dark:bg-slate-800 rounded-3xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] border border-slate-200 dark:border-slate-700 overflow-hidden transform transition-all duration-300">
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 flex justify-between items-center shadow-sm z-10 relative">
+            <div class="flex items-center gap-3 relative z-10">
+                <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-2xl shadow-inner backdrop-blur-sm"><i class="ph-fill ph-chats-circle"></i></div>
                 <div>
-                    <h3 class="font-black text-sm leading-tight" id="chat-target-name">الدردشة</h3>
-                    <p class="text-[10px] text-blue-100 font-bold mt-0.5">مساحة التواصل</p>
+                    <h3 class="font-black text-lg leading-tight" id="chat-target-name">الدردشة</h3>
+                    <p class="text-xs text-blue-100 font-bold mt-0.5">مساحة التواصل</p>
                 </div>
             </div>
-            <button onclick="closeChat()" class="bg-black/10 hover:bg-black/20 rounded-full w-7 h-7 flex items-center justify-center transition text-sm relative z-10">✖</button>
+            <button onclick="closeChat()" class="bg-black/10 hover:bg-black/20 rounded-full w-8 h-8 flex items-center justify-center transition text-lg relative z-10"><i class="ph-bold ph-x"></i></button>
         </div>
         
-        <!-- مساحة الرسائل -->
-        <div id="chat-messages" class="flex-1 overflow-y-auto overflow-x-hidden p-3 flex flex-col gap-2 bg-white scroll-smooth"></div>
+        <div id="chat-messages" class="flex-1 overflow-y-auto overflow-x-hidden p-4 flex flex-col gap-3 bg-white dark:bg-slate-900 scroll-smooth"></div>
 
-        <!-- منطقة الكتابة -->
-        <div class="bg-white p-2 border-t border-slate-100 flex gap-2 items-end shadow-[0_-5px_10px_-5px_rgba(0,0,0,0.05)]">
-            <div class="flex-1 bg-slate-100 rounded-xl border border-slate-200 p-1 flex flex-col focus-within:border-blue-400 focus-within:bg-white transition-all shadow-inner">
-                <textarea id="chat-input" rows="1" class="w-full bg-transparent px-3 py-2 outline-none resize-none font-bold text-slate-700 text-sm placeholder-slate-400 leading-relaxed" placeholder="رسالة أو رابط..."></textarea>
+        <div class="bg-white dark:bg-slate-800 p-3 border-t border-slate-100 dark:border-slate-700 flex gap-2 items-end shadow-[0_-5px_10px_-5px_rgba(0,0,0,0.05)]">
+            <div class="flex-1 bg-slate-100 dark:bg-slate-700 rounded-2xl border-2 border-slate-200 dark:border-slate-600 p-1 flex flex-col focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-slate-800 transition-all shadow-inner">
+                <textarea id="chat-input" rows="1" class="w-full bg-transparent px-3 py-2 outline-none resize-none font-bold text-slate-700 dark:text-slate-200 text-sm placeholder-slate-400 dark:placeholder-slate-500 leading-relaxed" placeholder="رسالة أو رابط..."></textarea>
             </div>
-            <button id="send-msg-btn" onclick="sendChatMessage()" class="px-3 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-black text-sm btn-modern flex items-center justify-center shadow-md shadow-blue-500/30">إرسال</button>
+            <button id="send-msg-btn" onclick="sendChatMessage()" class="w-12 h-12 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl font-black text-xl btn-modern flex items-center justify-center shadow-md shadow-blue-500/30"><i class="ph-bold ph-paper-plane-tilt"></i></button>
         </div>
     </div>
 
-    <!-- شاشة التحفيز الإجبارية -->
+    <!-- شاشة التحفيز -->
     <div id="welcome-quote-screen" class="fixed inset-0 bg-slate-900/95 backdrop-blur-2xl z-[85] flex-col items-center justify-center p-6 welcome-hidden flex">
         <div class="absolute top-1/4 left-1/4 w-72 h-72 bg-emerald-500/20 rounded-full blur-[80px] animate-pulse"></div>
         <div class="absolute bottom-1/4 right-1/4 w-72 h-72 bg-blue-500/20 rounded-full blur-[80px] animate-pulse" style="animation-delay: 1.5s;"></div>
 
         <div class="bg-white/10 backdrop-blur-3xl border border-white/20 p-8 md:p-14 rounded-[3rem] max-w-2xl w-full text-center relative z-10 shadow-[0_0_50px_-10px_rgba(0,0,0,0.5)]">
-            <div class="text-7xl md:text-8xl mb-6 animate-bounce">💡</div>
+            <div class="text-7xl md:text-8xl mb-6 animate-bounce text-emerald-400"><i class="ph-fill ph-lightbulb"></i></div>
             <h2 class="text-3xl md:text-4xl font-black text-emerald-300 mb-6 tracking-wide drop-shadow-md">جرعة تحفيزية لليوم</h2>
             <div class="w-20 h-1.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent mx-auto mb-8 opacity-70 rounded-full"></div>
             <p id="welcome-quote-text" class="text-2xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-100 to-teal-50 leading-relaxed mb-12 drop-shadow-lg" style="line-height: 1.6;">
             </p>
             <button onclick="closeWelcomeScreen()" class="group relative px-8 py-5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black text-2xl rounded-2xl w-full md:w-auto mx-auto overflow-hidden shadow-[0_10px_30px_-10px_rgba(16,185,129,0.6)] hover:scale-105 transition-all duration-300">
-                <span class="relative z-10 flex items-center justify-center gap-3">مواصلة الدراسة <span class="group-hover:translate-x-2 transition-transform duration-300 text-3xl">🚀</span></span>
-                <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out"></div>
+                <span class="relative z-10 flex items-center justify-center gap-3">مواصلة الدراسة <i class="ph-bold ph-rocket-launch group-hover:translate-x-2 transition-transform duration-300 text-3xl"></i></span>
             </button>
+            <div class="mt-6 text-emerald-100/50 text-sm font-bold">تظهر هذه الرسالة مرة واحدة يومياً</div>
         </div>
     </div>
 
     <!-- نافذة الإعدادات -->
     <div id="settings-modal" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-[70] backdrop-blur-md p-4 transition-opacity duration-300">
-        <div class="bg-white/95 p-8 rounded-3xl max-w-sm w-full shadow-2xl border border-white/50 transform transition-transform duration-300 scale-95" id="settings-content">
-            <div class="flex justify-between items-center mb-6 border-b pb-3 border-slate-100">
-                <h3 class="text-2xl font-black text-slate-800 flex items-center gap-2">⚙️ الإعدادات</h3>
-                <button onclick="closeSettings()" class="text-slate-400 hover:text-red-500 font-bold text-3xl transition hover:rotate-90">✖</button>
+        <div class="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] max-w-sm w-full shadow-2xl border border-white/50 dark:border-slate-700 transform transition-transform duration-300 scale-95" id="settings-content">
+            <div class="flex justify-between items-center mb-6 border-b border-slate-100 dark:border-slate-700 pb-4">
+                <h3 class="text-2xl font-black text-slate-800 dark:text-white flex items-center gap-3"><i class="ph-fill ph-gear-six text-blue-500"></i> الإعدادات</h3>
+                <button onclick="closeSettings()" class="text-slate-400 hover:text-red-500 font-bold text-3xl transition hover:rotate-90"><i class="ph-bold ph-x"></i></button>
             </div>
-            <div class="space-y-4">
+            <div class="space-y-5">
                 <div>
-                    <label class="block text-base font-bold text-slate-600 mb-2">👤 اسم المستخدم</label>
-                    <input type="text" id="settings-username" disabled class="w-full px-5 py-3 rounded-xl border-2 border-slate-100 bg-slate-50 text-slate-400 font-black outline-none cursor-not-allowed shadow-inner text-lg">
+                    <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2 flex items-center gap-2"><i class="ph-fill ph-user"></i> اسم المستخدم</label>
+                    <input type="text" id="settings-username" disabled class="w-full px-5 py-3.5 rounded-xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-400 dark:text-slate-500 font-black outline-none cursor-not-allowed shadow-inner text-lg">
                 </div>
                 <div>
-                    <label class="block text-base font-bold text-slate-600 mb-2">🔒 كلمة المرور الجديدة</label>
-                    <input type="text" id="settings-new-password" class="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none font-black transition shadow-sm text-lg">
+                    <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2 flex items-center gap-2"><i class="ph-fill ph-lock-key"></i> كلمة المرور الجديدة</label>
+                    <input type="text" id="settings-new-password" class="w-full px-5 py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-blue-500 outline-none font-black transition shadow-sm text-lg text-slate-800 dark:text-white">
                 </div>
                 <div id="settings-phone-container">
-                    <label class="block text-base font-bold text-slate-600 mb-2">📱 هاتف ولي الأمر</label>
-                    <input type="tel" id="settings-new-phone" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-white focus:border-blue-500 outline-none font-black transition shadow-sm text-left tracking-[0.2em] text-lg" dir="auto" placeholder="05/06/07...">
+                    <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2 flex items-center gap-2"><i class="ph-fill ph-device-mobile"></i> هاتف ولي الأمر</label>
+                    <input type="tel" id="settings-new-phone" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full px-5 py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-blue-500 outline-none font-black transition shadow-sm text-left tracking-[0.2em] text-lg text-slate-800 dark:text-white" dir="auto" placeholder="05/06/07...">
                 </div>
-                <button onclick="saveSettingsData()" class="w-full bg-gradient-to-r from-slate-800 to-slate-900 text-white font-black py-4 rounded-xl transition btn-modern mt-2 shadow-lg shadow-slate-900/20 text-xl">💾 حفظ التغييرات</button>
+                <button onclick="saveSettingsData()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-4 rounded-xl transition btn-modern mt-4 shadow-lg shadow-blue-500/30 text-xl flex items-center justify-center gap-2"><i class="ph-bold ph-floppy-disk"></i> حفظ التغييرات</button>
             </div>
         </div>
     </div>
 
     <!-- نافذة تعديل المحتوى للأستاذ -->
     <div id="edit-modal" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-[80] backdrop-blur-md transition-opacity duration-300">
-        <div class="bg-white p-8 rounded-[2rem] max-w-sm w-[90%] mx-auto shadow-2xl border border-white/50">
-            <h3 class="text-2xl font-black mb-4 text-slate-800 flex items-center gap-2">✏️ تعديل المحتوى</h3>
+        <div class="bg-white dark:bg-slate-800 p-8 rounded-[2rem] max-w-sm w-[90%] mx-auto shadow-2xl border border-white/50 dark:border-slate-700">
+            <h3 class="text-2xl font-black mb-6 text-slate-800 dark:text-white flex items-center gap-3"><i class="ph-fill ph-pencil-simple text-amber-500"></i> تعديل المحتوى</h3>
             <div class="space-y-4">
-                <input type="text" id="edit-link-title" class="w-full text-base font-bold p-3 border-2 border-slate-200 rounded-xl outline-none focus:border-blue-500 transition bg-slate-50" placeholder="عنوان المحتوى...">
-                <input type="text" id="edit-link-url" class="w-full text-base p-3 border-2 border-slate-200 rounded-xl outline-none focus:border-blue-500 transition bg-slate-50 text-left font-bold text-slate-600" dir="ltr" placeholder="https://...">
+                <input type="text" id="edit-link-title" class="w-full text-base font-bold p-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl outline-none focus:border-amber-500 transition bg-slate-50 dark:bg-slate-900 dark:text-white" placeholder="عنوان المحتوى...">
+                <input type="text" id="edit-link-url" class="w-full text-base p-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl outline-none focus:border-amber-500 transition bg-slate-50 dark:bg-slate-900 dark:text-white text-left font-bold" dir="ltr" placeholder="https://...">
             </div>
-            <div class="flex justify-center gap-3 mt-6">
-                <button onclick="closeEditModal()" class="flex-1 py-3 bg-slate-100 text-slate-700 rounded-xl font-black text-lg hover:bg-slate-200 transition btn-modern">إلغاء</button>
-                <button onclick="saveEditedLink()" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-black text-lg hover:bg-blue-700 transition shadow-lg shadow-blue-500/30 btn-modern">تحديث</button>
+            <div class="flex justify-center gap-3 mt-8">
+                <button onclick="closeEditModal()" class="flex-1 py-3.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-black text-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition btn-modern">إلغاء</button>
+                <button onclick="saveEditedLink()" class="flex-1 py-3.5 bg-amber-500 text-white rounded-xl font-black text-lg hover:bg-amber-600 transition shadow-lg shadow-amber-500/30 btn-modern">تحديث</button>
             </div>
         </div>
     </div>
 
     <!-- نافذة تأكيد الإجراءات -->
     <div id="confirm-modal" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-[80] backdrop-blur-md transition-opacity duration-300">
-        <div class="bg-white p-8 rounded-[2rem] max-w-sm w-[90%] mx-auto shadow-2xl text-center border border-white/50">
-            <div class="w-20 h-20 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-5 shadow-inner">⚠️</div>
-            <h3 class="text-2xl font-black mb-2 text-slate-800">تأكيد الإجراء</h3>
-            <p class="text-slate-500 mb-8 font-bold leading-relaxed text-base" id="confirm-message">هل أنت متأكد؟</p>
-            <div class="flex justify-center gap-3">
-                <button onclick="closeConfirm(false)" class="flex-1 py-3 bg-slate-100 text-slate-700 rounded-xl font-black text-lg hover:bg-slate-200 transition btn-modern">إلغاء</button>
-                <button onclick="closeConfirm(true)" class="flex-1 py-3 bg-red-500 text-white rounded-xl font-black text-lg hover:bg-red-600 transition shadow-lg shadow-red-500/30 btn-modern">تأكيد</button>
+        <div class="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] max-w-sm w-[90%] mx-auto shadow-2xl text-center border border-white/50 dark:border-slate-700">
+            <div class="w-24 h-24 bg-amber-100 dark:bg-amber-900/50 text-amber-500 rounded-full flex items-center justify-center text-6xl mx-auto mb-6 shadow-inner"><i class="ph-fill ph-warning"></i></div>
+            <h3 class="text-3xl font-black mb-3 text-slate-800 dark:text-white">تأكيد الإجراء</h3>
+            <p class="text-slate-500 dark:text-slate-400 mb-8 font-bold leading-relaxed text-lg" id="confirm-message">هل أنت متأكد؟</p>
+            <div class="flex justify-center gap-4">
+                <button onclick="closeConfirm(false)" class="flex-1 py-4 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-black text-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition btn-modern">إلغاء</button>
+                <button onclick="closeConfirm(true)" class="flex-1 py-4 bg-red-500 text-white rounded-xl font-black text-lg hover:bg-red-600 transition shadow-lg shadow-red-500/30 btn-modern">تأكيد</button>
             </div>
         </div>
     </div>
 
-    <!-- نافذة نجاح التسجيل -->
+    <!-- نافذة نجاح التسجيل الإجبارية -->
     <div id="registration-success-modal" class="fixed inset-0 bg-slate-900/80 hidden items-center justify-center z-[90] backdrop-blur-md transition-opacity duration-300 p-4">
-        <div class="bg-white p-8 md:p-10 rounded-[2.5rem] max-w-md w-full mx-auto shadow-2xl border border-white/50 relative overflow-hidden transform transition-all scale-100">
+        <div class="bg-white dark:bg-slate-800 p-8 md:p-10 rounded-[3rem] max-w-md w-full mx-auto shadow-2xl border border-white/50 dark:border-slate-700 relative overflow-hidden transform transition-all scale-100">
             <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500 rounded-full opacity-10 blur-2xl"></div>
-            <div class="absolute bottom-0 left-0 w-32 h-32 bg-blue-500 rounded-full opacity-10 blur-2xl"></div>
             
-            <div class="text-center mb-6 relative z-10">
-                <div class="w-24 h-24 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center text-5xl mx-auto mb-5 shadow-inner">🎉</div>
-                <h3 class="text-2xl font-black text-slate-800">تم تسجيل طلبك بنجاح!</h3>
+            <div class="text-center mb-8 relative z-10">
+                <div class="w-28 h-28 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-500 rounded-full flex items-center justify-center text-6xl mx-auto mb-6 shadow-inner"><i class="ph-fill ph-confetti"></i></div>
+                <h3 class="text-3xl font-black text-slate-800 dark:text-white">تم تسجيل طلبك بنجاح!</h3>
             </div>
             
-            <div class="space-y-4 relative z-10 mb-8 bg-slate-50/80 p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
-                <p class="text-slate-700 font-bold leading-relaxed flex items-start gap-3">
-                    <span class="text-xl mt-1">📌</span>
-                    <span><strong class="text-blue-700 font-black">ملاحظة 1:</strong> ستصلكم رسالة في رقم هاتف الولي تؤكد قبولكم في المنصة.</span>
+            <div class="space-y-5 relative z-10 mb-8 bg-slate-50/80 dark:bg-slate-900/80 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <p class="text-slate-700 dark:text-slate-300 font-bold leading-relaxed flex items-start gap-3 text-lg">
+                    <i class="ph-fill ph-push-pin text-2xl text-amber-500 mt-1"></i>
+                    <span><strong class="text-blue-600 dark:text-blue-400 font-black">ملاحظة 1:</strong> ستصلكم رسالة في رقم هاتف الولي تؤكد قبولكم في المنصة.</span>
                 </p>
-                <div class="h-px w-full bg-slate-200 my-2"></div>
-                <p class="text-slate-700 font-bold leading-relaxed flex items-start gap-3">
-                    <span class="text-xl mt-1">📌</span>
+                <div class="h-px w-full bg-slate-200 dark:bg-slate-700 my-2"></div>
+                <p class="text-slate-700 dark:text-slate-300 font-bold leading-relaxed flex items-start gap-3 text-lg">
+                    <i class="ph-fill ph-push-pin text-2xl text-amber-500 mt-1"></i>
                     <span>
-                        <strong class="text-blue-700 font-black">ملاحظة 2:</strong> أرسلوا وصل تسديد حقوق المنصة على الواتساب في الرقم التالي:
+                        <strong class="text-blue-600 dark:text-blue-400 font-black">ملاحظة 2:</strong> أرسلوا وصل تسديد حقوق المنصة على الواتساب:
                         <br> 
-                        <a href="https://wa.me/213699271555" target="_blank" class="inline-flex items-center gap-2 mt-3 text-white bg-emerald-500 px-4 py-2 rounded-xl font-black tracking-widest text-lg hover:bg-emerald-600 transition shadow-md shadow-emerald-500/30" dir="ltr">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                        <a href="https://wa.me/213699271555" target="_blank" class="inline-flex items-center justify-center w-full gap-3 mt-4 text-white bg-[#25D366] px-5 py-3.5 rounded-xl font-black tracking-widest text-xl hover:bg-[#128C7E] transition shadow-md shadow-[#25D366]/30" dir="ltr">
+                            <i class="ph-fill ph-whatsapp-logo text-2xl"></i>
                             0699 27 15 55
                         </a>
                     </span>
                 </p>
             </div>
-            <button onclick="closeRegModal()" class="w-full py-4 bg-gradient-to-r from-slate-800 to-slate-900 text-white rounded-2xl font-black text-xl btn-modern relative z-10 shadow-lg shadow-slate-900/20">فهمت ذلك، شكراً 👍</button>
+            <button onclick="closeRegModal()" class="w-full py-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl font-black text-2xl btn-modern relative z-10 shadow-lg shadow-blue-500/30">فهمت ذلك، شكراً <i class="ph-fill ph-thumbs-up"></i></button>
         </div>
     </div>
 
-    <div class="max-w-7xl mx-auto">
+    <div class="max-w-7xl mx-auto relative z-10">
         
-        <!-- 1. شاشة تسجيل الدخول -->
-        <div id="auth-screen" class="screen active max-w-md mx-auto mt-8 md:mt-12 bg-white/90 backdrop-blur-xl p-8 md:p-10 rounded-[2.5rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-white/60 relative overflow-hidden interactive-card">
-            <div class="absolute -top-32 -right-32 w-64 h-64 bg-blue-400 rounded-full opacity-20 blur-3xl"></div>
-            <div class="absolute -bottom-32 -left-32 w-64 h-64 bg-indigo-400 rounded-full opacity-20 blur-3xl"></div>
+        <!-- ===================================== -->
+        <!-- شاشة المصادقة (Auth Screen) -->
+        <!-- ===================================== -->
+        <div id="auth-screen" class="screen active max-w-md mx-auto mt-8 md:mt-12 bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl p-8 md:p-12 rounded-[3rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] border border-white/60 dark:border-slate-700/60 relative overflow-hidden interactive-card">
+            
+            <div class="absolute top-4 left-4 z-20">
+                <button onclick="toggleDarkMode()" class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-amber-400 flex items-center justify-center text-2xl shadow-sm hover:scale-110 transition"><i class="ph-fill ph-moon"></i></button>
+            </div>
 
-            <div class="text-center mb-10 relative z-10">
-                <div class="w-32 h-32 mx-auto mb-6 rounded-3xl shadow-2xl overflow-hidden border-4 border-white bg-white p-1 transform transition hover:scale-105 duration-300">
-                    <img src="icon.png" alt="شعار المنصة" class="w-full h-full object-cover rounded-2xl">
+            <div class="text-center mb-10 relative z-10 pt-4">
+                <div class="w-36 h-36 mx-auto mb-6 rounded-[2rem] shadow-2xl overflow-hidden border-4 border-white dark:border-slate-700 bg-white p-1 transform transition hover:scale-105 duration-300">
+                    <img src="icon.png" alt="شعار المنصة" class="w-full h-full object-cover rounded-[1.7rem]">
                 </div>
-                <h2 id="auth-title" class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-800 drop-shadow-sm mb-2">منصة المجتهد</h2>
-                <div class="inline-block bg-blue-50 text-blue-700 px-5 py-2 rounded-full text-sm font-bold border border-blue-100 shadow-sm tracking-wide">للعلوم الفيزيائية</div>
+                <h2 id="auth-title" class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 drop-shadow-sm mb-3">منصة المجتهد</h2>
+                <div class="inline-block bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-6 py-2 rounded-full text-base font-bold border border-blue-100 dark:border-blue-800 shadow-sm tracking-wide">للعلوم الفيزيائية</div>
             </div>
             
-            <div class="space-y-4 relative z-10">
+            <div class="space-y-5 relative z-10">
                 <div class="relative group">
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-xl">👤</div>
-                    <input type="text" id="username" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50/50 outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all font-black text-slate-700 text-lg placeholder-slate-400" placeholder="اسم المستخدم">
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-fill ph-user"></i></div>
+                    <input type="text" id="username" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 dark:focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400" placeholder="اسم المستخدم">
                 </div>
                 
                 <div class="relative group hidden" id="parent-name-container">
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-xl">👨‍👦</div>
-                    <input type="text" id="parent-name" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50/50 outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all font-black text-slate-700 text-lg placeholder-slate-400" placeholder="اسم ولي الأمر (ثلاثي)">
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-fill ph-users-three"></i></div>
+                    <input type="text" id="parent-name" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400" placeholder="اسم ولي الأمر (ثلاثي)">
                 </div>
                 
                 <div class="relative group hidden" id="phone-number-container">
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-xl">📱</div>
-                    <input type="tel" id="phone-number" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50/50 outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all font-black text-slate-700 text-lg placeholder-slate-400 text-left tracking-[0.2em]" dir="auto" placeholder="05 / 06 / 07...">
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-fill ph-device-mobile"></i></div>
+                    <input type="tel" id="phone-number" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400 text-left tracking-[0.2em]" dir="auto" placeholder="05 / 06 / 07...">
                 </div>
 
                 <div class="relative group">
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors hidden text-xl" id="level-icon">🎓</div>
-                    <select id="user-level" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50/50 outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all hidden font-black text-blue-700 text-lg appearance-none cursor-pointer">
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors hidden text-2xl" id="level-icon"><i class="ph-fill ph-graduation-cap"></i></div>
+                    <select id="user-level" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all hidden font-black text-blue-700 dark:text-blue-400 text-lg appearance-none cursor-pointer">
                         <option value="" disabled selected>اختر مستواك الدراسي بدقة...</option>
                         <option value="m_y1">السنة الأولى متوسط</option>
                         <option value="m_y2">السنة الثانية متوسط</option>
@@ -275,193 +286,217 @@
                 </div>
 
                 <div class="relative group">
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-xl">🔒</div>
-                    <input type="password" id="password" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50/50 outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all font-black text-slate-700 text-lg placeholder-slate-400" placeholder="كلمة المرور">
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-fill ph-lock-key"></i></div>
+                    <input type="password" id="password" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400" placeholder="كلمة المرور">
                 </div>
                 
-                <button id="auth-action-btn" onclick="handleAuth()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black py-4.5 rounded-2xl btn-modern text-2xl mt-4 shadow-xl shadow-blue-600/30 tracking-wide">تسجيل الدخول</button>
+                <button id="auth-action-btn" onclick="handleAuth()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black py-5 rounded-2xl btn-modern text-2xl mt-6 shadow-xl shadow-blue-600/30 tracking-wide flex justify-center items-center gap-2">
+                    <i class="ph-bold ph-sign-in"></i> تسجيل الدخول
+                </button>
             </div>
             
-            <div class="text-center mt-6 relative z-10">
-                <button onclick="toggleAuthMode()" id="switch-mode-text" class="text-slate-500 font-bold hover:text-blue-600 transition underline decoration-2 underline-offset-4 decoration-slate-300 hover:decoration-blue-400 text-base">إنشاء حساب تلميذ جديد 🚀</button>
+            <div class="text-center mt-8 relative z-10 border-t border-slate-100 dark:border-slate-700 pt-6">
+                <button onclick="toggleAuthMode()" id="switch-mode-text" class="text-slate-500 dark:text-slate-400 font-bold hover:text-blue-600 dark:hover:text-blue-400 transition underline decoration-2 underline-offset-4 decoration-slate-300 dark:decoration-slate-600 text-lg flex items-center justify-center gap-2 mx-auto"><i class="ph-fill ph-rocket-launch"></i> إنشاء حساب تلميذ جديد</button>
             </div>
         </div>
 
-        <!-- 2. شاشة الانتظار -->
-        <div id="pending-screen" class="screen max-w-md mx-auto mt-20 bg-white/95 backdrop-blur-md p-10 rounded-[2.5rem] shadow-2xl text-center border-t-8 border-amber-400 border border-white/50 interactive-card">
-            <div class="w-24 h-24 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center text-6xl mx-auto mb-6 shadow-inner animate-pulse">⏳</div>
-            <h2 class="text-3xl font-black text-slate-800 mb-4 drop-shadow-sm">طلبك قيد المراجعة</h2>
-            <p class="text-slate-500 mb-8 font-bold leading-relaxed text-lg">تم تسجيل حسابك بنجاح في منصة المجتهد. يرجى الانتظار حتى يقوم الأستاذ بتفعيل حسابك لتبدأ التعلم.</p>
-            <button onclick="logout()" class="w-full bg-slate-100 text-slate-700 font-black py-4 rounded-2xl hover:bg-slate-200 transition btn-modern text-lg border border-slate-200">تسجيل الخروج</button>
+        <!-- ===================================== -->
+        <!-- شاشة الانتظار (Pending) -->
+        <!-- ===================================== -->
+        <div id="pending-screen" class="screen max-w-md mx-auto mt-20 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md p-10 rounded-[3rem] shadow-2xl text-center border-t-8 border-amber-400 border border-white/50 dark:border-slate-700 interactive-card">
+            <div class="w-32 h-32 bg-amber-100 dark:bg-amber-900/30 text-amber-500 rounded-full flex items-center justify-center text-7xl mx-auto mb-8 shadow-inner animate-pulse"><i class="ph-fill ph-hourglass-high"></i></div>
+            <h2 class="text-4xl font-black text-slate-800 dark:text-white mb-4 drop-shadow-sm">طلبك قيد المراجعة</h2>
+            <p class="text-slate-500 dark:text-slate-400 mb-10 font-bold leading-relaxed text-xl">تم تسجيل حسابك بنجاح في منصة المجتهد. يرجى الانتظار حتى يقوم الأستاذ بتفعيل حسابك لتبدأ التعلم.</p>
+            <button onclick="logout()" class="w-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-black py-5 rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-600 transition btn-modern text-xl flex justify-center items-center gap-2"><i class="ph-bold ph-arrow-right"></i> العودة للرئيسية</button>
         </div>
 
-        <!-- 3. شاشة تحكم المسؤول (الأستاذ) -->
+        <!-- ===================================== -->
+        <!-- شاشة الأستاذ (Admin Panel) -->
+        <!-- ===================================== -->
         <div id="admin-screen" class="screen">
-            <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 backdrop-blur-xl p-4 md:p-5 rounded-[2rem] shadow-lg border border-white/50 mb-6 gap-5 sticky top-4 z-40 transition-all duration-300">
+            <!-- Header -->
+            <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-5 md:p-6 rounded-[2.5rem] shadow-lg border border-white/50 dark:border-slate-700 mb-8 gap-5 sticky top-4 z-40 transition-all duration-300">
                 <div class="flex items-center gap-4 w-full md:w-auto">
-                    <div class="w-14 h-14 rounded-2xl shadow-lg overflow-hidden bg-white p-1 border border-slate-100"><img src="icon.png" class="w-full h-full object-cover rounded-xl"></div>
+                    <div class="w-16 h-16 rounded-2xl shadow-lg overflow-hidden bg-white p-1 border border-slate-100"><img src="icon.png" class="w-full h-full object-cover rounded-xl"></div>
                     <div>
-                        <h1 class="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-800 to-slate-600 leading-tight">منصة المجتهد</h1>
+                        <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 leading-tight">منصة المجتهد</h1>
                         <div class="flex items-center gap-2 mt-1">
-                            <span class="text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 px-3 py-1 rounded-lg shadow-sm">لوحة الأستاذ 👨‍🏫</span>
+                            <span class="text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 px-3 py-1 rounded-lg shadow-sm flex items-center gap-1"><i class="ph-fill ph-chalkboard-teacher"></i> لوحة الأستاذ</span>
                         </div>
                     </div>
                 </div>
                 <div class="flex items-center gap-3 w-full md:w-auto justify-end flex-wrap">
-                    <div class="stats-container relative">
-                        <div class="bg-blue-50 border border-blue-100 text-blue-700 px-4 py-2.5 rounded-2xl font-black text-sm flex items-center gap-2 cursor-help transition hover:bg-blue-100 shadow-sm">
-                            <span class="text-xl">👥</span> <span class="hidden md:inline">التلاميذ:</span> <span id="total-students-count" class="text-lg bg-white px-2 rounded-md shadow-sm">0</span>
-                        </div>
-                        <div class="stats-dropdown p-5">
-                            <h4 class="font-black text-slate-800 mb-4 border-b pb-3 flex items-center gap-2 text-base">📊 تفاصيل المستويات</h4>
-                            <ul id="level-stats-list" class="space-y-3 text-sm font-bold text-slate-600"></ul>
-                        </div>
-                    </div>
-                    <!-- تغيير أيقونة الإعدادات إلى نص -->
-                    <button onclick="openSettings()" class="bg-slate-100 text-slate-700 px-4 py-2.5 rounded-2xl font-black hover:bg-slate-200 transition btn-modern shadow-sm border border-slate-200 text-sm flex items-center gap-2" title="الإعدادات">الإعدادات ⚙️</button>
-                    <!-- تغيير أيقونة الخروج إلى نص -->
-                    <button onclick="logout()" class="bg-red-50 text-red-600 px-4 py-2.5 rounded-2xl font-black hover:bg-red-100 transition btn-modern border border-red-100 shadow-sm flex items-center gap-2 text-sm">تسجيل الخروج 🚪</button>
+                    <button onclick="toggleDarkMode()" class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-amber-400 text-2xl shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-fill ph-moon"></i></button>
+                    <button onclick="openSettings()" class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" title="الإعدادات"><i class="ph-fill ph-gear-six"></i></button>
+                    <button onclick="logout()" class="icon-btn px-6 h-12 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-lg font-black shadow-sm border border-red-100 dark:border-red-800 flex items-center gap-2">تسجيل الخروج <i class="ph-bold ph-sign-out"></i></button>
                 </div>
             </header>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                <!-- قسم متابعة التلاميذ -->
-                <div class="lg:col-span-12">
-                    <details class="bg-white/95 backdrop-blur-xl rounded-[2.5rem] shadow-lg border border-white/50 interactive-card overflow-hidden group">
-                        <summary class="p-6 md:p-8 flex items-center justify-between outline-none">
-                            <div class="flex items-center gap-5">
-                                <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-3xl shadow-inner group-hover:scale-110 transition-transform">📋</div>
-                                <div>
-                                    <h3 class="text-2xl font-black text-slate-800">متابعة التلاميذ و إشعار الأولياء</h3>
-                                    <p class="text-slate-500 font-bold mt-1 text-sm hidden sm:block">انقر هنا لعرض قائمة التلاميذ أو مراسلة الولي عبر واتساب</p>
-                                </div>
-                            </div>
-                        </summary>
-                        <div class="p-5 md:p-8 pt-0 border-t border-slate-100/50">
-                            <div class="overflow-x-auto rounded-3xl border border-slate-100 shadow-inner bg-slate-50/50 mt-6">
-                                <table class="w-full text-right border-collapse whitespace-nowrap min-w-[1200px]">
-                                    <thead class="bg-slate-100 text-slate-600 text-sm font-black border-b border-slate-200">
-                                        <tr>
-                                            <th class="p-5 rounded-tr-3xl">التلميذ (وكلمة المرور)</th>
-                                            <th class="p-5">معلومات الولي (واتساب)</th>
-                                            <th class="p-5">المستوى</th>
-                                            <th class="p-5 w-48">التقدم بالنقاط</th>
-                                            <th class="p-5">الحالة</th>
-                                            <th class="p-5 text-left rounded-tl-3xl">الإجراءات</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="students-table-body" class="bg-white divide-y divide-slate-100 text-sm"></tbody>
-                                </table>
-                            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-10">
+                <!-- إحصائيات سريعة (Charts) -->
+                <div class="lg:col-span-4 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-6 md:p-8 rounded-[2.5rem] shadow-lg border border-white/50 dark:border-slate-700 interactive-card flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-2xl font-black text-slate-800 dark:text-white flex items-center gap-3 mb-6">
+                            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center text-3xl shadow-inner"><i class="ph-fill ph-users"></i></div>
+                            إحصائيات التلاميذ
+                        </h3>
+                        <div class="bg-blue-50 dark:bg-slate-700/50 rounded-2xl p-6 flex justify-between items-center border border-blue-100 dark:border-slate-600 mb-6">
+                            <span class="text-lg font-bold text-blue-800 dark:text-blue-300">العدد الإجمالي</span>
+                            <span id="total-students-count" class="text-4xl font-black text-blue-600 dark:text-blue-400">0</span>
                         </div>
-                    </details>
+                    </div>
+                    <div class="flex-1 min-h-[200px] flex items-center justify-center relative">
+                        <canvas id="studentsChart" class="max-h-full"></canvas>
+                    </div>
                 </div>
 
-                <!-- قسم إدارة المحتوى -->
-                <div class="lg:col-span-12 bg-white/95 backdrop-blur-xl p-5 md:p-8 rounded-[2.5rem] shadow-lg border border-white/50 mb-10">
-                    <div class="mb-6 border-b border-slate-100 pb-4">
-                        <h3 class="text-2xl font-black text-slate-800 flex items-center gap-3 mb-2">
-                            <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center text-xl shadow-inner">📚</div>
-                            إدارة محتوى المنصة
+                <!-- قسم متابعة التلاميذ -->
+                <div class="lg:col-span-8 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-6 md:p-8 rounded-[2.5rem] shadow-lg border border-white/50 dark:border-slate-700 flex flex-col h-full max-h-[600px]">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                        <h3 class="text-2xl font-black text-slate-800 dark:text-white flex items-center gap-3">
+                            <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center text-3xl shadow-inner"><i class="ph-fill ph-clipboard-text"></i></div>
+                            إدارة الحسابات
                         </h3>
-                        <p class="text-slate-500 font-bold mr-14 text-sm">أضف الدروس، التمارين، والروابط لتظهر فوراً في حسابات تلاميذ كل مستوى.</p>
+                        <div class="flex gap-2">
+                            <button onclick="bulkAction('approve')" class="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-xl text-sm font-black hover:bg-emerald-100 transition border border-emerald-200 dark:border-emerald-800 flex items-center gap-2"><i class="ph-bold ph-check"></i> تفعيل المحدد</button>
+                            <button onclick="bulkAction('delete')" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-4 py-2 rounded-xl text-sm font-black hover:bg-red-100 transition border border-red-200 dark:border-red-800 flex items-center gap-2"><i class="ph-bold ph-trash"></i> حذف المحدد</button>
+                        </div>
                     </div>
-                    <div id="admin-program-view" class="space-y-6"></div>
+                    <div class="overflow-y-auto overflow-x-auto rounded-3xl border border-slate-100 dark:border-slate-700 shadow-inner bg-slate-50/50 dark:bg-slate-900/50 flex-1">
+                        <table class="w-full text-right border-collapse whitespace-nowrap min-w-[900px]">
+                            <thead class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-sm font-black border-b border-slate-200 dark:border-slate-700 sticky top-0 z-10 shadow-sm">
+                                <tr>
+                                    <th class="p-5 w-12 text-center rounded-tr-3xl"><input type="checkbox" id="select-all-cb" onclick="toggleSelectAll()" class="custom-cb"></th>
+                                    <th class="p-5">التلميذ / ولي الأمر</th>
+                                    <th class="p-5 text-center">المستوى</th>
+                                    <th class="p-5 text-center">نقاط (XP)</th>
+                                    <th class="p-5 text-center">الحالة</th>
+                                    <th class="p-5 text-left rounded-tl-3xl">الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="students-table-body" class="bg-white dark:bg-slate-800 divide-y divide-slate-100 dark:divide-slate-700 text-sm"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- قسم إدارة المحتوى (بصيغة التبويبات Tabs) -->
+                <div class="lg:col-span-12 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-6 md:p-8 rounded-[2.5rem] shadow-lg border border-white/50 dark:border-slate-700 mb-10">
+                    <div class="mb-8 border-b border-slate-100 dark:border-slate-700 pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <h3 class="text-3xl font-black text-slate-800 dark:text-white flex items-center gap-4 mb-2">
+                                <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center text-3xl shadow-inner"><i class="ph-fill ph-books"></i></div>
+                                إدارة محتوى المنصة
+                            </h3>
+                            <p class="text-slate-500 dark:text-slate-400 font-bold text-lg">أضف الدروس والتمارين حسب الطور والسنة الدراسية.</p>
+                        </div>
+                        
+                        <!-- Main Level Selector (Middle/High) -->
+                        <div class="flex bg-slate-100 dark:bg-slate-900 p-1.5 rounded-2xl shadow-inner border border-slate-200 dark:border-slate-700 w-full md:w-auto">
+                            <button onclick="switchAdminPart('part_middle')" id="tab-btn-part_middle" class="flex-1 md:w-48 py-3 rounded-xl font-black text-base transition-all bg-white dark:bg-slate-700 text-blue-600 dark:text-white shadow-md">التعليم المتوسط</button>
+                            <button onclick="switchAdminPart('part_high')" id="tab-btn-part_high" class="flex-1 md:w-48 py-3 rounded-xl font-black text-base transition-all text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">التعليم الثانوي</button>
+                        </div>
+                    </div>
+                    
+                    <div id="admin-program-view" class="min-h-[400px]"></div>
                 </div>
             </div>
         </div>
 
-        <!-- 4. شاشة التلميذ -->
+        <!-- ===================================== -->
+        <!-- شاشة التلميذ -->
+        <!-- ===================================== -->
         <div id="app-screen" class="screen">
-            <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 backdrop-blur-xl p-3 md:p-4 rounded-[2rem] shadow-lg border border-white/50 mb-6 gap-4 sticky top-4 z-40">
-                <div class="flex items-center gap-3 w-full md:w-auto">
-                    <div class="w-12 h-12 rounded-xl shadow-md overflow-hidden bg-white p-1 border border-slate-100 transform transition hover:scale-105"><img src="icon.png" class="w-full h-full object-cover rounded-lg"></div>
+            <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-4 md:p-6 rounded-[2.5rem] shadow-lg border border-white/50 dark:border-slate-700 mb-8 gap-5 sticky top-4 z-40">
+                <div class="flex items-center gap-4 w-full md:w-auto">
+                    <div class="w-14 h-14 rounded-2xl shadow-lg overflow-hidden bg-white p-1 border border-slate-100"><img src="icon.png" class="w-full h-full object-cover rounded-xl"></div>
                     <div>
-                        <h1 class="text-xl md:text-2xl font-black text-slate-800 leading-tight">مرحباً، <span id="display-username" class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600"></span></h1>
+                        <h1 class="text-2xl md:text-3xl font-black text-slate-800 dark:text-white leading-tight" id="display-username"></h1>
                         <div class="flex items-center gap-2 mt-1">
-                            <span class="text-xs font-black text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200">منصة المجتهد</span>
-                            <span id="student-level-badge" class="text-xs font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md border border-emerald-200 shadow-sm">تلميذ</span>
+                            <span class="text-sm font-black text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-600">منصة المجتهد</span>
+                            <span id="student-level-badge" class="text-sm font-black text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/50 px-3 py-1 rounded-lg border border-emerald-200 dark:border-emerald-800 shadow-sm">تلميذ</span>
                         </div>
                     </div>
                 </div>
                 
-                <div class="flex items-center gap-3 w-full md:w-auto justify-end flex-wrap">
-                    <button id="return-admin-btn" onclick="returnToAdmin()" class="hidden relative bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-2.5 rounded-xl font-black text-sm hover:from-amber-600 hover:to-orange-600 transition btn-modern shadow-md shadow-amber-500/30 flex items-center gap-2">
-                        <span class="hidden sm:inline">العودة للإدارة</span> 🔙
-                    </button>
+                <div class="flex items-center justify-between md:justify-end gap-3 w-full md:w-auto flex-wrap">
+                    <button id="return-admin-btn" onclick="returnToAdmin()" class="hidden icon-btn w-12 h-12 bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400 text-2xl shadow-sm border border-amber-200 dark:border-amber-800" title="العودة للإدارة"><i class="ph-bold ph-arrow-right"></i></button>
 
-                    <!-- القائمة المنسدلة لأبطال المستوى -->
+                    <button onclick="toggleDarkMode()" class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-amber-400 text-2xl shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-fill ph-moon"></i></button>
+
+                    <!-- قائمة أبطال المستوى المنسدلة -->
                     <div class="relative inline-block z-50">
                         <details class="group" id="leaderboard-dropdown-details">
-                            <summary class="bg-amber-50 text-amber-700 px-3 py-2.5 rounded-xl text-sm font-black hover:bg-amber-100 transition border border-amber-200 shadow-sm flex items-center gap-2 cursor-pointer outline-none">
-                                <span class="hidden sm:inline">أبطال المستوى</span> 🏆
+                            <summary class="bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-5 py-3 rounded-2xl text-lg font-black hover:bg-amber-100 dark:hover:bg-amber-900/50 transition border border-amber-200 dark:border-amber-800 shadow-sm flex items-center gap-2 cursor-pointer outline-none">
+                                <i class="ph-fill ph-trophy text-2xl"></i> <span class="hidden sm:inline">أبطال المستوى</span>
                             </summary>
-                            <div class="absolute top-full right-0 mt-2 w-[300px] md:w-80 bg-white rounded-[1.5rem] shadow-2xl border border-slate-100 p-4 z-[60] max-h-[350px] overflow-y-auto">
-                                <h4 class="font-black text-slate-800 text-lg mb-3 border-b border-slate-100 pb-2 flex items-center gap-2">
-                                    ترتيب المتفوقين
+                            <div class="absolute top-full right-0 mt-3 w-[320px] md:w-[400px] bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl border border-slate-100 dark:border-slate-700 p-5 z-[60] max-h-[400px] overflow-y-auto">
+                                <h4 class="font-black text-slate-800 dark:text-white text-xl mb-4 border-b border-slate-100 dark:border-slate-700 pb-3 flex items-center gap-2">
+                                    <i class="ph-fill ph-medal text-amber-500"></i> ترتيب المتفوقين
                                 </h4>
                                 <div id="leaderboard-container"></div>
                             </div>
                         </details>
                     </div>
 
-                    <!-- زر الدردشة في الأعلى مع الإشعار -->
-                    <button onclick="openChat('admin')" class="relative bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2.5 rounded-xl font-black text-sm hover:from-blue-700 hover:to-indigo-700 transition btn-modern shadow-md shadow-blue-500/30 flex items-center gap-2">
-                        <span class="hidden sm:inline">الدردشة</span> <span class="text-lg">💬</span>
-                        <span id="student-chat-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-[11px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm hidden animate-bounce">0</span>
+                    <!-- زر الدردشة -->
+                    <button onclick="openChat('admin')" class="relative bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-2xl font-black text-lg hover:from-blue-700 hover:to-indigo-700 transition btn-modern shadow-md shadow-blue-500/30 flex items-center gap-2">
+                        <span class="hidden sm:inline">الدردشة</span> <i class="ph-fill ph-chat-circle-dots text-2xl"></i>
+                        <span id="student-chat-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-[12px] font-black w-6 h-6 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-sm hidden animate-bounce">0</span>
                     </button>
 
-                    <button onclick="openSettings()" class="bg-slate-100 text-slate-700 px-4 py-2.5 rounded-xl font-black hover:bg-slate-200 transition btn-modern shadow-sm border border-slate-200 flex items-center gap-2 text-sm" title="الإعدادات">الإعدادات ⚙️</button>
-                    <!-- نص واضح لتسجيل الخروج -->
-                    <button onclick="logout()" class="bg-red-50 text-red-600 px-4 py-2.5 rounded-xl font-black hover:bg-red-100 transition btn-modern border border-red-100 shadow-sm flex items-center gap-2 text-sm">تسجيل الخروج 🚪</button>
+                    <button onclick="logout()" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-5 py-3 rounded-2xl font-black hover:bg-red-100 dark:hover:bg-red-900/50 transition btn-modern border border-red-100 dark:border-red-800 shadow-sm flex items-center gap-2 text-lg">تسجيل الخروج <i class="ph-bold ph-sign-out"></i></button>
                 </div>
             </header>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
-                <!-- شريط تقدم عام مصغر وأنيق يعمل بنقاط الـ XP -->
-                <div class="lg:col-span-12 bg-white/95 backdrop-blur-xl p-5 md:p-6 rounded-[2rem] shadow-sm border border-slate-200 relative overflow-hidden interactive-card flex flex-col justify-center">
-                    <div class="absolute -right-10 -top-10 w-32 h-32 bg-gradient-to-br from-emerald-400 to-teal-400 rounded-full opacity-10 blur-2xl group-hover:opacity-20 transition duration-500"></div>
-                    <div class="flex justify-between items-end mb-3 relative z-10">
-                        <div class="flex items-center gap-3">
-                             <h3 class="font-black text-slate-700 text-lg flex items-center gap-2">
-                                <div class="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center text-sm shadow-inner">🚀</div>
-                                مستوى تقدمك بالنقاط
-                            </h3>
-                        </div>
-                        <div class="flex items-baseline gap-1">
-                            <span id="progress-text" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500 tracking-tighter drop-shadow-sm">0</span>
-                            <span class="text-sm font-bold text-slate-400">XP</span>
+            <!-- شريط التقدم وشريط البحث -->
+            <div class="flex flex-col md:flex-row gap-6 mb-8 items-center">
+                
+                <!-- شريط البحث السريع -->
+                <div class="w-full md:w-1/2 relative group">
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-bold ph-magnifying-glass"></i></div>
+                    <input type="text" id="lesson-search" onkeyup="filterStudentLessons()" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400 shadow-sm" placeholder="ابحث عن درس، تمرين، أو وحدة...">
+                </div>
+
+                <!-- بطاقة التقدم (XP) -->
+                <div class="w-full md:w-1/2 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-5 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 flex items-center justify-between interactive-card">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-xl flex items-center justify-center text-2xl shadow-inner"><i class="ph-fill ph-shooting-star"></i></div>
+                        <div>
+                            <h3 class="font-black text-slate-700 dark:text-slate-300 text-lg">نقاط الخبرة (XP)</h3>
+                            <div class="w-48 bg-slate-100 dark:bg-slate-700 rounded-full h-2.5 mt-2 overflow-hidden shadow-inner">
+                                <div id="progress-bar-fill" class="bg-gradient-to-l from-emerald-400 to-teal-500 h-full rounded-full transition-all duration-1000 w-0"></div>
+                            </div>
                         </div>
                     </div>
-                    <div class="w-full bg-slate-100 rounded-full h-4 overflow-hidden shadow-inner p-0.5 relative z-10 border border-slate-200">
-                        <div id="progress-bar" class="bg-gradient-to-l from-emerald-400 to-teal-500 h-full rounded-full transition-all duration-1000 w-0 relative shadow-sm">
-                            <div class="absolute inset-0 bg-white/20 w-full h-full" style="background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent); background-size: 1rem 1rem;"></div>
-                        </div>
+                    <div class="flex items-baseline gap-1">
+                        <span id="progress-text-xp" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500 tracking-tighter drop-shadow-sm">0</span>
+                        <span class="text-lg font-bold text-slate-400">XP</span>
                     </div>
                 </div>
             </div>
             
-            <!-- حاوية واجهة الدروس للتلميذ -->
             <div id="student-program-view" class="pb-20"></div>
         </div>
     </div>
 
+    <!-- Firebase SDK Setup -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, deleteDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import confetti from 'https://cdn.skypack.dev/canvas-confetti';
 
         // =========================================================================================
         // الصق مفاتيح مشروعك الحقيقية هنا
         // =========================================================================================
         const firebaseConfig = {
-             apiKey: "AIzaSyDuuYHwmSW0UV1TO3gDGyETrvOimE7iGLs",
-             authDomain: "physique-58073.firebaseapp.com",
-             projectId: "physique-58073",
-             storageBucket: "physique-58073.firebasestorage.app",
-             messagingSenderId: "744073429659",
-             appId: "1:744073429659:web:0859514e70482543d13c3e",
-             measurementId: "G-D6BHHHVBX6"
+            apiKey: "AIzaSyDuuYHwmSW0UV1TO3gDGyETrvOimE7iGLs",
+            authDomain: "physique-58073.firebaseapp.com",
+            projectId: "physique-58073",
+            storageBucket: "physique-58073.firebasestorage.app",
+            messagingSenderId: "744073429659",
+            appId: "1:744073429659:web:0859514e70482543d13c3e",
+            measurementId: "G-D6BHHHVBX6"
         };
         // =========================================================================================
 
@@ -473,8 +508,7 @@
         const programCol = collection(db, 'physics_db', 'public', 'curriculum');
         const chatsPath = 'physics_db/public/chats';
 
-        // قيمة النقطة لكل رابط يفتحه التلميذ
-        const XP_PER_LINK = 10;
+        const XP_PER_ITEM = 10;
 
         let isAuthReady = false;
         window.currentUserRecord = null;
@@ -486,7 +520,9 @@
         let unsubscribeChatMeta = null;
         window.activeChatUser = null; 
         window.currentSections = [];
-        window.currentEditParams = null; // لتخزين بيانات الرابط الجاري تعديله
+        window.currentEditParams = null; 
+        window.adminActivePart = 'part_middle';
+        window.adminActiveYear = {}; // يحفظ التبويب المفتوح لكل طور
         
         window.adminUsersList = [];
         window.adminChatsData = {};
@@ -506,54 +542,57 @@
             "التعلم هو الكنز الوحيد الذي سيرافقك أينما ذهبت. 📚",
             "طريق الألف ميل يبدأ بخطوة واحدة، وأنت الآن في المسار الصحيح. 🚶‍♂️",
             "المحاولة فوز حتى وإن لم تصل، فكيف بك وأنت تجتهد للوصول! 🏆",
-            "العقول العظيمة تبدأ بشغف التعلم، فاجعل شغفك محركك. 💡",
-            "كل مسألة فيزيائية هي لغز ممتع ينتظر ذكاءك لحله. 🧩",
-            "لا تخشَ الخطأ، فكل خطأ هو خطوة نحو الفهم العميق. 📈",
-            "إنجازات الغد تُبنى بجهد اليوم، واصل المسير نحو القمة. 🎯",
-            "الفهم العميق يأتي بالتدرج، لا تستعجل النتائج وكن صبوراً. 🐢",
-            "أعظم العلماء كانوا تلاميذ مثلك، لا يملون من المحاولة والتجربة. 🔬"
+            "سر العبقرية هو الفضول.. لا تتوقف عن طرح الأسئلة! 🧠",
+            "الفيزياء تعلمنا أن لكل فعل رد فعل.. اجعل فعلك هو الاجتهاد. ⚡"
         ];
 
-        const getBranchIcon = (title) => {
-            if(title.includes('الكهرباء') || title.includes('كهربائية')) return '⚡';
-            if(title.includes('المادة') || title.includes('كيمياء') || title.includes('تحولات')) return '🧪';
-            if(title.includes('ميكانيك') || title.includes('حركة')) return '⚙️';
-            if(title.includes('ضوء') || title.includes('بصريات') || title.includes('الضوئية')) return '💡';
-            if(title.includes('طاقة') || title.includes('عمل')) return '🔋';
-            if(title.includes('مغناطيس') || title.includes('كهرومغناطيسية')) return '🧲';
-            return '📘'; 
+        // Dark Mode Toggle Logic
+        window.toggleDarkMode = () => {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            
+            // تحديث ألوان الرسم البياني إذا كان موجوداً
+            if(window.adminChart) {
+                window.adminChart.options.plugins.legend.labels.color = isDark ? '#fff' : '#333';
+                window.adminChart.update();
+            }
         };
 
-        // دالة لإطلاق الألعاب النارية البصرية (Confetti)
-        window.fireConfetti = () => {
-            var duration = 3 * 1000;
-            var animationEnd = Date.now() + duration;
-            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
-
-            function randomInRange(min, max) { return Math.random() * (max - min) + min; }
-
-            var interval = setInterval(function() {
-              var timeLeft = animationEnd - Date.now();
-
-              if (timeLeft <= 0) return clearInterval(interval);
-
-              var particleCount = 50 * (timeLeft / duration);
-              // منذ أن يتم حساب الألعاب النارية لتسقط، قم بإطلاق أكثر من القمة بقليل
-              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
-              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
-            }, 250);
+        // Icon Helper
+        const getBranchIcon = (title) => {
+            if(title.includes('الكهرباء') || title.includes('كهربائية')) return '<i class="ph-fill ph-lightning"></i>';
+            if(title.includes('المادة') || title.includes('كيمياء') || title.includes('تحولات')) return '<i class="ph-fill ph-flask"></i>';
+            if(title.includes('ميكانيك') || title.includes('حركة')) return '<i class="ph-fill ph-gear-six"></i>';
+            if(title.includes('ضوء') || title.includes('بصريات') || title.includes('الضوئية')) return '<i class="ph-fill ph-lightbulb"></i>';
+            if(title.includes('طاقة') || title.includes('عمل')) return '<i class="ph-fill ph-battery-full"></i>';
+            if(title.includes('مغناطيس') || title.includes('كهرومغناطيسية')) return '<i class="ph-fill ph-magnet"></i>';
+            return '<i class="ph-fill ph-book-bookmark"></i>'; 
         };
 
         window.showToast = (msg, type = 'success') => {
             const toast = document.createElement('div');
-            toast.className = `px-6 py-4 rounded-2xl shadow-2xl text-white font-black text-sm text-center transform transition-all duration-300 translate-y-[-20px] opacity-0 border border-white/10 flex items-center justify-center gap-2 backdrop-blur-md ${type === 'error' ? 'bg-red-500/95' : 'bg-slate-800/95'}`;
-            toast.innerHTML = `<span class="text-xl">${type === 'error' ? '⚠️' : '✅'}</span> <span>${msg}</span>`;
+            const icon = type === 'error' ? '<i class="ph-fill ph-warning-circle text-2xl"></i>' : '<i class="ph-fill ph-check-circle text-2xl"></i>';
+            const bgClass = type === 'error' ? 'bg-red-500/95 dark:bg-red-600/95' : 'bg-slate-800/95 dark:bg-emerald-600/95';
+            
+            toast.className = `px-6 py-4 rounded-2xl shadow-2xl text-white font-black text-base text-center transform transition-all duration-300 translate-y-[-20px] opacity-0 border border-white/10 flex items-center justify-center gap-3 backdrop-blur-md ${bgClass}`;
+            toast.innerHTML = `${icon} <span>${msg}</span>`;
             document.getElementById('toast-container').appendChild(toast);
-            setTimeout(() => { toast.classList.remove('translate-y-[-20px]', 'opacity-0'); }, 10);
+            setTimeout(() => toast.classList.remove('translate-y-[-20px]', 'opacity-0'), 10);
             setTimeout(() => { 
                 toast.classList.add('translate-y-[-20px]', 'opacity-0'); 
                 setTimeout(() => toast.remove(), 400);
-            }, 3000);
+            }, 4000);
+        };
+
+        window.fireConfetti = () => {
+            var duration = 3 * 1000;
+            var end = Date.now() + duration;
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#22c55e', '#3b82f6', '#f59e0b'] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#22c55e', '#3b82f6', '#f59e0b'] });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
         };
 
         window.closeConfirm = null;
@@ -561,39 +600,24 @@
             return new Promise((resolve) => {
                 document.getElementById('confirm-message').innerText = msg;
                 const modal = document.getElementById('confirm-modal');
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
+                modal.classList.remove('hidden'); modal.classList.add('flex');
                 
                 window.closeConfirm = (isConfirmed) => {
-                    modal.classList.add('hidden');
-                    modal.classList.remove('flex');
+                    modal.classList.add('hidden'); modal.classList.remove('flex');
                     resolve(isConfirmed);
                 };
             });
         };
 
         window.closeRegModal = () => {
-            const modal = document.getElementById('registration-success-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
+            document.getElementById('registration-success-modal').classList.add('hidden');
+            document.getElementById('registration-success-modal').classList.remove('flex');
             window.toggleAuthMode();
         };
 
         const switchScreen = (screenId) => {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
-        };
-
-        window.showWelcomeScreen = () => {
-            const screen = document.getElementById('welcome-quote-screen');
-            screen.classList.remove('welcome-hidden');
-            setTimeout(() => { screen.classList.add('welcome-visible'); }, 10);
-        };
-
-        window.closeWelcomeScreen = () => {
-            const screen = document.getElementById('welcome-quote-screen');
-            screen.classList.remove('welcome-visible');
-            screen.classList.add('welcome-hidden');
         };
 
         const defaultProgramData = [
@@ -622,8 +646,8 @@
         window.toggleAuthMode = () => {
             window.isRegistering = !window.isRegistering;
             document.getElementById('auth-title').innerText = window.isRegistering ? "حساب جديد" : "منصة المجتهد";
-            document.getElementById('auth-action-btn').innerText = window.isRegistering ? "إرسال الطلب" : "تسجيل الدخول";
-            document.getElementById('switch-mode-text').innerText = window.isRegistering ? "لديك حساب بالفعل؟ سجل دخولك" : "إنشاء حساب تلميذ جديد 🚀";
+            document.getElementById('auth-action-btn').innerHTML = window.isRegistering ? '<i class="ph-bold ph-paper-plane-tilt"></i> إرسال الطلب' : '<i class="ph-bold ph-sign-in"></i> تسجيل الدخول';
+            document.getElementById('switch-mode-text').innerHTML = window.isRegistering ? 'لديك حساب بالفعل؟ سجل دخولك <i class="ph-bold ph-arrow-left"></i>' : '<i class="ph-fill ph-rocket-launch"></i> إنشاء حساب تلميذ جديد';
             
             const levelSelect = document.getElementById('user-level');
             const levelIcon = document.getElementById('level-icon');
@@ -656,8 +680,8 @@
             }
 
             const btn = document.getElementById('auth-action-btn');
-            const originalText = btn.innerText;
-            btn.disabled = true; btn.innerText = "جاري التحقق...";
+            const originalHTML = btn.innerHTML;
+            btn.disabled = true; btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-2xl"></i> جاري التحقق...';
 
             try {
                 const userRef = doc(usersCol, username);
@@ -690,27 +714,39 @@
                             document.getElementById('display-username').innerText = username;
                             document.getElementById('student-level-badge').innerText = levelNames[window.currentUserRecord.level];
                             
-                            // نظام ذكي لعدم تكرار المقولات حتى انتهائها
-                            let availableQuotes = JSON.parse(localStorage.getItem('available_quotes')) || [];
-                            if (availableQuotes.length === 0) {
-                                availableQuotes = [...Array(motivationalQuotes.length).keys()];
+                            // نظام المقولات الذكي
+                            const lastQuoteDate = localStorage.getItem('last_quote_date');
+                            const today = new Date().toDateString();
+                            if (lastQuoteDate !== today) {
+                                let availableQuotes = JSON.parse(localStorage.getItem('available_quotes')) || [];
+                                if (availableQuotes.length === 0) availableQuotes = [...Array(motivationalQuotes.length).keys()];
+                                
+                                let randomIndex = Math.floor(Math.random() * availableQuotes.length);
+                                let quoteIndex = availableQuotes[randomIndex];
+                                availableQuotes.splice(randomIndex, 1);
+                                
+                                localStorage.setItem('available_quotes', JSON.stringify(availableQuotes));
+                                localStorage.setItem('last_quote_date', today);
+                                
+                                document.getElementById('welcome-quote-text').innerText = motivationalQuotes[quoteIndex];
+                                const screen = document.getElementById('welcome-quote-screen');
+                                screen.classList.remove('welcome-hidden');
+                                setTimeout(() => { screen.classList.add('welcome-visible'); }, 10);
                             }
-                            let randomIndex = Math.floor(Math.random() * availableQuotes.length);
-                            let quoteIndex = availableQuotes[randomIndex];
-                            availableQuotes.splice(randomIndex, 1);
-                            localStorage.setItem('available_quotes', JSON.stringify(availableQuotes));
-
-                            const selectedQuote = motivationalQuotes[quoteIndex];
-                            document.getElementById('welcome-quote-text').innerText = selectedQuote;
                             
                             switchScreen('app-screen');
-                            window.showWelcomeScreen(); 
                             startStudentListeners();
                         }
                     }
                 }
             } catch (err) { console.error(err); showToast("خطأ في الاتصال بالإنترنت", "error"); }
-            btn.disabled = false; btn.innerText = originalText;
+            btn.disabled = false; btn.innerHTML = originalHTML;
+        };
+
+        window.closeWelcomeScreen = () => {
+            const screen = document.getElementById('welcome-quote-screen');
+            screen.classList.remove('welcome-visible');
+            screen.classList.add('welcome-hidden');
         };
 
         window.loginAsStudent = (studentUsername) => {
@@ -755,9 +791,7 @@
             if(unsubscribeUsers) unsubscribeUsers();
             if(unsubscribeChat) unsubscribeChat();
             if(unsubscribeChatMeta) unsubscribeChatMeta();
-            document.getElementById('welcome-quote-screen').classList.remove('welcome-visible');
-            document.getElementById('welcome-quote-screen').classList.add('welcome-hidden');
-            if (typeof closeChat === 'function') closeChat(); // إخفاء نافذة الدردشة فور الخروج
+            if (typeof closeChat === 'function') closeChat();
             switchScreen('auth-screen');
         };
 
@@ -768,7 +802,6 @@
             const phoneContainer = document.getElementById('settings-phone-container');
             const phoneInput = document.getElementById('settings-new-phone');
             
-            // إخفاء حقل هاتف الولي إذا كان المستخدم هو المدير
             if(window.currentUserRecord.role === 'admin') {
                 phoneContainer.style.display = 'none';
             } else {
@@ -813,35 +846,12 @@
             } catch(e) { showToast("حدث خطأ أثناء الحفظ", "error"); }
         }
 
-        // دالة تتبع النقرات على الروابط بنظام XP والاحتفال
-        window.trackLinkClick = async (branchId, cat, lIdx, url) => {
-            window.open(url, '_blank');
-            if (window.currentUserRecord && window.currentUserRecord.role !== 'admin') {
-                let clickedLinks = [...(window.currentUserRecord.clickedLinks || [])];
-                let linkId = `${branchId}_${cat}_${lIdx}`;
-                if (!clickedLinks.includes(linkId)) {
-                    clickedLinks.push(linkId);
-                    window.currentUserRecord.clickedLinks = clickedLinks; // تحديث محلي فوري
-                    await updateDoc(doc(usersCol, window.currentUserRecord.username), { clickedLinks: clickedLinks });
-                    
-                    // إظهار الاحتفال البصري ورسالة النقاط
-                    showToast(`+${XP_PER_LINK} XP ! أحسنت 🌟`);
-                    window.fireConfetti();
-                    
-                    // تحديث الواجهة فوراً
-                    updateProgressUI(window.currentSections);
-                    renderProgramUI(window.currentSections, 'student-program-view', false);
-                }
-            }
-        };
-
-        // حساب التقدم ونقاط الـ XP بناءً على عدد الروابط المقروءة
-        const calculateProgressDetails = (levelId, data, sections) => {
-            if(!sections || !levelId) return { xp: 0, percent: 0, totalLinks: 0 };
-            
-            let clickedLinks = data.clickedLinks || [];
+        // حساب التقدم (XP) والتحديث
+        const calculateProgressXP = (levelId, data, sections) => {
+            if(!sections || !levelId) return { xp: 0, percent: 0 };
+            let xp = 0;
             let totalLinks = 0;
-            let clickedCount = 0;
+            let clickedLinks = data.clickedLinks || [];
 
             sections.forEach(p => p.years.forEach(y => {
                 if(y.id === levelId) {
@@ -850,15 +860,125 @@
                             let links = b.categories[cat] || [];
                             totalLinks += links.length;
                             links.forEach((_, lIdx) => {
-                                if(clickedLinks.includes(`${b.id}_${cat}_${lIdx}`)) clickedCount++;
+                                if(clickedLinks.includes(`${b.id}_${cat}_${lIdx}`)) xp += XP_PER_ITEM;
                             });
                         });
                     });
                 }
             }));
             
-            let percent = totalLinks === 0 ? 0 : Math.round((clickedCount / totalLinks) * 100);
-            return { xp: clickedCount * XP_PER_LINK, percent: percent, totalLinks: totalLinks };
+            let percent = totalLinks === 0 ? 0 : Math.round(( (xp / XP_PER_ITEM) / totalLinks) * 100);
+            return { xp, percent };
+        };
+
+        const updateProgressUI = (sections) => {
+            if(!window.currentUserRecord || window.currentUserRecord.role === 'admin') return;
+            let result = calculateProgressXP(window.currentUserRecord.level, window.currentUserRecord, sections);
+            
+            const bar = document.getElementById('progress-bar-fill');
+            const txt = document.getElementById('progress-text-xp');
+            if(bar) bar.style.width = `${result.percent}%`; 
+            if(txt) txt.innerText = `${result.xp}`;
+        };
+
+        window.trackLinkClick = async (branchId, cat, lIdx, url) => {
+            window.open(url, '_blank');
+            if (window.currentUserRecord && window.currentUserRecord.role !== 'admin') {
+                let clickedLinks = [...(window.currentUserRecord.clickedLinks || [])];
+                let linkId = `${branchId}_${cat}_${lIdx}`;
+                if (!clickedLinks.includes(linkId)) {
+                    clickedLinks.push(linkId);
+                    // التحديث المحلي فورا للاستجابة السريعة
+                    window.currentUserRecord.clickedLinks = clickedLinks;
+                    
+                    // الاحتفال
+                    window.fireConfetti();
+                    showToast(`+${XP_PER_ITEM} XP ! أحسنت 🌟`);
+                    
+                    // تحديث الواجهة
+                    updateProgressUI(window.currentSections);
+                    renderProgramUI(window.currentSections, 'student-program-view', false);
+
+                    // الحفظ في السحابة
+                    await updateDoc(doc(usersCol, window.currentUserRecord.username), { clickedLinks: clickedLinks });
+                }
+            }
+        };
+
+        // Student Search
+        window.filterStudentLessons = () => {
+            const query = document.getElementById('lesson-search').value.toLowerCase();
+            document.querySelectorAll('.student-branch-wrapper').forEach(branch => {
+                const title = branch.querySelector('.branch-title').innerText.toLowerCase();
+                let hasVisibleLink = false;
+                
+                branch.querySelectorAll('.lesson-link').forEach(link => {
+                    const linkText = link.innerText.toLowerCase();
+                    if(linkText.includes(query) || title.includes(query)) {
+                        link.style.display = 'flex';
+                        hasVisibleLink = true;
+                    } else {
+                        link.style.display = 'none';
+                    }
+                });
+
+                if(title.includes(query) || hasVisibleLink) {
+                    branch.style.display = 'block';
+                } else {
+                    branch.style.display = 'none';
+                }
+            });
+        };
+
+        // Admin Tabs
+        window.switchAdminPart = (partId) => {
+            window.adminActivePart = partId;
+            document.querySelectorAll(`.admin-part-content`).forEach(el => el.classList.remove('active'));
+            document.querySelectorAll(`[id^="tab-btn-part_"]`).forEach(el => {
+                el.classList.remove('bg-white', 'text-blue-600', 'shadow-md', 'dark:bg-slate-700', 'dark:text-white');
+                el.classList.add('text-slate-500', 'dark:text-slate-400');
+            });
+            
+            document.getElementById(`content-${partId}`).classList.add('active');
+            document.getElementById(`tab-btn-${partId}`).classList.add('bg-white', 'text-blue-600', 'shadow-md', 'dark:bg-slate-700', 'dark:text-white');
+            document.getElementById(`tab-btn-${partId}`).classList.remove('text-slate-500', 'dark:text-slate-400');
+        };
+
+        window.switchAdminYear = (partId, yearId) => {
+            window.adminActiveYear[partId] = yearId;
+            document.querySelectorAll(`.admin-year-content-${partId}`).forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll(`.admin-year-btn-${partId}`).forEach(el => {
+                el.classList.remove('bg-blue-500', 'text-white', 'shadow-sm');
+                el.classList.add('bg-white', 'text-slate-600', 'dark:bg-slate-800', 'dark:text-slate-400');
+            });
+            
+            document.getElementById(`content-${partId}-${yearId}`).classList.remove('hidden');
+            document.getElementById(`btn-${partId}-${yearId}`).classList.add('bg-blue-500', 'text-white', 'shadow-sm');
+            document.getElementById(`btn-${partId}-${yearId}`).classList.remove('bg-white', 'text-slate-600', 'dark:bg-slate-800', 'dark:text-slate-400');
+        };
+
+        // Admin Bulk Actions
+        window.toggleSelectAll = () => {
+            const state = document.getElementById('select-all-cb').checked;
+            document.querySelectorAll('.student-cb').forEach(cb => cb.checked = state);
+        };
+
+        window.bulkAction = async (action) => {
+            const checked = Array.from(document.querySelectorAll('.student-cb:checked')).map(cb => cb.value);
+            if(checked.length === 0) return showToast("يرجى تحديد تلميذ واحد على الأقل", "error");
+            
+            const actionText = action === 'approve' ? 'تفعيل' : 'حذف نهائي لـ';
+            if(!await confirmAction(`هل أنت متأكد من ${actionText} ${checked.length} حساب(ات)؟`)) return;
+
+            for(let username of checked) {
+                if(action === 'approve') {
+                    await updateDoc(doc(usersCol, username), { approved: true });
+                } else if (action === 'delete') {
+                    await deleteDoc(doc(usersCol, username));
+                }
+            }
+            showToast(`تم ${actionText} الحسابات بنجاح 🚀`);
+            document.getElementById('select-all-cb').checked = false;
         };
 
         const renderLeaderboard = () => {
@@ -866,37 +986,40 @@
             const container = document.getElementById('leaderboard-container');
             container.innerHTML = '';
             
-            // ترتيب الطلاب بناءً على نقاط الـ XP وليس النسبة
             let levelMates = window.allStudentsProgress
                 .filter(s => s.level === window.currentUserRecord.level && s.approved)
-                .sort((a, b) => b.xp - a.xp); 
+                .sort((a, b) => b.xp - a.xp); // Sort by XP
 
             if(levelMates.length === 0) {
-                container.innerHTML = '<div class="text-slate-400 text-center py-4 font-bold">لا يوجد منافسون بعد.. كن أنت المتصدر!</div>';
+                container.innerHTML = `
+                <div class="flex flex-col items-center justify-center p-6 opacity-50">
+                    <i class="ph-fill ph-ghost text-5xl mb-2"></i>
+                    <div class="text-slate-500 dark:text-slate-400 font-bold text-center">لا يوجد منافسون بعد.. كن أنت المتصدر!</div>
+                </div>`;
                 return;
             }
 
-            let html = '<div class="flex flex-col gap-2 mt-1">';
+            let html = '<div class="flex flex-col gap-2">';
             levelMates.forEach((student, index) => {
                 let rank = index + 1;
                 let rankClass = '';
                 let medal = '';
-                if(rank === 1) { rankClass = 'rank-1 font-black shadow-sm'; medal = '🥇'; }
-                else if(rank === 2) { rankClass = 'rank-2 font-black'; medal = '🥈'; }
-                else if(rank === 3) { rankClass = 'rank-3 font-black'; medal = '🥉'; }
-                else { rankClass = 'bg-white font-bold border border-slate-100'; medal = `<span class="text-slate-400 bg-slate-100 rounded-full w-6 h-6 flex items-center justify-center text-xs font-black shadow-inner">${rank}</span>`; }
+                if(rank === 1) { rankClass = 'rank-1 shadow-sm'; medal = '<i class="ph-fill ph-medal text-amber-400"></i>'; }
+                else if(rank === 2) { rankClass = 'rank-2 shadow-sm'; medal = '<i class="ph-fill ph-medal text-slate-400"></i>'; }
+                else if(rank === 3) { rankClass = 'rank-3 shadow-sm'; medal = '<i class="ph-fill ph-medal text-orange-400"></i>'; }
+                else { rankClass = 'bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700'; medal = `<span class="text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-700 rounded-full w-6 h-6 flex items-center justify-center text-xs font-black">${rank}</span>`; }
                 
                 let isMe = student.id === window.currentUserRecord.username;
-                let meClass = isMe ? 'ring-2 ring-blue-500 shadow-sm' : '';
+                let meClass = isMe ? 'ring-2 ring-blue-500 shadow-md scale-[1.02] z-10' : '';
                 let nameDisplay = isMe ? 'أنت (بطل المنصة)' : student.id;
 
                 html += `
                     <div class="leaderboard-row flex items-center justify-between p-3 rounded-2xl ${rankClass} ${meClass}">
                         <div class="flex items-center gap-3">
-                            <div class="text-xl w-6 text-center">${medal}</div>
-                            <div class="text-slate-700 text-sm ${isMe ? 'text-blue-700' : ''}">${nameDisplay}</div>
+                            <div class="text-2xl w-6 flex justify-center">${medal}</div>
+                            <div class="text-slate-700 dark:text-slate-200 font-bold text-sm ${isMe ? 'text-blue-700 dark:text-blue-400 font-black' : ''}">${nameDisplay}</div>
                         </div>
-                        <div class="xp-badge px-2 py-0.5 rounded text-xs font-black">
+                        <div class="bg-gradient-to-r from-emerald-400 to-teal-500 text-white px-3 py-1 rounded-lg text-xs font-black shadow-inner flex items-center gap-1">
                             ${student.xp} XP
                         </div>
                     </div>
@@ -917,71 +1040,83 @@
                 if(data.level) levelStats[data.level] = (levelStats[data.level] || 0) + 1;
                 
                 let levelDisplay = data.level ? (levelNames[data.level] || data.level) : "غير محدد";
-                let progDetails = calculateProgressDetails(data.level, data, window.currentSections);
+                let prog = calculateProgressXP(data.level, data, window.currentSections);
                 
                 let parentInfo = data.parentName ? 
-                    `<div class="font-black text-slate-800">${data.parentName}</div>
-                     <div class="mt-1.5">
-                        <a href="https://wa.me/213${(data.phoneNumber||'').substring(1)}" target="_blank" class="bg-[#25D366] hover:bg-[#128C7E] text-white px-3 py-1.5 rounded-lg text-sm font-black shadow-sm transition inline-flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                            واتساب الولي
+                    `<div class="font-black text-slate-800 dark:text-slate-200">${data.parentName}</div>
+                     <div class="mt-2">
+                        <a href="https://wa.me/213${(data.phoneNumber||'').substring(1)}" target="_blank" class="bg-[#25D366] hover:bg-[#128C7E] text-white px-3 py-1.5 rounded-lg text-xs font-black shadow-sm transition inline-flex items-center gap-2">
+                            <i class="ph-bold ph-whatsapp-logo text-base"></i> واتساب الولي
                         </a>
-                     </div>` : '<div class="text-sm text-slate-400 font-bold">غير متوفر</div>';
+                     </div>` : '<div class="text-sm text-slate-400 dark:text-slate-500 font-bold">غير متوفر</div>';
 
                 let unreadCount = window.adminChatsData[d.id]?.unreadAdmin || 0;
-                let chatBadge = unreadCount > 0 ? `<span class="absolute -top-2 -right-2 bg-red-500 text-white text-[12px] font-black w-6 h-6 flex items-center justify-center rounded-full animate-bounce shadow-md border-2 border-white">${unreadCount}</span>` : '';
+                let chatBadge = unreadCount > 0 ? `<span class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full animate-bounce shadow-md border border-white">${unreadCount}</span>` : '';
 
                 tbody.innerHTML += `
-                    <tr class="hover:bg-blue-50/40 transition duration-200 border-b border-slate-100 group">
-                        <td class="p-4">
-                            <div class="font-black text-slate-800 text-xl group-hover:text-blue-600 transition">${d.id}</div>
-                            <div class="text-sm text-slate-500 font-bold mt-1.5 flex items-center gap-2">
-                                <span class="opacity-70">🔑</span> <span class="text-blue-700 bg-blue-50 px-2 py-0.5 rounded-lg border border-blue-200/50">${data.password}</span>
+                    <tr class="hover:bg-blue-50/40 dark:hover:bg-blue-900/20 transition duration-200 group">
+                        <td class="p-4 text-center border-b border-slate-100 dark:border-slate-700">
+                            <input type="checkbox" class="student-cb custom-cb" value="${d.id}">
+                        </td>
+                        <td class="p-4 border-b border-slate-100 dark:border-slate-700">
+                            <div class="font-black text-slate-800 dark:text-white text-lg group-hover:text-blue-600 transition">${d.id}</div>
+                            <div class="text-xs text-slate-500 dark:text-slate-400 font-bold mt-1.5 flex items-center gap-1.5">
+                                <i class="ph-fill ph-key opacity-70"></i> <span class="text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded border border-blue-200/50 dark:border-blue-800/50">${data.password}</span>
                             </div>
+                            <div class="mt-3 bg-slate-50 dark:bg-slate-900/50 p-2 rounded-lg border border-slate-100 dark:border-slate-700">${parentInfo}</div>
                         </td>
-                        <td class="p-4 bg-slate-50/40">${parentInfo}</td>
-                        <td class="p-4 text-base font-black text-slate-600 bg-slate-50/70">${levelDisplay}</td>
-                        <td class="p-4 text-center">
-                            <div class="xp-badge inline-block px-3 py-1 rounded-lg text-sm font-black mb-1">${progDetails.xp} XP</div>
-                            <div class="text-xs font-bold text-slate-500">إنجاز: ${progDetails.percent}%</div>
+                        <td class="p-4 text-sm font-black text-slate-600 dark:text-slate-300 text-center border-b border-slate-100 dark:border-slate-700">${levelDisplay}</td>
+                        <td class="p-4 text-center border-b border-slate-100 dark:border-slate-700">
+                            <div class="inline-flex bg-gradient-to-r from-emerald-400 to-teal-500 text-white px-3 py-1 rounded-lg text-sm font-black shadow-sm mb-1">${prog.xp} XP</div>
+                            <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500">إنجاز: ${prog.percent}%</div>
                         </td>
-                        <td class="p-4 bg-slate-50/70 text-center">
-                            <span class="px-3 py-1 rounded-full text-xs font-black ${data.approved ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">
-                                ${data.approved ? 'مفعل' : 'انتظار'}
+                        <td class="p-4 text-center border-b border-slate-100 dark:border-slate-700">
+                            <span class="px-3 py-1 rounded-full text-xs font-black shadow-sm ${data.approved ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800'}">
+                                ${data.approved ? 'مفعل ✅' : 'انتظار ⏳'}
                             </span>
                         </td>
-                        <td class="p-4 text-left">
+                        <td class="p-4 text-left border-b border-slate-100 dark:border-slate-700">
                             <div class="flex gap-2 justify-end">
-                                <button onclick="loginAsStudent('${d.id}')" class="icon-btn w-9 h-9 bg-indigo-50 text-indigo-700 text-lg shadow-sm border border-indigo-200" title="دخول لحساب التلميذ">👁️</button>
-                                <button onclick="openChat('${d.id}')" class="relative icon-btn w-9 h-9 bg-blue-50 text-blue-600 text-lg shadow-sm border border-blue-200" title="مراسلة التلميذ">💬 ${chatBadge}</button>
-                                <button onclick="toggleUserStatus('${d.id}', ${!data.approved})" class="icon-btn w-9 h-9 ${data.approved ? 'bg-slate-100 text-slate-600 border-slate-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'} text-lg shadow-sm border" title="${data.approved ? 'تعطيل الحساب' : 'تفعيل الحساب'}">${data.approved ? '⛔' : '✅'}</button>
-                                <button onclick="deleteUserAccount('${d.id}')" class="icon-btn w-9 h-9 bg-red-50 text-red-500 text-lg shadow-sm border border-red-200" title="حذف نهائي">🗑️</button>
+                                <button onclick="loginAsStudent('${d.id}')" class="icon-btn w-9 h-9 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 text-lg shadow-sm border border-indigo-200 dark:border-indigo-800" title="دخول לחساب התلميذ"><i class="ph-bold ph-eye"></i></button>
+                                <button onclick="openChat('${d.id}')" class="relative icon-btn w-9 h-9 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-lg shadow-sm border border-blue-200 dark:border-blue-800" title="مراسلة"><i class="ph-bold ph-chat-circle-dots"></i>${chatBadge}</button>
                             </div>
                         </td>
                     </tr>`;
             });
             
             document.getElementById('total-students-count').innerText = studentCount;
-            const statsList = document.getElementById('level-stats-list');
-            statsList.innerHTML = '';
-            if(Object.keys(levelStats).length === 0) {
-                statsList.innerHTML = '<li class="text-slate-400 text-center py-3">لا يوجد تلاميذ مسجلين بعد</li>';
-            } else {
-                for (const [levelId, count] of Object.entries(levelStats)) {
-                    statsList.innerHTML += `<li class="flex justify-between items-center bg-slate-50 p-2 rounded-lg border border-slate-100"><span class="text-sm font-bold text-slate-700">${levelNames[levelId]}</span><span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-md font-black text-sm">${count}</span></li>`;
-                }
+            
+            // تحديث الرسم البياني (Chart.js)
+            const ctx = document.getElementById('studentsChart');
+            if(ctx) {
+                if(window.adminChart) window.adminChart.destroy();
+                const isDark = document.documentElement.classList.contains('dark');
+                window.adminChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(levelStats).map(l => levelNames[l] || l),
+                        datasets: [{
+                            data: Object.values(levelStats),
+                            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316'],
+                            borderWidth: 2,
+                            borderColor: isDark ? '#1e293b' : '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'right', labels: { color: isDark ? '#cbd5e1' : '#334155', font: {family: 'Tajawal', weight: 'bold', size: 12} } }
+                        }
+                    }
+                });
             }
         };
 
         const startAdminListeners = () => {
             unsubscribeProgram = onSnapshot(doc(programCol, 'main'), (docSnap) => {
                 if(docSnap.exists()) {
-                    // حفظ حالة فتح/غلق النوافذ قبل إعادة الرسم
-                    const openDetails = Array.from(document.querySelectorAll('details[open]')).map(el => el.id);
                     window.currentSections = docSnap.data().sections; 
                     renderProgramUI(window.currentSections, 'admin-program-view', true);
-                    // إعادة فتح النوافذ
-                    openDetails.forEach(id => { const el = document.getElementById(id); if(el) el.open = true; });
                     renderAdminTable(); 
                 }
             });
@@ -994,8 +1129,8 @@
                     if(d.data().role !== 'admin') {
                         let data = d.data();
                         window.adminUsersList.push({id: d.id, data: data}); 
-                        let details = calculateProgressDetails(data.level, data, window.currentSections);
-                        window.allStudentsProgress.push({ id: d.id, level: data.level, xp: details.xp, percent: details.percent, approved: data.approved });
+                        let prog = calculateProgressXP(data.level, data, window.currentSections);
+                        window.allStudentsProgress.push({ id: d.id, level: data.level, xp: prog.xp, approved: data.approved });
                     }
                 });
                 renderAdminTable();
@@ -1025,8 +1160,8 @@
                 snapshot.forEach(d => {
                     let data = d.data();
                     if(data.role !== 'admin') {
-                        let details = calculateProgressDetails(data.level, data, window.currentSections);
-                        window.allStudentsProgress.push({ id: d.id, level: data.level, xp: details.xp, percent: details.percent, approved: data.approved });
+                        let prog = calculateProgressXP(data.level, data, window.currentSections);
+                        window.allStudentsProgress.push({ id: d.id, level: data.level, xp: prog.xp, approved: data.approved });
                     }
                     if(d.id === window.currentUserRecord.username) {
                         window.currentUserRecord.clickedLinks = data.clickedLinks || [];
@@ -1050,7 +1185,7 @@
         const linkify = (text) => {
             const urlRegex = /(https?:\/\/[^\s]+)/g;
             return text.replace(urlRegex, function(url) {
-                return '<a href="' + url + '" target="_blank" class="text-blue-500 font-bold underline decoration-2 underline-offset-2 hover:text-blue-700 transition inline-flex items-center gap-1">🔗 رابط</a>';
+                return '<a href="' + url + '" target="_blank" class="text-blue-500 dark:text-blue-400 font-bold underline decoration-2 underline-offset-2 hover:text-blue-700 dark:hover:text-blue-300 transition inline-flex items-center gap-1"><i class="ph-bold ph-link"></i> رابط</a>';
             });
         };
 
@@ -1078,19 +1213,20 @@
                 msgs.forEach(m => {
                     let isMine = m.sender === window.currentUserRecord.role;
                     let isAdminMsg = m.sender === 'admin';
-                    let bubbleClass = isMine ? 'chat-mine' : 'chat-other';
+                    let bubbleClass = isMine ? 'chat-mine dark:bg-blue-900/30 dark:border-blue-800' : 'chat-other dark:bg-slate-800 dark:border-slate-700';
                     let alignment = isMine ? 'self-end' : 'self-start';
+                    let textColor = isAdminMsg && !isMine ? 'text-red-600 dark:text-red-400 font-bold' : 'text-slate-700 dark:text-slate-200';
                     
-                    // تلوين رسائل الأستاذ بالأحمر
-                    let textColor = isAdminMsg ? 'text-red-600 font-bold' : '';
-                    
-                    let contentHtml = `<p class="text-[14px] font-normal whitespace-pre-wrap break-words ${textColor}" dir="auto">${linkify(m.text)}</p>`;
-                    
+                    let contentHtml = `<p class="text-[14px] whitespace-pre-wrap break-words ${textColor}" dir="auto">${linkify(m.text)}</p>`;
                     chatHtml += `<div class="chat-bubble ${bubbleClass} ${alignment} shadow-sm transition hover:shadow-md">${contentHtml}</div>`;
                 });
                 
                 const msgBox = document.getElementById('chat-messages');
-                msgBox.innerHTML = chatHtml || `<div class="h-full flex flex-col items-center justify-center opacity-50"><div class="text-4xl mb-2">👋</div><div class="text-center text-slate-500 font-bold bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-xs">أهلاً بك! يمكنك المراسلة هنا.</div></div>`;
+                msgBox.innerHTML = chatHtml || `
+                    <div class="h-full flex flex-col items-center justify-center opacity-50">
+                        <i class="ph-fill ph-hand-waving text-6xl text-slate-400 mb-3"></i>
+                        <div class="text-center text-slate-500 font-bold bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm text-sm">أهلاً بك! يمكنك المراسلة هنا.</div>
+                    </div>`;
                 msgBox.scrollTop = msgBox.scrollHeight;
                 
                 if (window.activeChatUser) setDoc(doc(db, chatsPath, chatRoomId), { [window.currentUserRecord.role === 'admin' ? 'unreadAdmin' : 'unreadStudent']: 0 }, { merge: true });
@@ -1109,7 +1245,8 @@
             if(!text) return; 
             
             let btn = document.getElementById('send-msg-btn');
-            btn.disabled = true; btn.innerHTML = '...';
+            const origHtml = btn.innerHTML;
+            btn.disabled = true; btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i>';
 
             try {
                 let chatRoomId = window.currentUserRecord.role === 'admin' ? window.activeChatUser : window.currentUserRecord.username;
@@ -1122,25 +1259,8 @@
                 inputEl.value = '';
                 setTimeout(() => { const msgBox = document.getElementById('chat-messages'); msgBox.scrollTop = msgBox.scrollHeight; }, 100);
             } catch(e) { console.error(e); showToast("فشل الإرسال. تأكد من اتصالك بالإنترنت", "error"); }
-            btn.disabled = false; btn.innerHTML = 'إرسال';
+            btn.disabled = false; btn.innerHTML = origHtml;
         };
-
-        window.toggleUserStatus = async (username, status) => { 
-            await updateDoc(doc(usersCol, username), { approved: status }); 
-            showToast(status ? "تم تفعيل حساب التلميذ" : "تم تعطيل الحساب");
-            if (status) {
-                const userObj = window.adminUsersList.find(u => u.id === username);
-                if (userObj && userObj.data && userObj.data.phoneNumber) {
-                    let phone = userObj.data.phoneNumber;
-                    if(phone.startsWith('0')) phone = '213' + phone.substring(1);
-                    let msg = "السلام عليكم أما بعد, تم قبول إبنكم لمزاولة الدراسة في منصة المجتهد للعلوم الفيزيائية , نتمنى له التوفيق والنجاح";
-                    let waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
-                    window.open(waUrl, '_blank');
-                }
-            }
-        };
-
-        window.deleteUserAccount = async (username) => { if(await confirmAction(`سيتم حذف حساب التلميذ وكل تقدمه نهائياً.`)) { await deleteDoc(doc(usersCol, username)); showToast("تم الحذف بنجاح"); } };
 
         window.adminAddLink = async (pIdx, yIdx, bIdx, cat, branchId) => {
             let title = document.getElementById(`title_${branchId}_${cat}`).value.trim();
@@ -1153,7 +1273,7 @@
             sections[pIdx].years[yIdx].branches[bIdx].categories[cat].push({title, url});
             await updateDoc(docRef, { sections });
             showToast("تمت الإضافة بنجاح للمنهج 📚");
-            // لن يتم إعادة التوجيه بسبب تحديث onSnapshot وسيحافظ على النوافذ مفتوحة بفضل الكود أعلاه
+            // لن يتم إعادة التوجيه بفضل نظام الحفاظ على حالة التبويبات (Tabs State Preservation)
         };
 
         window.adminDeleteLink = async (pIdx, yIdx, bIdx, cat, lIdx) => {
@@ -1170,7 +1290,6 @@
             let currentLink = window.currentSections[pIdx].years[yIdx].branches[bIdx].categories[cat][lIdx];
             document.getElementById('edit-link-title').value = currentLink.title;
             document.getElementById('edit-link-url').value = currentLink.url;
-            
             window.currentEditParams = { pIdx, yIdx, bIdx, cat, lIdx };
             
             const modal = document.getElementById('edit-modal');
@@ -1194,25 +1313,24 @@
                 let sections = window.currentSections;
                 sections[pIdx].years[yIdx].branches[bIdx].categories[cat][lIdx] = { title: newTitle, url: newUrl };
                 
-                const docRef = doc(programCol, 'main');
-                await updateDoc(docRef, { sections });
+                await updateDoc(doc(programCol, 'main'), { sections });
                 showToast("تم التعديل بنجاح ✏️");
                 closeEditModal();
             }
         };
 
-        const updateProgressUI = (sections) => {
-            let details = calculateProgressDetails(window.currentUserRecord.level, window.currentUserRecord, sections);
-            document.getElementById('progress-bar').style.width = `${details.percent}%`; 
-            document.getElementById('progress-text').innerText = `${details.xp}`;
-        };
-
         const catConfig = {
-            lessons: { title: 'الدروس', icon: '📘', bg: 'bg-blue-50/50', text: 'text-blue-700' },
-            exercises: { title: 'التمارين', icon: '📝', bg: 'bg-orange-50/50', text: 'text-orange-700' },
-            exams: { title: 'الفروض والإختبارات', icon: '🏆', bg: 'bg-purple-50/50', text: 'text-purple-700' }
+            lessons: { title: 'الدروس', icon: '<i class="ph-fill ph-books"></i>', bg: 'bg-blue-50/50 dark:bg-blue-900/10', text: 'text-blue-700 dark:text-blue-400', border: 'border-blue-100 dark:border-blue-900/30' },
+            exercises: { title: 'التمارين', icon: '<i class="ph-fill ph-pencil-simple"></i>', bg: 'bg-orange-50/50 dark:bg-orange-900/10', text: 'text-orange-700 dark:text-orange-400', border: 'border-orange-100 dark:border-orange-900/30' },
+            exams: { title: 'الفروض والإختبارات', icon: '<i class="ph-fill ph-exam"></i>', bg: 'bg-purple-50/50 dark:bg-purple-900/10', text: 'text-purple-700 dark:text-purple-400', border: 'border-purple-100 dark:border-purple-900/30' }
         };
         
+        const getEmptyStateHTML = (title) => `
+            <div class="flex flex-col items-center justify-center p-6 text-center bg-white/50 dark:bg-slate-800/30 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700">
+                <i class="ph-fill ph-folder-open text-5xl text-slate-300 dark:text-slate-600 mb-2"></i>
+                <h3 class="text-sm font-black text-slate-500 dark:text-slate-400">لا يوجد ${title} حالياً</h3>
+            </div>`;
+
         const renderProgramUI = (sections, containerId, isAdmin) => {
             if(!sections) return;
             window.currentSections = sections;
@@ -1222,46 +1340,42 @@
 
             if (!isAdmin && userLevel) {
                 html += `<div class="flex flex-col gap-6">`;
-                
                 sections.forEach((part, pIdx) => {
                     part.years.forEach((year, yIdx) => {
                         if (year.id === userLevel) {
                             year.branches.forEach((branch, bIdx) => {
-                                let branchLinksTotal = 0;
-                                let branchLinksClicked = 0;
+                                let branchLinksTotal = 0; let branchLinksClicked = 0;
                                 ['lessons', 'exercises', 'exams'].forEach(cat => {
                                     let links = branch.categories[cat] || [];
                                     branchLinksTotal += links.length;
-                                    links.forEach((_, lIdx) => {
-                                        if(clickedLinks.includes(`${branch.id}_${cat}_${lIdx}`)) branchLinksClicked++;
-                                    });
+                                    links.forEach((_, lIdx) => { if(clickedLinks.includes(`${branch.id}_${cat}_${lIdx}`)) branchLinksClicked++; });
                                 });
                                 let unitProg = branchLinksTotal === 0 ? 0 : Math.round((branchLinksClicked / branchLinksTotal) * 100);
                                 let isComp = branchLinksTotal > 0 && unitProg === 100;
                                 
                                 let branchIcon = getBranchIcon(branch.title);
-                                let cardCls = isComp ? 'border-emerald-400 bg-emerald-50/30' : 'border-slate-200 bg-white/90';
+                                let cardCls = isComp ? 'border-emerald-400 dark:border-emerald-600 bg-emerald-50/30 dark:bg-emerald-900/10' : 'border-slate-200 dark:border-slate-700 bg-white/90 dark:bg-slate-800/90';
                                 
                                 html += `
-                                <details class="rounded-3xl shadow-sm border-2 overflow-hidden interactive-card group backdrop-blur-xl ${cardCls}" id="details_student_${branch.id}">
-                                    <summary class="p-5 flex items-center gap-4 outline-none cursor-pointer">
-                                        <div class="w-16 h-16 rounded-2xl bg-white shadow-inner border border-slate-100 flex items-center justify-center text-4xl group-hover:scale-110 transition duration-300 relative">
+                                <details class="student-branch-wrapper rounded-[2rem] shadow-sm border-2 overflow-hidden interactive-card group backdrop-blur-xl ${cardCls}">
+                                    <summary class="p-5 md:p-6 flex items-center gap-4 outline-none cursor-pointer">
+                                        <div class="w-16 h-16 rounded-2xl bg-white dark:bg-slate-700 shadow-inner border border-slate-100 dark:border-slate-600 flex items-center justify-center text-4xl group-hover:scale-110 transition duration-300 relative text-blue-600 dark:text-amber-400">
                                             ${branchIcon}
-                                            ${isComp ? `<div class="absolute -top-2 -right-2 bg-emerald-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shadow-md border-2 border-white">✔</div>` : ''}
+                                            ${isComp ? `<div class="absolute -top-2 -right-2 bg-emerald-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shadow-md border-2 border-white dark:border-slate-800"><i class="ph-bold ph-check"></i></div>` : ''}
                                         </div>
                                         <div class="flex-1">
-                                            <h3 class="text-xl font-black text-slate-800">${branch.title}</h3>
+                                            <h3 class="branch-title text-xl md:text-2xl font-black text-slate-800 dark:text-white">${branch.title}</h3>
                                             <div class="flex items-center gap-2 mt-2">
-                                                <div class="flex-1 bg-slate-200 rounded-full h-1.5 overflow-hidden">
+                                                <div class="flex-1 bg-slate-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
                                                     <div class="${isComp ? 'bg-emerald-500' : 'bg-blue-500'} h-full transition-all duration-700" style="width: ${unitProg}%"></div>
                                                 </div>
-                                                <span class="text-xs font-black ${isComp ? 'text-emerald-600' : 'text-blue-600'}">${unitProg}%</span>
+                                                <span class="text-xs font-black ${isComp ? 'text-emerald-600 dark:text-emerald-400' : 'text-blue-600 dark:text-blue-400'}">${unitProg}%</span>
                                             </div>
                                         </div>
-                                        <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition transform group-open:rotate-180 text-lg shadow-inner">▼</div>
+                                        <div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-400 dark:text-slate-300 group-hover:bg-blue-600 group-hover:text-white transition transform group-open:rotate-180 text-lg shadow-inner"><i class="ph-bold ph-caret-down"></i></div>
                                     </summary>
-                                    <div class="p-5 border-t-2 border-slate-100 bg-slate-50/80">
-                                        <div class="grid grid-cols-1 gap-4">
+                                    <div class="p-5 md:p-6 border-t-2 border-slate-100 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-900/80">
+                                        <div class="grid grid-cols-1 gap-5">
                                 `;
 
                                 ['lessons', 'exercises', 'exams'].forEach(cat => {
@@ -1272,18 +1386,18 @@
                                         let linkId = `${branch.id}_${cat}_${lIdx}`;
                                         let isRead = clickedLinks.includes(linkId);
                                         return `
-                                        <a href="#" onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}'); return false;" class="flex items-center justify-between gap-3 bg-white p-3 rounded-2xl border ${isRead ? 'border-emerald-200' : 'border-slate-100'} shadow-sm hover:shadow-md transition group/link relative overflow-hidden">
+                                        <a href="#" onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}'); return false;" class="lesson-item flex items-center justify-between gap-3 bg-white dark:bg-slate-800 p-3 rounded-2xl border ${isRead ? 'border-emerald-200 dark:border-emerald-800' : 'border-slate-100 dark:border-slate-700'} shadow-sm hover:shadow-md transition group/link relative overflow-hidden">
                                             <div class="flex items-center gap-3">
-                                                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl group-hover/link:bg-blue-600 group-hover/link:text-white transition shadow-inner">🔗</div>
+                                                <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl group-hover/link:bg-blue-600 group-hover/link:text-white transition shadow-inner"><i class="ph-bold ph-link"></i></div>
                                                 <span class="${conf.text} font-bold text-sm truncate max-w-[200px] sm:max-w-xs group-hover/link:underline decoration-2 underline-offset-4">${lnk.title}</span>
                                             </div>
-                                            ${isRead ? `<span class="bg-emerald-100 text-emerald-600 text-[10px] font-black px-2 py-1 rounded-full">مقروء ✅</span>` : ''}
+                                            ${isRead ? `<span class="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 text-[10px] font-black px-2 py-1 rounded-md flex items-center gap-1"><i class="ph-bold ph-check"></i> مقروء</span>` : ''}
                                         </a>`;
-                                    }).join('') : `<div class="text-sm text-slate-400 font-bold bg-white/50 p-3 rounded-2xl border-2 border-dashed border-slate-200 text-center">لا يوجد محتوى بعد</div>`;
+                                    }).join('') : getEmptyStateHTML(conf.title);
 
                                     html += `
-                                    <div class="${conf.bg} p-4 rounded-2xl border border-slate-200">
-                                        <h5 class="font-black ${conf.text} text-lg mb-3 flex items-center gap-2"><span class="text-xl">${conf.icon}</span> ${conf.title}</h5>
+                                    <div class="${conf.bg} ${conf.border} p-5 rounded-3xl border">
+                                        <h5 class="font-black ${conf.text} text-lg mb-4 flex items-center gap-2">${conf.icon} ${conf.title}</h5>
                                         <div class="space-y-2">${linksList}</div>
                                     </div>`;
                                 });
@@ -1294,34 +1408,35 @@
                 });
                 html += `</div>`;
             } else {
+                // Admin View - Using Tabs for Years to organize content beautifully
                 sections.forEach((part, pIdx) => {
                     let pColor = part.color === 'blue' ? 'blue' : 'indigo';
-                    let partHasContent = false;
-                    let partHtml = `
-                    <details class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden mb-8 interactive-card" id="details_admin_p_${pIdx}">
-                        <summary class="bg-slate-50 text-slate-800 p-6 font-black text-xl hover:bg-slate-100 transition border-b border-slate-200 flex items-center gap-3 outline-none">
-                            <div class="w-10 h-10 rounded-xl bg-${pColor}-100 text-${pColor}-600 flex items-center justify-center text-xl shadow-inner">🗂️</div>
-                            ${part.title}
-                        </summary>
-                        <div class="p-5 space-y-6 bg-white">`;
-
+                    
+                    // Container for this part (toggled by top buttons)
+                    html += `<div id="content-${part.id}" class="admin-part-content tab-content ${window.adminActivePart === part.id ? 'active' : ''}">`;
+                    
+                    // Render Tabs for Years
+                    html += `<div class="flex overflow-x-auto gap-2 mb-6 pb-2 scroll-smooth">`;
                     part.years.forEach((year, yIdx) => {
-                        partHasContent = true;
-                        partHtml += `
-                        <details class="bg-slate-50/50 rounded-2xl border border-slate-100 overflow-hidden shadow-sm interactive-card" id="details_admin_p_${pIdx}_y_${yIdx}">
-                            <summary class="text-slate-700 p-5 font-black hover:bg-slate-100 transition border-b border-slate-100 text-lg flex items-center gap-2 outline-none">
-                                <span class="w-3 h-3 rounded-full bg-${pColor}-500 shadow-sm"></span> ${year.title}
-                            </summary>
-                            <div class="p-5 space-y-6 bg-white/50 backdrop-blur-sm">`;
+                        // Set active year for this part if not set
+                        if(window.adminActiveYear[part.id] === undefined && yIdx === 0) window.adminActiveYear[part.id] = year.id;
+                        let isActive = window.adminActiveYear[part.id] === year.id;
+                        let btnCls = isActive ? 'bg-blue-500 text-white shadow-sm' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700';
+                        html += `<button id="btn-${part.id}-${year.id}" onclick="switchAdminYear('${part.id}', '${year.id}')" class="admin-year-btn-${part.id} whitespace-nowrap px-5 py-2.5 rounded-xl font-black text-sm transition border border-slate-100 dark:border-slate-700 ${btnCls}">${year.title}</button>`;
+                    });
+                    html += `</div>`;
 
+                    // Render Content for each Year
+                    part.years.forEach((year, yIdx) => {
+                        let isActive = window.adminActiveYear[part.id] === year.id;
+                        html += `<div id="content-${part.id}-${year.id}" class="admin-year-content-${part.id} space-y-6 ${isActive ? '' : 'hidden'}">`;
+                        
                         year.branches.forEach((branch, bIdx) => {
-                            partHtml += `
-                            <div class="border-2 rounded-[1.5rem] p-5 transition-all duration-300 bg-white border-slate-200 shadow-sm">
-                                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b-2 border-slate-100 pb-4 gap-4">
-                                    <h4 class="font-black text-slate-800 text-xl flex items-center gap-2">
-                                        <span class="text-${pColor}-500 text-3xl">${getBranchIcon(branch.title)}</span> ${branch.title}
-                                    </h4>
-                                </div>
+                            html += `
+                            <div class="border-2 rounded-[2rem] p-5 md:p-6 bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 shadow-sm">
+                                <h4 class="font-black text-slate-800 dark:text-white text-xl flex items-center gap-2 mb-5 border-b border-slate-100 dark:border-slate-700 pb-3">
+                                    <span class="text-${pColor}-500 text-3xl">${getBranchIcon(branch.title)}</span> ${branch.title}
+                                </h4>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5">`;
 
                             ['lessons', 'exercises', 'exams'].forEach(cat => {
@@ -1329,34 +1444,33 @@
                                 let conf = catConfig[cat];
                                 
                                 let linksList = links.length ? links.map((lnk, lIdx) => `
-                                    <li class="flex justify-between items-center bg-white p-3 rounded-xl border border-white/50 shadow-sm text-sm mb-2 hover:shadow-md transition group interactive-card">
-                                        <a href="${lnk.url}" target="_blank" class="${conf.text} font-bold truncate w-2/3 hover:opacity-80 hover:underline decoration-2 underline-offset-4 flex items-center gap-2">
-                                            <span class="text-lg opacity-80">🔗</span> ${lnk.title}
+                                    <div class="flex justify-between items-center bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm text-sm mb-2 group interactive-card">
+                                        <a href="${lnk.url}" target="_blank" class="${conf.text} font-bold truncate w-2/3 hover:underline flex items-center gap-2">
+                                            <i class="ph-bold ph-link text-lg opacity-70"></i> ${lnk.title}
                                         </a>
                                         <div class="flex gap-1">
-                                            <button onclick="adminEditLinkModal(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" class="text-slate-400 hover:bg-blue-50 hover:text-blue-500 p-1.5 rounded-md text-lg transition" title="تعديل">✏️</button>
-                                            <button onclick="adminDeleteLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" class="text-slate-400 hover:bg-red-50 hover:text-red-500 p-1.5 rounded-md text-lg transition" title="حذف">✖</button>
+                                            <button onclick="adminEditLinkModal(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" class="text-slate-400 hover:text-amber-500 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg transition"><i class="ph-bold ph-pencil"></i></button>
+                                            <button onclick="adminDeleteLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" class="text-slate-400 hover:text-red-500 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg transition"><i class="ph-bold ph-trash"></i></button>
                                         </div>
-                                    </li>
-                                `).join('') : `<li class="text-sm text-slate-500 text-center p-4 font-bold bg-white/50 rounded-xl border-2 border-dashed border-slate-200">لم يتم إضافة محتوى بعد</li>`;
+                                    </div>
+                                `).join('') : getEmptyStateHTML('محتوى');
 
-                                partHtml += `
-                                <div class="${conf.bg} p-5 rounded-2xl border-2 border-slate-200">
-                                    <h5 class="font-black ${conf.text} text-lg mb-4 flex items-center gap-2 bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-100 w-max"><span class="text-xl">${conf.icon}</span> ${conf.title}</h5>
-                                    <ul class="mb-2">${linksList}</ul>
-                                    <div class="mt-4 pt-4 border-t-2 border-black/5 border-dashed space-y-3">
-                                        <input type="text" id="title_${branch.id}_${cat}" class="w-full text-sm font-bold p-3 border-2 border-white/50 rounded-xl outline-none focus:border-blue-400 focus:bg-white transition bg-white/60 shadow-inner text-slate-700" placeholder="عنوان المحتوى...">
-                                        <input type="text" id="url_${branch.id}_${cat}" class="w-full text-sm p-3 border-2 border-white/50 rounded-xl outline-none focus:border-blue-400 focus:bg-white transition bg-white/60 shadow-inner text-left font-bold text-slate-600" dir="ltr" placeholder="https://...">
-                                        <button onclick="adminAddLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', '${branch.id}')" class="w-full bg-slate-800 hover:bg-slate-900 text-white text-sm font-black py-3 rounded-xl transition btn-modern shadow-md">إضافة ➕</button>
+                                html += `
+                                <div class="${conf.bg} ${conf.border} p-5 rounded-2xl border">
+                                    <h5 class="font-black ${conf.text} text-base mb-3 flex items-center gap-2">${conf.icon} ${conf.title}</h5>
+                                    <div class="mb-2 max-h-48 overflow-y-auto pr-1 scroll-smooth">${linksList}</div>
+                                    <div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 space-y-2">
+                                        <input type="text" id="title_${branch.id}_${cat}" class="w-full text-xs font-bold p-3 border border-slate-200 dark:border-slate-600 rounded-lg outline-none focus:border-blue-400 bg-white dark:bg-slate-900 text-slate-700 dark:text-white" placeholder="عنوان المحتوى...">
+                                        <input type="text" id="url_${branch.id}_${cat}" class="w-full text-xs p-3 border border-slate-200 dark:border-slate-600 rounded-lg outline-none focus:border-blue-400 bg-white dark:bg-slate-900 text-slate-600 dark:text-white text-left font-bold" dir="ltr" placeholder="https://...">
+                                        <button onclick="adminAddLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', '${branch.id}')" class="w-full bg-slate-800 dark:bg-blue-600 text-white text-xs font-black py-2.5 rounded-lg transition btn-modern flex items-center justify-center gap-1"><i class="ph-bold ph-plus"></i> إضافة</button>
                                     </div>
                                 </div>`;
                             });
-                            partHtml += `</div></div>`; 
+                            html += `</div></div>`; 
                         });
-                        partHtml += `</div></details>`; 
+                        html += `</div>`; // End Year content
                     });
-                    partHtml += `</div></details>`; 
-                    if (partHasContent) html += partHtml;
+                    html += `</div>`; // End Part content
                 });
             }
             document.getElementById(containerId).innerHTML = html;
