@@ -13,6 +13,8 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <!-- استدعاء مكتبة الاحتفالات البصرية -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.4/confetti.browser.min.js"></script>
     
     <style>
         body { 
@@ -82,6 +84,14 @@
         .theme-lessons { background-color: #f0f9ff; border-color: #bae6fd; }
         .theme-exercises { background-color: #fff7ed; border-color: #fed7aa; }
         .theme-exams { background-color: #faf5ff; border-color: #e9d5ff; }
+
+        /* شارة نقاط الخبرة XP */
+        .xp-badge {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+        }
     </style>
 </head>
 <body class="text-slate-800 antialiased p-3 md:p-6 pb-24 selection:bg-blue-200 selection:text-blue-900 relative overflow-x-hidden overflow-y-scroll">
@@ -287,9 +297,9 @@
 
         <!-- 3. شاشة تحكم المسؤول (الأستاذ) -->
         <div id="admin-screen" class="screen">
-            <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 backdrop-blur-xl p-4 md:p-5 rounded-[2.5rem] shadow-lg border border-white/50 mb-6 gap-5 sticky top-4 z-40 transition-all duration-300">
+            <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 backdrop-blur-xl p-4 md:p-5 rounded-[2rem] shadow-lg border border-white/50 mb-6 gap-5 sticky top-4 z-40 transition-all duration-300">
                 <div class="flex items-center gap-4 w-full md:w-auto">
-                    <div class="w-14 h-14 rounded-2xl shadow-lg overflow-hidden bg-white p-1 border border-slate-100 transform transition hover:scale-105"><img src="icon.png" class="w-full h-full object-cover rounded-xl"></div>
+                    <div class="w-14 h-14 rounded-2xl shadow-lg overflow-hidden bg-white p-1 border border-slate-100"><img src="icon.png" class="w-full h-full object-cover rounded-xl"></div>
                     <div>
                         <h1 class="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-800 to-slate-600 leading-tight">منصة المجتهد</h1>
                         <div class="flex items-center gap-2 mt-1">
@@ -335,7 +345,7 @@
                                             <th class="p-5 rounded-tr-3xl">التلميذ (وكلمة المرور)</th>
                                             <th class="p-5">معلومات الولي (واتساب)</th>
                                             <th class="p-5">المستوى</th>
-                                            <th class="p-5 w-48">التقدم الدراسي</th>
+                                            <th class="p-5 w-48">التقدم بالنقاط</th>
                                             <th class="p-5">الحالة</th>
                                             <th class="p-5 text-left rounded-tl-3xl">الإجراءات</th>
                                         </tr>
@@ -408,17 +418,20 @@
             </header>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
-                <!-- شريط تقدم عام مصغر وأنيق -->
+                <!-- شريط تقدم عام مصغر وأنيق يعمل بنقاط الـ XP -->
                 <div class="lg:col-span-12 bg-white/95 backdrop-blur-xl p-5 md:p-6 rounded-[2rem] shadow-sm border border-slate-200 relative overflow-hidden interactive-card flex flex-col justify-center">
                     <div class="absolute -right-10 -top-10 w-32 h-32 bg-gradient-to-br from-emerald-400 to-teal-400 rounded-full opacity-10 blur-2xl group-hover:opacity-20 transition duration-500"></div>
                     <div class="flex justify-between items-end mb-3 relative z-10">
                         <div class="flex items-center gap-3">
                              <h3 class="font-black text-slate-700 text-lg flex items-center gap-2">
                                 <div class="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center text-sm shadow-inner">🚀</div>
-                                تقدمك الإجمالي
+                                مستوى تقدمك بالنقاط
                             </h3>
                         </div>
-                        <span id="progress-text" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500 tracking-tighter drop-shadow-sm">0%</span>
+                        <div class="flex items-baseline gap-1">
+                            <span id="progress-text" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500 tracking-tighter drop-shadow-sm">0</span>
+                            <span class="text-sm font-bold text-slate-400">XP</span>
+                        </div>
                     </div>
                     <div class="w-full bg-slate-100 rounded-full h-4 overflow-hidden shadow-inner p-0.5 relative z-10 border border-slate-200">
                         <div id="progress-bar" class="bg-gradient-to-l from-emerald-400 to-teal-500 h-full rounded-full transition-all duration-1000 w-0 relative shadow-sm">
@@ -459,6 +472,9 @@
         const usersCol = collection(db, 'physics_db', 'public', 'profiles');
         const programCol = collection(db, 'physics_db', 'public', 'curriculum');
         const chatsPath = 'physics_db/public/chats';
+
+        // قيمة النقطة لكل رابط يفتحه التلميذ
+        const XP_PER_LINK = 10;
 
         let isAuthReady = false;
         window.currentUserRecord = null;
@@ -506,6 +522,26 @@
             if(title.includes('طاقة') || title.includes('عمل')) return '🔋';
             if(title.includes('مغناطيس') || title.includes('كهرومغناطيسية')) return '🧲';
             return '📘'; 
+        };
+
+        // دالة لإطلاق الألعاب النارية البصرية (Confetti)
+        window.fireConfetti = () => {
+            var duration = 3 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
+
+            function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+
+            var interval = setInterval(function() {
+              var timeLeft = animationEnd - Date.now();
+
+              if (timeLeft <= 0) return clearInterval(interval);
+
+              var particleCount = 50 * (timeLeft / duration);
+              // منذ أن يتم حساب الألعاب النارية لتسقط، قم بإطلاق أكثر من القمة بقليل
+              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
         };
 
         window.showToast = (msg, type = 'success') => {
@@ -777,7 +813,7 @@
             } catch(e) { showToast("حدث خطأ أثناء الحفظ", "error"); }
         }
 
-        // دالة تتبع النقرات على الروابط
+        // دالة تتبع النقرات على الروابط بنظام XP والاحتفال
         window.trackLinkClick = async (branchId, cat, lIdx, url) => {
             window.open(url, '_blank');
             if (window.currentUserRecord && window.currentUserRecord.role !== 'admin') {
@@ -785,39 +821,44 @@
                 let linkId = `${branchId}_${cat}_${lIdx}`;
                 if (!clickedLinks.includes(linkId)) {
                     clickedLinks.push(linkId);
+                    window.currentUserRecord.clickedLinks = clickedLinks; // تحديث محلي فوري
                     await updateDoc(doc(usersCol, window.currentUserRecord.username), { clickedLinks: clickedLinks });
+                    
+                    // إظهار الاحتفال البصري ورسالة النقاط
+                    showToast(`+${XP_PER_LINK} XP ! أحسنت 🌟`);
+                    window.fireConfetti();
+                    
+                    // تحديث الواجهة فوراً
+                    updateProgressUI(window.currentSections);
+                    renderProgramUI(window.currentSections, 'student-program-view', false);
                 }
             }
         };
 
-        // حساب التقدم بناءً على عدد الروابط المقروءة لكل وحدة
-        const calculateProgress = (levelId, data, sections) => {
-            if(!sections || !levelId) return 0;
-            let totalUnitProgress = 0;
-            let unitCount = 0;
+        // حساب التقدم ونقاط الـ XP بناءً على عدد الروابط المقروءة
+        const calculateProgressDetails = (levelId, data, sections) => {
+            if(!sections || !levelId) return { xp: 0, percent: 0, totalLinks: 0 };
+            
             let clickedLinks = data.clickedLinks || [];
+            let totalLinks = 0;
+            let clickedCount = 0;
 
             sections.forEach(p => p.years.forEach(y => {
                 if(y.id === levelId) {
                     y.branches.forEach(b => {
-                        let branchLinksTotal = 0;
-                        let branchLinksClicked = 0;
                         ['lessons', 'exercises', 'exams'].forEach(cat => {
                             let links = b.categories[cat] || [];
-                            branchLinksTotal += links.length;
+                            totalLinks += links.length;
                             links.forEach((_, lIdx) => {
-                                if(clickedLinks.includes(`${b.id}_${cat}_${lIdx}`)) branchLinksClicked++;
+                                if(clickedLinks.includes(`${b.id}_${cat}_${lIdx}`)) clickedCount++;
                             });
                         });
-                        let unitProg = branchLinksTotal === 0 ? 0 : (branchLinksClicked / branchLinksTotal) * 100;
-                        totalUnitProgress += unitProg;
-                        unitCount++;
                     });
                 }
             }));
             
-            if(unitCount === 0) return 0; 
-            return Math.round(totalUnitProgress / unitCount);
+            let percent = totalLinks === 0 ? 0 : Math.round((clickedCount / totalLinks) * 100);
+            return { xp: clickedCount * XP_PER_LINK, percent: percent, totalLinks: totalLinks };
         };
 
         const renderLeaderboard = () => {
@@ -825,9 +866,10 @@
             const container = document.getElementById('leaderboard-container');
             container.innerHTML = '';
             
+            // ترتيب الطلاب بناءً على نقاط الـ XP وليس النسبة
             let levelMates = window.allStudentsProgress
                 .filter(s => s.level === window.currentUserRecord.level && s.approved)
-                .sort((a, b) => b.progress - a.progress); 
+                .sort((a, b) => b.xp - a.xp); 
 
             if(levelMates.length === 0) {
                 container.innerHTML = '<div class="text-slate-400 text-center py-4 font-bold">لا يوجد منافسون بعد.. كن أنت المتصدر!</div>';
@@ -854,8 +896,8 @@
                             <div class="text-xl w-6 text-center">${medal}</div>
                             <div class="text-slate-700 text-sm ${isMe ? 'text-blue-700' : ''}">${nameDisplay}</div>
                         </div>
-                        <div class="bg-slate-100 text-slate-700 px-3 py-1 rounded-lg text-xs flex items-center gap-1 shadow-inner">
-                            <span class="${student.progress > 50 ? 'text-emerald-600' : 'text-amber-500'} font-black">${student.progress}%</span>
+                        <div class="xp-badge px-2 py-0.5 rounded text-xs font-black">
+                            ${student.xp} XP
                         </div>
                     </div>
                 `;
@@ -875,7 +917,7 @@
                 if(data.level) levelStats[data.level] = (levelStats[data.level] || 0) + 1;
                 
                 let levelDisplay = data.level ? (levelNames[data.level] || data.level) : "غير محدد";
-                let progPercent = calculateProgress(data.level, data, window.currentSections);
+                let progDetails = calculateProgressDetails(data.level, data, window.currentSections);
                 
                 let parentInfo = data.parentName ? 
                     `<div class="font-black text-slate-800">${data.parentName}</div>
@@ -899,11 +941,9 @@
                         </td>
                         <td class="p-4 bg-slate-50/40">${parentInfo}</td>
                         <td class="p-4 text-base font-black text-slate-600 bg-slate-50/70">${levelDisplay}</td>
-                        <td class="p-4">
-                            <div class="flex items-center gap-3">
-                                <span class="text-base font-black ${progPercent > 50 ? 'text-emerald-500' : 'text-amber-500'} w-10">${progPercent}%</span>
-                                <div class="flex-1 h-2.5 bg-slate-100 rounded-full overflow-hidden shadow-inner"><div class="h-full ${progPercent > 50 ? 'bg-emerald-400' : 'bg-amber-400'} transition-all duration-1000" style="width:${progPercent}%"></div></div>
-                            </div>
+                        <td class="p-4 text-center">
+                            <div class="xp-badge inline-block px-3 py-1 rounded-lg text-sm font-black mb-1">${progDetails.xp} XP</div>
+                            <div class="text-xs font-bold text-slate-500">إنجاز: ${progDetails.percent}%</div>
                         </td>
                         <td class="p-4 bg-slate-50/70 text-center">
                             <span class="px-3 py-1 rounded-full text-xs font-black ${data.approved ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">
@@ -954,8 +994,8 @@
                     if(d.data().role !== 'admin') {
                         let data = d.data();
                         window.adminUsersList.push({id: d.id, data: data}); 
-                        let progPercent = calculateProgress(data.level, data, window.currentSections);
-                        window.allStudentsProgress.push({ id: d.id, level: data.level, progress: progPercent, approved: data.approved });
+                        let details = calculateProgressDetails(data.level, data, window.currentSections);
+                        window.allStudentsProgress.push({ id: d.id, level: data.level, xp: details.xp, percent: details.percent, approved: data.approved });
                     }
                 });
                 renderAdminTable();
@@ -985,8 +1025,8 @@
                 snapshot.forEach(d => {
                     let data = d.data();
                     if(data.role !== 'admin') {
-                        let progPercent = calculateProgress(data.level, data, window.currentSections);
-                        window.allStudentsProgress.push({ id: d.id, level: data.level, progress: progPercent, approved: data.approved });
+                        let details = calculateProgressDetails(data.level, data, window.currentSections);
+                        window.allStudentsProgress.push({ id: d.id, level: data.level, xp: details.xp, percent: details.percent, approved: data.approved });
                     }
                     if(d.id === window.currentUserRecord.username) {
                         window.currentUserRecord.clickedLinks = data.clickedLinks || [];
@@ -1043,11 +1083,8 @@
                     
                     // تلوين رسائل الأستاذ بالأحمر
                     let textColor = isAdminMsg ? 'text-red-600 font-bold' : '';
-                    // إضافة التوقيت
-                    let timeStr = new Date(m.timestamp).toLocaleTimeString('ar-DZ', {hour: '2-digit', minute:'2-digit'});
-                    let timeHtml = `<span class="inline-block text-[10px] text-slate-400 mx-2 opacity-80" dir="ltr">${timeStr}</span>`;
                     
-                    let contentHtml = `<p class="text-[14px] font-normal whitespace-pre-wrap break-words ${textColor}" dir="auto">${linkify(m.text)} ${timeHtml}</p>`;
+                    let contentHtml = `<p class="text-[14px] font-normal whitespace-pre-wrap break-words ${textColor}" dir="auto">${linkify(m.text)}</p>`;
                     
                     chatHtml += `<div class="chat-bubble ${bubbleClass} ${alignment} shadow-sm transition hover:shadow-md">${contentHtml}</div>`;
                 });
@@ -1165,9 +1202,9 @@
         };
 
         const updateProgressUI = (sections) => {
-            let progPercent = calculateProgress(window.currentUserRecord.level, window.currentUserRecord, sections);
-            document.getElementById('progress-bar').style.width = `${progPercent}%`; 
-            document.getElementById('progress-text').innerText = `${progPercent}%`;
+            let details = calculateProgressDetails(window.currentUserRecord.level, window.currentUserRecord, sections);
+            document.getElementById('progress-bar').style.width = `${details.percent}%`; 
+            document.getElementById('progress-text').innerText = `${details.xp}`;
         };
 
         const catConfig = {
