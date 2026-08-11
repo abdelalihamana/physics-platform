@@ -28,9 +28,6 @@
     
     <!-- Phosphor Icons (Professional Icon Library) -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    
-    <!-- Chart.js for Admin Analytics -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         body { 
@@ -96,12 +93,10 @@
         .dark .rank-2 { background: linear-gradient(to left, rgba(148, 163, 184, 0.1), #1e293b); }
         .dark .rank-3 { background: linear-gradient(to left, rgba(251, 146, 60, 0.1), #1e293b); }
 
-        /* Hide tabs smoothly */
         .tab-content { display: none; animation: fadeInTab 0.3s ease; }
         .tab-content.active { display: block; }
         @keyframes fadeInTab { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Custom checkbox */
         .custom-cb { width: 1.25rem; height: 1.25rem; cursor: pointer; accent-color: #2563eb; }
     </style>
 </head>
@@ -110,7 +105,7 @@
     <!-- نافذة الإشعارات -->
     <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 w-[90%] md:w-auto"></div>
 
-    <!-- نافذة المحادثة (على شكل نافذة منبثقة عائمة) -->
+    <!-- نافذة المحادثة -->
     <div id="chat-modal" class="fixed bottom-4 right-4 z-[90] hidden flex-col w-[350px] h-[450px] bg-white dark:bg-slate-800 rounded-3xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] border border-slate-200 dark:border-slate-700 overflow-hidden transform transition-all duration-300">
         <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 flex justify-between items-center shadow-sm z-10 relative">
             <div class="flex items-center gap-3 relative z-10">
@@ -317,7 +312,7 @@
             <!-- Header -->
             <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-5 md:p-6 rounded-[2.5rem] shadow-lg border border-white/50 dark:border-slate-700 mb-8 gap-5 sticky top-4 z-40 transition-all duration-300">
                 <div class="flex items-center gap-4 w-full md:w-auto">
-                    <div class="w-16 h-16 rounded-2xl shadow-lg overflow-hidden bg-white p-1 border border-slate-100"><img src="icon.png" class="w-full h-full object-cover rounded-xl"></div>
+                    <div class="w-16 h-16 rounded-2xl shadow-lg overflow-hidden bg-white p-1 border border-slate-100 dark:border-slate-700"><img src="icon.png" class="w-full h-full object-cover rounded-xl"></div>
                     <div>
                         <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 leading-tight">منصة المجتهد</h1>
                         <div class="flex items-center gap-2 mt-1">
@@ -333,28 +328,27 @@
             </header>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-10">
-                <!-- إحصائيات سريعة (Charts) -->
-                <div class="lg:col-span-4 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-6 md:p-8 rounded-[2.5rem] shadow-lg border border-white/50 dark:border-slate-700 interactive-card flex flex-col justify-between">
-                    <div>
-                        <h3 class="text-2xl font-black text-slate-800 dark:text-white flex items-center gap-3 mb-6">
-                            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center text-3xl shadow-inner"><i class="ph-fill ph-users"></i></div>
-                            إحصائيات التلاميذ
-                        </h3>
-                        <div class="bg-blue-50 dark:bg-slate-700/50 rounded-2xl p-6 flex justify-between items-center border border-blue-100 dark:border-slate-600 mb-6">
-                            <span class="text-lg font-bold text-blue-800 dark:text-blue-300">العدد الإجمالي</span>
-                            <span id="total-students-count" class="text-4xl font-black text-blue-600 dark:text-blue-400">0</span>
-                        </div>
+                <!-- إحصائيات سريعة (Grid بدل Chart.js) -->
+                <div class="lg:col-span-4 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-6 md:p-8 rounded-[2.5rem] shadow-lg border border-white/50 dark:border-slate-700 interactive-card flex flex-col">
+                    <h3 class="text-2xl font-black text-slate-800 dark:text-white flex items-center gap-3 mb-6">
+                        <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center text-3xl shadow-inner"><i class="ph-fill ph-chart-bar"></i></div>
+                        إحصائيات التلاميذ
+                    </h3>
+                    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 flex justify-between items-center shadow-md mb-6">
+                        <span class="text-lg font-bold text-white">العدد الإجمالي</span>
+                        <span id="total-students-count" class="text-4xl font-black text-white">0</span>
                     </div>
-                    <div class="flex-1 min-h-[200px] flex items-center justify-center relative">
-                        <canvas id="studentsChart" class="max-h-full"></canvas>
+                    <!-- شبكة الإحصائيات -->
+                    <div id="admin-stats-grid" class="grid grid-cols-2 gap-3 flex-1 overflow-y-auto pr-2 scroll-smooth">
+                        <!-- سيتم توليد البطاقات هنا عبر الجافاسكريبت -->
                     </div>
                 </div>
 
                 <!-- قسم متابعة التلاميذ -->
                 <div class="lg:col-span-8 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-6 md:p-8 rounded-[2.5rem] shadow-lg border border-white/50 dark:border-slate-700 flex flex-col h-full max-h-[600px]">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b border-slate-100 dark:border-slate-700 pb-4">
                         <h3 class="text-2xl font-black text-slate-800 dark:text-white flex items-center gap-3">
-                            <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center text-3xl shadow-inner"><i class="ph-fill ph-clipboard-text"></i></div>
+                            <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center text-3xl shadow-inner"><i class="ph-fill ph-users"></i></div>
                             إدارة الحسابات
                         </h3>
                         <div class="flex gap-2">
@@ -362,6 +356,14 @@
                             <button onclick="bulkAction('delete')" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-4 py-2 rounded-xl text-sm font-black hover:bg-red-100 transition border border-red-200 dark:border-red-800 flex items-center gap-2"><i class="ph-bold ph-trash"></i> حذف المحدد</button>
                         </div>
                     </div>
+
+                    <!-- أزرار فلترة الجدول -->
+                    <div class="flex gap-2 mb-4 bg-slate-100 dark:bg-slate-900 p-1.5 rounded-xl w-fit border border-slate-200 dark:border-slate-700">
+                        <button onclick="filterStudentsTable('all')" id="filter-stu-all" class="px-5 py-2 rounded-lg font-black text-sm bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-white transition-all">الكل</button>
+                        <button onclick="filterStudentsTable('middle')" id="filter-stu-middle" class="px-5 py-2 rounded-lg font-black text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-all">المتوسط</button>
+                        <button onclick="filterStudentsTable('high')" id="filter-stu-high" class="px-5 py-2 rounded-lg font-black text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-all">الثانوي</button>
+                    </div>
+
                     <div class="overflow-y-auto overflow-x-auto rounded-3xl border border-slate-100 dark:border-slate-700 shadow-inner bg-slate-50/50 dark:bg-slate-900/50 flex-1">
                         <table class="w-full text-right border-collapse whitespace-nowrap min-w-[900px]">
                             <thead class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-sm font-black border-b border-slate-200 dark:border-slate-700 sticky top-0 z-10 shadow-sm">
@@ -379,7 +381,7 @@
                     </div>
                 </div>
 
-                <!-- قسم إدارة المحتوى (بصيغة التبويبات Tabs) -->
+                <!-- قسم إدارة المحتوى (بصيغة التبويبات Tabs للأطوار، السنوات، والوحدات) -->
                 <div class="lg:col-span-12 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-6 md:p-8 rounded-[2.5rem] shadow-lg border border-white/50 dark:border-slate-700 mb-10">
                     <div class="mb-8 border-b border-slate-100 dark:border-slate-700 pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
@@ -387,7 +389,7 @@
                                 <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center text-3xl shadow-inner"><i class="ph-fill ph-books"></i></div>
                                 إدارة محتوى المنصة
                             </h3>
-                            <p class="text-slate-500 dark:text-slate-400 font-bold text-lg">أضف الدروس والتمارين حسب الطور والسنة الدراسية.</p>
+                            <p class="text-slate-500 dark:text-slate-400 font-bold text-lg">أضف الدروس والتمارين حسب الطور، السنة الدراسية والوحدة.</p>
                         </div>
                         
                         <!-- Main Level Selector (Middle/High) -->
@@ -408,7 +410,7 @@
         <div id="app-screen" class="screen">
             <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-4 md:p-6 rounded-[2.5rem] shadow-lg border border-white/50 dark:border-slate-700 mb-8 gap-5 sticky top-4 z-40">
                 <div class="flex items-center gap-4 w-full md:w-auto">
-                    <div class="w-14 h-14 rounded-2xl shadow-lg overflow-hidden bg-white p-1 border border-slate-100"><img src="icon.png" class="w-full h-full object-cover rounded-xl"></div>
+                    <div class="w-14 h-14 rounded-2xl shadow-lg overflow-hidden bg-white p-1 border border-slate-100 dark:border-slate-700"><img src="icon.png" class="w-full h-full object-cover rounded-xl"></div>
                     <div>
                         <h1 class="text-2xl md:text-3xl font-black text-slate-800 dark:text-white leading-tight" id="display-username"></h1>
                         <div class="flex items-center gap-2 mt-1">
@@ -419,7 +421,10 @@
                 </div>
                 
                 <div class="flex items-center justify-between md:justify-end gap-3 w-full md:w-auto flex-wrap">
-                    <button id="return-admin-btn" onclick="returnToAdmin()" class="hidden icon-btn w-12 h-12 bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400 text-2xl shadow-sm border border-amber-200 dark:border-amber-800" title="العودة للإدارة"><i class="ph-bold ph-arrow-right"></i></button>
+                    <!-- زر العودة للإدارة الجديد (برتقالي مع نبض) -->
+                    <button id="return-admin-btn" onclick="returnToAdmin()" class="hidden relative px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-2xl text-lg shadow-[0_0_15px_rgba(249,115,22,0.6)] animate-pulse hover:animate-none transition-all flex items-center gap-2 border border-orange-300 dark:border-orange-700" title="العودة للإدارة">
+                        <i class="ph-bold ph-arrow-right"></i> العودة للإدارة
+                    </button>
 
                     <button onclick="toggleDarkMode()" class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-amber-400 text-2xl shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-fill ph-moon"></i></button>
 
@@ -444,7 +449,7 @@
                         <span id="student-chat-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-[12px] font-black w-6 h-6 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-sm hidden animate-bounce">0</span>
                     </button>
 
-                    <button onclick="logout()" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-5 py-3 rounded-2xl font-black hover:bg-red-100 dark:hover:bg-red-900/50 transition btn-modern border border-red-100 dark:border-red-800 shadow-sm flex items-center gap-2 text-lg">تسجيل الخروج <i class="ph-bold ph-sign-out"></i></button>
+                    <button onclick="logout()" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-5 py-3 rounded-2xl font-black hover:bg-red-100 dark:hover:bg-red-900/50 transition btn-modern border border-red-100 dark:border-red-800 shadow-sm flex items-center gap-2 text-lg">خروج <i class="ph-bold ph-sign-out"></i></button>
                 </div>
             </header>
 
@@ -454,7 +459,7 @@
                 <!-- شريط البحث السريع -->
                 <div class="w-full md:w-1/2 relative group">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-bold ph-magnifying-glass"></i></div>
-                    <input type="text" id="lesson-search" onkeyup="filterStudentLessons()" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400 shadow-sm" placeholder="ابحث عن درس، تمرين، أو وحدة...">
+                    <input type="text" id="lesson-search" onkeyup="executeStudentSearch()" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400 shadow-sm" placeholder="ابحث عن درس، تمرين، أو وحدة...">
                 </div>
 
                 <!-- بطاقة التقدم (XP) -->
@@ -489,8 +494,6 @@
         import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, deleteDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // =========================================================================================
-        // الصق مفاتيح مشروعك الحقيقية هنا
-        // =========================================================================================
         const firebaseConfig = {
             apiKey: "AIzaSyDuuYHwmSW0UV1TO3gDGyETrvOimE7iGLs",
             authDomain: "physique-58073.firebaseapp.com",
@@ -520,12 +523,19 @@
         let unsubscribeUsers = null;
         let unsubscribeChat = null;
         let unsubscribeChatMeta = null;
+        
         window.activeChatUser = null; 
         window.currentSections = [];
         window.currentEditParams = null; 
+        
+        // Admin UI States
         window.adminActivePart = 'part_middle';
-        window.adminActiveYear = {}; // يحفظ التبويب المفتوح لكل طور
-        window.studentActiveBranchTab = null; // تبويب الوحدة المفتوح للتلميذ
+        window.adminActiveYear = {}; 
+        window.adminActiveBranch = {}; // يحفظ الوحدة المفتوحة لكل سنة للأستاذ
+        window.adminStudentsFilter = 'all'; // فلتر التلاميذ
+        
+        // Student UI States
+        window.studentActiveBranchTab = null;
         
         window.adminUsersList = [];
         window.adminChatsData = {};
@@ -554,12 +564,6 @@
             document.documentElement.classList.toggle('dark');
             const isDark = document.documentElement.classList.contains('dark');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            
-            // تحديث ألوان الرسم البياني إذا كان موجوداً
-            if(window.adminChart) {
-                window.adminChart.options.plugins.legend.labels.color = isDark ? '#fff' : '#333';
-                window.adminChart.update();
-            }
         };
 
         // Icon Helper
@@ -625,7 +629,7 @@
 
         const defaultProgramData = [
             { id: "part_middle", title: "التعليم المتوسط", color: "blue", years: [{ id: "m_y1", title: "السنة الأولى متوسط", branches: [{ id: "m1_b1", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m1_b2", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m1_b3", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [], exams: [] } }] }, { id: "m_y2", title: "السنة الثانية متوسط", branches: [{ id: "m2_b1", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m2_b2", title: "الظواهر الميكانيكية", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m2_b3", title: "الظواهر الكهرومغناطيسية", categories: { lessons: [], exercises: [], exams: [] } }] }, { id: "m_y3", title: "السنة الثالثة متوسط", branches: [{ id: "m3_b1", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m3_b2", title: "الطاقة", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m3_b3", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m3_b4", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [], exams: [] } }] }, { id: "m_y4", title: "السنة الرابعة متوسط", branches: [{ id: "m4_b1", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m4_b2", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m4_b3", title: "الظواهر الميكانيكية", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m4_b4", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [], exams: [] } }] }] },
-            { id: "part_high", title: "التعليم الثانوي", color: "indigo", years: [{ id: "h_y1", title: "السنة أولى ثانوي", branches: [{ id: "h1_b1", title: "الدروس والوحدات", categories: { lessons: [], exercises: [], exams: [] } }] }, { id: "h_y2", title: "السنة الثانية ثانوي", branches: [{ id: "h2_b1", title: "الدروس والوحدات", categories: { lessons: [], exercises: [], exams: [] } }] }, { id: "h_y3", title: "السنة الثالثة ثانوي", branches: [{ id: "h3_b1", title: "الدروس والوحدات", categories: { lessons: [], exercises: [], exams: [] } }] }] }
+            { id: "part_high", title: "التعليم الثانوي", color: "indigo", years: [{ id: "h_y1", title: "السنة أولى ثانوي", branches: [{ id: "h1_b1", title: "بنية وهندسة أفراد بعض الأنواع الكيميائية", categories: { lessons: [], exercises: [], exams: [] } }] }, { id: "h_y2", title: "السنة الثانية ثانوي", branches: [{ id: "h2_b1", title: "المقاربة الكيفية لطاقة جملة وانحفاظها", categories: { lessons: [], exercises: [], exams: [] } }] }, { id: "h_y3", title: "السنة الثالثة ثانوي", branches: [{ id: "h3_b1", title: "تطور جملة كيميائية نحو حالة التوازن", categories: { lessons: [], exercises: [], exams: [] } }] }] }
         ];
 
         const initAuth = async () => {
@@ -785,17 +789,19 @@
             showToast("تمت العودة للوحة الإدارة بنجاح");
         };
 
-        window.logout = () => {
-            window.currentUserRecord = null;
-            window.originalAdminRecord = null;
-            document.getElementById('password').value = '';
-            document.getElementById('return-admin-btn').classList.add('hidden');
-            if(unsubscribeProgram) unsubscribeProgram();
-            if(unsubscribeUsers) unsubscribeUsers();
-            if(unsubscribeChat) unsubscribeChat();
-            if(unsubscribeChatMeta) unsubscribeChatMeta();
-            if (typeof closeChat === 'function') closeChat();
-            switchScreen('auth-screen');
+        window.logout = async () => {
+            if(await confirmAction("هل أنت متأكد أنك تريد تسجيل الخروج من حسابك؟")) {
+                window.currentUserRecord = null;
+                window.originalAdminRecord = null;
+                document.getElementById('password').value = '';
+                document.getElementById('return-admin-btn').classList.add('hidden');
+                if(unsubscribeProgram) unsubscribeProgram();
+                if(unsubscribeUsers) unsubscribeUsers();
+                if(unsubscribeChat) unsubscribeChat();
+                if(unsubscribeChatMeta) unsubscribeChatMeta();
+                if (typeof closeChat === 'function') closeChat();
+                switchScreen('auth-screen');
+            }
         };
 
         window.openSettings = () => {
@@ -891,49 +897,92 @@
                 let linkId = `${branchId}_${cat}_${lIdx}`;
                 if (!clickedLinks.includes(linkId)) {
                     clickedLinks.push(linkId);
-                    // التحديث المحلي فورا للاستجابة السريعة
                     window.currentUserRecord.clickedLinks = clickedLinks;
                     
-                    // الاحتفال
                     window.fireConfetti();
                     showToast(`+${XP_PER_ITEM} XP ! أحسنت 🌟`);
                     
-                    // تحديث الواجهة
                     updateProgressUI(window.currentSections);
-                    renderProgramUI(window.currentSections, 'student-program-view', false);
+                    // إعادة الرسم إذا لم نكن في وضع البحث المستمر
+                    if(document.getElementById('lesson-search').value.trim() === '') {
+                        renderProgramUI(window.currentSections, 'student-program-view', false);
+                    } else {
+                        window.executeStudentSearch(); // تحديث نتائج البحث لعرض شارة "مقروء"
+                    }
 
-                    // الحفظ في السحابة
                     await updateDoc(doc(usersCol, window.currentUserRecord.username), { clickedLinks: clickedLinks });
                 }
             }
         };
 
-        // Student Search
-        window.filterStudentLessons = () => {
-            const query = document.getElementById('lesson-search').value.toLowerCase();
-            document.querySelectorAll('.student-branch-wrapper').forEach(branch => {
-                const title = branch.querySelector('.branch-title').innerText.toLowerCase();
-                let hasVisibleLink = false;
-                
-                branch.querySelectorAll('.lesson-link').forEach(link => {
-                    const linkText = link.innerText.toLowerCase();
-                    if(linkText.includes(query) || title.includes(query)) {
-                        link.style.display = 'flex';
-                        hasVisibleLink = true;
-                    } else {
-                        link.style.display = 'none';
-                    }
-                });
+        // بحث متقدم للتلميذ
+        window.executeStudentSearch = () => {
+            const query = document.getElementById('lesson-search').value.toLowerCase().trim();
+            const container = document.getElementById('student-program-view');
+            
+            if (query === '') {
+                renderProgramUI(window.currentSections, 'student-program-view', false);
+                return;
+            }
 
-                if(title.includes(query) || hasVisibleLink) {
-                    branch.style.display = 'block';
-                } else {
-                    branch.style.display = 'none';
+            let html = `<div class="bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl rounded-[2rem] border border-blue-200 dark:border-blue-800 p-6 shadow-lg animate-[fadeInTab_0.3s_ease]">
+                            <h3 class="text-xl font-black text-blue-600 dark:text-blue-400 mb-6 flex items-center gap-2">
+                                <i class="ph-bold ph-magnifying-glass"></i> نتائج البحث عن: "${query}"
+                            </h3>
+                            <div class="space-y-4">`;
+            
+            let found = false;
+            let userLevel = window.currentUserRecord.level;
+            let clickedLinks = window.currentUserRecord.clickedLinks || [];
+
+            window.currentSections.forEach(p => p.years.forEach(y => {
+                if(y.id === userLevel) {
+                    y.branches.forEach(branch => {
+                        ['lessons', 'exercises', 'exams'].forEach(cat => {
+                            let links = branch.categories[cat] || [];
+                            let conf = catConfig[cat];
+
+                            links.forEach((lnk, lIdx) => {
+                                if(lnk.title.toLowerCase().includes(query) || branch.title.toLowerCase().includes(query)) {
+                                    found = true;
+                                    let linkId = `${branch.id}_${cat}_${lIdx}`;
+                                    let isRead = clickedLinks.includes(linkId);
+                                    
+                                    html += `
+                                    <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition hover:shadow-md">
+                                        <div>
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <span class="text-xs font-black bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400 px-2 py-1 rounded">${branch.title}</span>
+                                                <span class="text-xs font-black bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300 px-2 py-1 rounded flex items-center gap-1">${conf.icon} ${conf.title}</span>
+                                            </div>
+                                            <h4 class="font-bold text-slate-800 dark:text-white text-lg">${lnk.title}</h4>
+                                        </div>
+                                        <div class="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
+                                            ${isRead ? `<span class="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 text-xs font-black px-3 py-1.5 rounded-lg flex items-center gap-1"><i class="ph-bold ph-check"></i> مكتمل</span>` : ''}
+                                            <button onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}')" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl font-black shadow-sm transition flex items-center gap-2 text-sm whitespace-nowrap">
+                                                مشاهدة <i class="ph-bold ph-arrow-left"></i>
+                                            </button>
+                                        </div>
+                                    </div>`;
+                                }
+                            });
+                        });
+                    });
                 }
-            });
+            }));
+
+            if (!found) {
+                html += `<div class="text-center p-8 opacity-60">
+                            <i class="ph-fill ph-magnifying-glass text-6xl text-slate-400 mb-3"></i>
+                            <h4 class="text-lg font-bold text-slate-500">لا توجد نتائج مطابقة لبحثك في مستواك.</h4>
+                         </div>`;
+            }
+
+            html += `</div></div>`;
+            container.innerHTML = html;
         };
 
-        // Admin Tabs
+        // Admin Tabs & Filters
         window.switchAdminPart = (partId) => {
             window.adminActivePart = partId;
             document.querySelectorAll(`.admin-part-content`).forEach(el => el.classList.remove('active'));
@@ -960,9 +1009,30 @@
             document.getElementById(`btn-${partId}-${yearId}`).classList.remove('bg-white', 'text-slate-600', 'dark:bg-slate-800', 'dark:text-slate-400');
         };
 
+        window.switchAdminBranch = (yearId, branchId) => {
+            window.adminActiveBranch[yearId] = branchId;
+            renderProgramUI(window.currentSections, 'admin-program-view', true);
+        };
+
         window.switchStudentTab = (branchId) => {
             window.studentActiveBranchTab = branchId;
+            document.getElementById('lesson-search').value = '';
             renderProgramUI(window.currentSections, 'student-program-view', false);
+        };
+
+        window.filterStudentsTable = (filterType) => {
+            window.adminStudentsFilter = filterType;
+            ['all', 'middle', 'high'].forEach(t => {
+                let btn = document.getElementById(`filter-stu-${t}`);
+                if(t === filterType) {
+                    btn.classList.add('bg-white', 'dark:bg-slate-700', 'text-blue-600', 'dark:text-white', 'shadow-sm');
+                    btn.classList.remove('text-slate-500', 'dark:text-slate-400');
+                } else {
+                    btn.classList.remove('bg-white', 'dark:bg-slate-700', 'text-blue-600', 'dark:text-white', 'shadow-sm');
+                    btn.classList.add('text-slate-500', 'dark:text-slate-400');
+                }
+            });
+            renderAdminTable();
         };
 
         // Admin Bulk Actions
@@ -996,7 +1066,7 @@
             
             let levelMates = window.allStudentsProgress
                 .filter(s => s.level === window.currentUserRecord.level && s.approved)
-                .sort((a, b) => b.xp - a.xp); // Sort by XP
+                .sort((a, b) => b.xp - a.xp);
 
             if(levelMates.length === 0) {
                 container.innerHTML = `
@@ -1044,16 +1114,27 @@
 
             window.adminUsersList.forEach(d => {
                 const data = d.data;
-                studentCount++;
+                // حساب الاحصائيات الكلية دائماً
                 if(data.level) levelStats[data.level] = (levelStats[data.level] || 0) + 1;
+                studentCount++;
+
+                // تطبيق فلتر العرض في الجدول
+                let isMiddle = data.level && data.level.startsWith('m_');
+                let isHigh = data.level && data.level.startsWith('h_');
+                if(window.adminStudentsFilter === 'middle' && !isMiddle) return;
+                if(window.adminStudentsFilter === 'high' && !isHigh) return;
                 
                 let levelDisplay = data.level ? (levelNames[data.level] || data.level) : "غير محدد";
                 let prog = calculateProgressXP(data.level, data, window.currentSections);
                 
+                // رابط واتساب الذكي
+                let waMessage = encodeURIComponent(`السلام عليكم، تواصل من منصة المجتهد بخصوص التلميذ(ة): ${d.id} مسجل بمستوى ${levelDisplay}.`);
+                let waLink = data.phoneNumber ? `https://wa.me/213${data.phoneNumber.substring(1)}?text=${waMessage}` : '#';
+
                 let parentInfo = data.parentName ? 
                     `<div class="font-black text-slate-800 dark:text-slate-200">${data.parentName}</div>
                      <div class="mt-2">
-                        <a href="https://wa.me/213${(data.phoneNumber||'').substring(1)}" target="_blank" class="bg-[#25D366] hover:bg-[#128C7E] text-white px-3 py-1.5 rounded-lg text-xs font-black shadow-sm transition inline-flex items-center gap-2">
+                        <a href="${waLink}" target="_blank" class="bg-[#25D366] hover:bg-[#128C7E] text-white px-3 py-1.5 rounded-lg text-xs font-black shadow-sm transition inline-flex items-center gap-2">
                             <i class="ph-bold ph-whatsapp-logo text-base"></i> واتساب الولي
                         </a>
                      </div>` : '<div class="text-sm text-slate-400 dark:text-slate-500 font-bold">غير متوفر</div>';
@@ -1094,28 +1175,23 @@
             
             document.getElementById('total-students-count').innerText = studentCount;
             
-            // تحديث الرسم البياني (Chart.js)
-            const ctx = document.getElementById('studentsChart');
-            if(ctx) {
-                if(window.adminChart) window.adminChart.destroy();
-                const isDark = document.documentElement.classList.contains('dark');
-                window.adminChart = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: Object.keys(levelStats).map(l => levelNames[l] || l),
-                        datasets: [{
-                            data: Object.values(levelStats),
-                            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316'],
-                            borderWidth: 2,
-                            borderColor: isDark ? '#1e293b' : '#ffffff'
-                        }]
-                    },
-                    options: {
-                        responsive: true, maintainAspectRatio: false,
-                        plugins: {
-                            legend: { position: 'right', labels: { color: isDark ? '#cbd5e1' : '#334155', font: {family: 'Tajawal', weight: 'bold', size: 12} } }
-                        }
-                    }
+            // تحديث شبكة الإحصائيات (Grid) بدلاً من Chart.js
+            const statsGrid = document.getElementById('admin-stats-grid');
+            if(statsGrid) {
+                statsGrid.innerHTML = '';
+                const colors = ['bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800', 
+                                'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800', 
+                                'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800', 
+                                'bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-800'];
+                
+                Object.keys(levelStats).sort().forEach((lvl, i) => {
+                    let c = colors[i % colors.length];
+                    statsGrid.innerHTML += `
+                        <div class="p-3 rounded-xl border flex flex-col justify-between items-center text-center shadow-sm ${c}">
+                            <span class="text-xs font-black mb-1">${levelNames[lvl] || lvl}</span>
+                            <span class="text-xl font-black">${levelStats[lvl]}</span>
+                        </div>
+                    `;
                 });
             }
         };
@@ -1156,7 +1232,9 @@
             unsubscribeProgram = onSnapshot(doc(programCol, 'main'), (docSnap) => {
                 if(docSnap.exists()) { 
                     window.currentSections = docSnap.data().sections; 
-                    renderProgramUI(window.currentSections, 'student-program-view', false); 
+                    if(document.getElementById('lesson-search').value.trim() === '') {
+                        renderProgramUI(window.currentSections, 'student-program-view', false); 
+                    }
                     updateProgressUI(window.currentSections); 
                     renderLeaderboard(); 
                 }
@@ -1175,7 +1253,12 @@
                         window.currentUserRecord.clickedLinks = data.clickedLinks || [];
                         window.currentUserRecord.phoneNumber = data.phoneNumber || ''; 
                         updateProgressUI(window.currentSections || []); 
-                        renderProgramUI(window.currentSections || [], 'student-program-view', false);
+                        
+                        if(document.getElementById('lesson-search').value.trim() === '') {
+                            renderProgramUI(window.currentSections || [], 'student-program-view', false);
+                        } else {
+                            window.executeStudentSearch();
+                        }
                     }
                 });
                 renderLeaderboard(); 
@@ -1281,7 +1364,6 @@
             sections[pIdx].years[yIdx].branches[bIdx].categories[cat].push({title, url});
             await updateDoc(docRef, { sections });
             showToast("تمت الإضافة بنجاح للمنهج 📚");
-            // لن يتم إعادة التوجيه بفضل نظام الحفاظ على حالة التبويبات (Tabs State Preservation)
         };
 
         window.adminDeleteLink = async (pIdx, yIdx, bIdx, cat, lIdx) => {
@@ -1351,10 +1433,8 @@
                 sections.forEach(p => p.years.forEach(y => { if (y.id === userLevel) userYearData = y; }));
 
                 if (userYearData && userYearData.branches && userYearData.branches.length > 0) {
-                    // تحديد التبويب الافتراضي إذا لم يتم اختيار واحد
                     if (!window.studentActiveBranchTab) window.studentActiveBranchTab = userYearData.branches[0].id;
 
-                    // 1. رسم أزرار التبويبات (الوحدات)
                     html += `<div class="flex overflow-x-auto gap-3 mb-6 pb-2 scroll-smooth">`;
                     userYearData.branches.forEach(branch => {
                         let isActive = window.studentActiveBranchTab === branch.id;
@@ -1363,10 +1443,9 @@
                     });
                     html += `</div>`;
 
-                    // 2. رسم محتوى الوحدة المحددة فقط
                     html += `<div class="flex flex-col gap-6">`;
                     userYearData.branches.forEach(branch => {
-                        if (window.studentActiveBranchTab !== branch.id) return; // تخطي الوحدات غير المحددة
+                        if (window.studentActiveBranchTab !== branch.id) return; 
 
                         let branchLinksTotal = 0; let branchLinksClicked = 0;
                         ['lessons', 'exercises', 'exams'].forEach(cat => {
@@ -1435,69 +1514,82 @@
                      html += `<div class="text-center p-8 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm"><h3 class="text-xl font-bold text-slate-500 dark:text-slate-400">لا يوجد محتوى متاح لمستواك حالياً</h3></div>`;
                 }
             } else {
-                // Admin View - Using Tabs for Years to organize content beautifully
+                // Admin View - Tabs for Years AND Branches
                 sections.forEach((part, pIdx) => {
                     let pColor = part.color === 'blue' ? 'blue' : 'indigo';
                     
-                    // Container for this part (toggled by top buttons)
                     html += `<div id="content-${part.id}" class="admin-part-content tab-content ${window.adminActivePart === part.id ? 'active' : ''}">`;
                     
-                    // Render Tabs for Years
-                    html += `<div class="flex overflow-x-auto gap-2 mb-6 pb-2 scroll-smooth">`;
+                    // Year Tabs
+                    html += `<div class="flex overflow-x-auto gap-2 mb-6 pb-2 scroll-smooth border-b border-slate-200 dark:border-slate-700">`;
                     part.years.forEach((year, yIdx) => {
-                        // Set active year for this part if not set
                         if(window.adminActiveYear[part.id] === undefined && yIdx === 0) window.adminActiveYear[part.id] = year.id;
                         let isActive = window.adminActiveYear[part.id] === year.id;
-                        let btnCls = isActive ? 'bg-blue-500 text-white shadow-sm' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700';
-                        html += `<button id="btn-${part.id}-${year.id}" onclick="switchAdminYear('${part.id}', '${year.id}')" class="admin-year-btn-${part.id} whitespace-nowrap px-5 py-2.5 rounded-xl font-black text-sm transition border border-slate-100 dark:border-slate-700 ${btnCls}">${year.title}</button>`;
+                        let btnCls = isActive ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400';
+                        html += `<button id="btn-${part.id}-${year.id}" onclick="switchAdminYear('${part.id}', '${year.id}')" class="admin-year-btn-${part.id} whitespace-nowrap px-4 py-3 font-black text-sm transition-all border-b-4 ${btnCls}">${year.title}</button>`;
                     });
                     html += `</div>`;
 
-                    // Render Content for each Year
                     part.years.forEach((year, yIdx) => {
-                        let isActive = window.adminActiveYear[part.id] === year.id;
-                        html += `<div id="content-${part.id}-${year.id}" class="admin-year-content-${part.id} space-y-6 ${isActive ? '' : 'hidden'}">`;
+                        let isYearActive = window.adminActiveYear[part.id] === year.id;
+                        html += `<div id="content-${part.id}-${year.id}" class="admin-year-content-${part.id} animate-[fadeInTab_0.3s_ease] ${isYearActive ? '' : 'hidden'}">`;
                         
-                        year.branches.forEach((branch, bIdx) => {
-                            html += `
-                            <div class="border-2 rounded-[2rem] p-5 md:p-6 bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 shadow-sm">
-                                <h4 class="font-black text-slate-800 dark:text-white text-xl flex items-center gap-2 mb-5 border-b border-slate-100 dark:border-slate-700 pb-3">
-                                    <span class="text-${pColor}-500 text-3xl">${getBranchIcon(branch.title)}</span> ${branch.title}
-                                </h4>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">`;
+                        if (year.branches && year.branches.length > 0) {
+                            if (!window.adminActiveBranch[year.id]) window.adminActiveBranch[year.id] = year.branches[0].id;
 
-                            ['lessons', 'exercises', 'exams'].forEach(cat => {
-                                let links = branch.categories[cat] || [];
-                                let conf = catConfig[cat];
-                                
-                                let linksList = links.length ? links.map((lnk, lIdx) => `
-                                    <div class="flex justify-between items-center bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm text-sm mb-2 group interactive-card">
-                                        <a href="${lnk.url}" target="_blank" class="${conf.text} font-bold truncate w-2/3 hover:underline flex items-center gap-2">
-                                            <i class="ph-bold ph-link text-lg opacity-70"></i> ${lnk.title}
-                                        </a>
-                                        <div class="flex gap-1">
-                                            <button onclick="adminEditLinkModal(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" class="text-slate-400 hover:text-amber-500 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg transition"><i class="ph-bold ph-pencil"></i></button>
-                                            <button onclick="adminDeleteLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" class="text-slate-400 hover:text-red-500 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg transition"><i class="ph-bold ph-trash"></i></button>
-                                        </div>
-                                    </div>
-                                `).join('') : getEmptyStateHTML('محتوى');
+                            // Branch Tabs for Admin
+                            html += `<div class="flex overflow-x-auto gap-2 mb-6 pb-2 scroll-smooth">`;
+                            year.branches.forEach(branch => {
+                                let isActive = window.adminActiveBranch[year.id] === branch.id;
+                                let btnCls = isActive ? 'bg-indigo-600 text-white shadow-md' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-indigo-50 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700 border';
+                                html += `<button onclick="switchAdminBranch('${year.id}', '${branch.id}')" class="whitespace-nowrap px-5 py-2.5 rounded-xl font-black text-xs transition-all flex items-center gap-2 ${btnCls}">${getBranchIcon(branch.title)} ${branch.title}</button>`;
+                            });
+                            html += `</div>`;
+
+                            // Branch Content
+                            year.branches.forEach((branch, bIdx) => {
+                                if (window.adminActiveBranch[year.id] !== branch.id) return;
 
                                 html += `
-                                <div class="${conf.bg} ${conf.border} p-5 rounded-2xl border">
-                                    <h5 class="font-black ${conf.text} text-base mb-3 flex items-center gap-2">${conf.icon} ${conf.title}</h5>
-                                    <div class="mb-2 max-h-48 overflow-y-auto pr-1 scroll-smooth">${linksList}</div>
-                                    <div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 space-y-2">
-                                        <input type="text" id="title_${branch.id}_${cat}" class="w-full text-xs font-bold p-3 border border-slate-200 dark:border-slate-600 rounded-lg outline-none focus:border-blue-400 bg-white dark:bg-slate-900 text-slate-700 dark:text-white" placeholder="عنوان المحتوى...">
-                                        <input type="text" id="url_${branch.id}_${cat}" class="w-full text-xs p-3 border border-slate-200 dark:border-slate-600 rounded-lg outline-none focus:border-blue-400 bg-white dark:bg-slate-900 text-slate-600 dark:text-white text-left font-bold" dir="ltr" placeholder="https://...">
-                                        <button onclick="adminAddLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', '${branch.id}')" class="w-full bg-slate-800 dark:bg-blue-600 text-white text-xs font-black py-2.5 rounded-lg transition btn-modern flex items-center justify-center gap-1"><i class="ph-bold ph-plus"></i> إضافة</button>
-                                    </div>
-                                </div>`;
+                                <div class="border-2 rounded-[2rem] p-5 md:p-6 bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 shadow-sm animate-[fadeInTab_0.3s_ease]">
+                                    <h4 class="font-black text-slate-800 dark:text-white text-xl flex items-center gap-2 mb-5 border-b border-slate-100 dark:border-slate-700 pb-3">
+                                        <span class="text-${pColor}-500 text-3xl">${getBranchIcon(branch.title)}</span> ${branch.title}
+                                    </h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">`;
+
+                                ['lessons', 'exercises', 'exams'].forEach(cat => {
+                                    let links = branch.categories[cat] || [];
+                                    let conf = catConfig[cat];
+                                    
+                                    let linksList = links.length ? links.map((lnk, lIdx) => `
+                                        <div class="flex justify-between items-center bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm text-sm mb-2 group interactive-card">
+                                            <a href="${lnk.url}" target="_blank" class="${conf.text} font-bold truncate w-2/3 hover:underline flex items-center gap-2">
+                                                <i class="ph-bold ph-link text-lg opacity-70"></i> ${lnk.title}
+                                            </a>
+                                            <div class="flex gap-1">
+                                                <button onclick="adminEditLinkModal(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" class="text-slate-400 hover:text-amber-500 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg transition"><i class="ph-bold ph-pencil"></i></button>
+                                                <button onclick="adminDeleteLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" class="text-slate-400 hover:text-red-500 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg transition"><i class="ph-bold ph-trash"></i></button>
+                                            </div>
+                                        </div>
+                                    `).join('') : getEmptyStateHTML('محتوى');
+
+                                    html += `
+                                    <div class="${conf.bg} ${conf.border} p-5 rounded-2xl border flex flex-col h-full">
+                                        <h5 class="font-black ${conf.text} text-base mb-3 flex items-center gap-2">${conf.icon} ${conf.title}</h5>
+                                        <div class="mb-2 max-h-60 overflow-y-auto pr-1 scroll-smooth flex-1">${linksList}</div>
+                                        <div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 space-y-2 mt-auto">
+                                            <input type="text" id="title_${branch.id}_${cat}" class="w-full text-xs font-bold p-3 border border-slate-200 dark:border-slate-600 rounded-lg outline-none focus:border-blue-400 bg-white dark:bg-slate-900 text-slate-700 dark:text-white transition-all" placeholder="عنوان المحتوى...">
+                                            <input type="text" id="url_${branch.id}_${cat}" class="w-full text-xs p-3 border border-slate-200 dark:border-slate-600 rounded-lg outline-none focus:border-blue-400 bg-white dark:bg-slate-900 text-slate-600 dark:text-white text-left font-bold transition-all" dir="ltr" placeholder="https://...">
+                                            <button onclick="adminAddLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', '${branch.id}')" class="w-full bg-slate-800 dark:bg-blue-600 hover:bg-slate-700 dark:hover:bg-blue-700 text-white text-xs font-black py-2.5 rounded-lg transition-all flex items-center justify-center gap-1"><i class="ph-bold ph-plus"></i> إضافة</button>
+                                        </div>
+                                    </div>`;
+                                });
+                                html += `</div></div>`; 
                             });
-                            html += `</div></div>`; 
-                        });
-                        html += `</div>`; // End Year content
+                        }
+                        html += `</div>`; 
                     });
-                    html += `</div>`; // End Part content
+                    html += `</div>`; 
                 });
             }
             document.getElementById(containerId).innerHTML = html;
