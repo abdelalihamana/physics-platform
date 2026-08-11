@@ -142,20 +142,6 @@
             </div>
             
             <div class="space-y-5 max-h-[65vh] overflow-y-auto pr-2">
-                <!-- الأفاتار (للتلميذ فقط) -->
-                <div id="settings-avatar-container" class="hidden border-b border-slate-100 dark:border-slate-700 pb-5">
-                    <div class="mb-4 flex items-center justify-between">
-                        <label class="text-sm font-bold text-slate-600 dark:text-slate-400 flex items-center gap-2"><i class="ph-fill ph-image"></i> الصورة الشخصية</label>
-                        <label class="bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 px-3 py-1.5 rounded-lg text-xs font-black cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition border border-indigo-200 dark:border-indigo-800 flex items-center gap-1 shadow-sm">
-                            <i class="ph-bold ph-upload-simple"></i> رفع صورة
-                            <input type="file" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
-                        </label>
-                    </div>
-                    <div class="flex flex-wrap gap-3 justify-center" id="avatar-grid">
-                        <!-- يتم ملؤها بالجافاسكريبت -->
-                    </div>
-                </div>
-
                 <div>
                     <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2 flex items-center gap-2"><i class="ph-fill ph-user"></i> اسم المستخدم</label>
                     <input type="text" id="settings-username" disabled class="w-full px-5 py-3.5 rounded-xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-400 dark:text-slate-500 font-black outline-none cursor-not-allowed shadow-inner text-lg">
@@ -318,14 +304,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex items-center gap-3 w-full md:w-auto justify-end flex-wrap">
+                <div class="flex items-center gap-3 w-full md:w-auto justify-end flex-wrap relative">
                     
-                    <!-- إحصائيات الإدارة العائمة (تظهر عند وضع المؤشر) -->
+                    <!-- إحصائيات الإدارة العائمة (تظهر على اليمين - للداخل) -->
                     <div class="relative group z-50">
                         <button class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-blue-600 dark:text-blue-400 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" title="إحصائيات التلاميذ">
                             <i class="ph-fill ph-chart-bar"></i>
                         </button>
-                        <div class="absolute top-full right-0 md:left-1/2 md:-translate-x-1/2 mt-3 w-[300px] bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl border border-slate-100 dark:border-slate-700 p-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-3 cursor-default">
+                        <div class="absolute top-full left-0 mt-3 w-[280px] md:w-[300px] bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl border border-slate-100 dark:border-slate-700 p-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-3 cursor-default">
                             <h4 class="font-black text-slate-800 dark:text-white border-b border-slate-100 dark:border-slate-700 pb-3 mb-4 flex items-center justify-between">
                                 <span class="flex items-center gap-2"><i class="ph-fill ph-users"></i> إحصائيات المنصة</span>
                                 <span id="hover-total-students" class="bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400 px-3 py-1 rounded-lg text-sm shadow-inner">0</span>
@@ -414,9 +400,9 @@
         <div id="app-screen" class="screen">
             <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-4 md:p-6 rounded-[2.5rem] shadow-lg border border-white/50 dark:border-slate-700 mb-8 gap-5 sticky top-4 z-40">
                 <div class="flex items-center gap-4 w-full md:w-auto">
-                    <!-- أفاتار التلميذ يتغير ديناميكياً -->
-                    <div id="student-header-avatar" class="w-14 h-14 rounded-2xl shadow-lg bg-white dark:bg-slate-800 p-1 border border-slate-100 dark:border-slate-700">
-                        <img src="icon.png" class="w-full h-full object-cover rounded-xl">
+                    <!-- أيقونة التلميذ الثابتة -->
+                    <div class="w-14 h-14 rounded-2xl shadow-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-slate-100 dark:border-slate-700 text-3xl">
+                        <i class="ph-fill ph-user-circle"></i>
                     </div>
                     <div>
                         <h1 class="text-2xl md:text-3xl font-black text-slate-800 dark:text-white leading-tight" id="display-username"></h1>
@@ -428,17 +414,8 @@
                 </div>
                 
                 <div class="flex items-center justify-between md:justify-end gap-3 w-full md:w-auto flex-wrap">
-                    <!-- زر العودة للإدارة الجديد (يظهر فقط للأستاذ عند مراقبة حساب) -->
-                    <button id="return-admin-btn" onclick="returnToAdmin()" class="hidden relative px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-2xl text-lg shadow-[0_0_15px_rgba(249,115,22,0.6)] animate-pulse hover:animate-none transition-all flex items-center gap-2 border border-orange-300 dark:border-orange-700" title="العودة للإدارة">
-                        <i class="ph-bold ph-arrow-right"></i> العودة للإدارة
-                    </button>
-
-                    <button onclick="toggleDarkMode()" class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-amber-400 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" title="الوضع الليلي"><i class="ph-fill ph-moon"></i></button>
-
-                    <!-- زر الإعدادات للتلميذ -->
-                    <button id="student-settings-btn" onclick="openSettings()" class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" title="إعدادات الحساب"><i class="ph-fill ph-gear-six"></i></button>
-
-                    <!-- قائمة أبطال المستوى -->
+                    
+                    <!-- قائمة أبطال المستوى (تم نقلها للمقدمة لتظهر على اليمين أثناء المراقبة) -->
                     <div class="relative inline-block z-50">
                         <details class="group" id="leaderboard-dropdown-details">
                             <summary class="bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-5 py-3 rounded-2xl text-lg font-black hover:bg-amber-100 dark:hover:bg-amber-900/50 transition border border-amber-200 dark:border-amber-800 shadow-sm flex items-center gap-2 cursor-pointer outline-none">
@@ -453,13 +430,23 @@
                         </details>
                     </div>
 
+                    <!-- زر العودة للإدارة الجديد (يظهر فقط للأستاذ عند مراقبة حساب) -->
+                    <button id="return-admin-btn" onclick="returnToAdmin()" class="hidden relative px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-2xl text-lg shadow-[0_0_15px_rgba(249,115,22,0.6)] animate-pulse hover:animate-none transition-all flex items-center gap-2 border border-orange-300 dark:border-orange-700" title="العودة للإدارة">
+                        <i class="ph-bold ph-arrow-right"></i> العودة للإدارة
+                    </button>
+
+                    <button id="student-dark-btn" onclick="toggleDarkMode()" class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-amber-400 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" title="الوضع الليلي"><i class="ph-fill ph-moon"></i></button>
+
+                    <!-- زر الإعدادات للتلميذ -->
+                    <button id="student-settings-btn" onclick="openSettings()" class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" title="إعدادات الحساب"><i class="ph-fill ph-gear-six"></i></button>
+
                     <!-- زر الدردشة -->
-                    <button onclick="openChat('admin')" class="relative bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-2xl font-black text-lg hover:from-blue-700 hover:to-indigo-700 transition btn-modern shadow-md shadow-blue-500/30 flex items-center gap-2">
+                    <button id="student-chat-btn" onclick="openChat('admin')" class="relative bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-2xl font-black text-lg hover:from-blue-700 hover:to-indigo-700 transition btn-modern shadow-md shadow-blue-500/30 flex items-center gap-2">
                         <span class="hidden sm:inline">الدردشة</span> <i class="ph-fill ph-chat-circle-dots text-2xl"></i>
                         <span id="student-chat-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-[12px] font-black w-6 h-6 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-sm hidden animate-bounce">0</span>
                     </button>
 
-                    <button onclick="logout()" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-5 py-3 rounded-2xl font-black hover:bg-red-100 dark:hover:bg-red-900/50 transition btn-modern border border-red-100 dark:border-red-800 shadow-sm flex items-center gap-2 text-lg">خروج <i class="ph-bold ph-sign-out"></i></button>
+                    <button id="student-logout-btn" onclick="logout()" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-5 py-3 rounded-2xl font-black hover:bg-red-100 dark:hover:bg-red-900/50 transition btn-modern border border-red-100 dark:border-red-800 shadow-sm flex items-center gap-2 text-lg">خروج <i class="ph-bold ph-sign-out"></i></button>
                 </div>
             </header>
 
@@ -533,13 +520,12 @@
         window.currentEditParams = null; 
         
         // Admin & Student States
-        window.adminMainTab = 'accounts'; // التبويب الرئيسي للإدارة (accounts أو content)
+        window.adminMainTab = 'accounts'; 
         window.adminActivePart = 'part_middle';
         window.adminActiveYear = {}; 
         window.adminActiveBranch = {}; 
         window.adminStudentsFilter = 'all'; 
         window.studentActiveBranchTab = null;
-        window.selectedAvatarId = 'default';
         
         window.adminUsersList = [];
         window.adminChatsData = {};
@@ -560,32 +546,9 @@
             "طريق الألف ميل يبدأ بخطوة واحدة، وأنت الآن في المسار الصحيح. 🚶‍♂️"
         ];
 
-        // قائمة الأفاتارات
-        const AVATARS = {
-            'default': { type: 'img', src: 'icon.png' },
-            'av1': { type: 'icon', icon: 'ph-student', color: 'bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400' },
-            'av2': { type: 'icon', icon: 'ph-user-focus', color: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400' },
-            'av3': { type: 'icon', icon: 'ph-rocket-launch', color: 'bg-purple-100 text-purple-600 dark:bg-purple-900/50 dark:text-purple-400' },
-            'av4': { type: 'icon', icon: 'ph-mask-happy', color: 'bg-amber-100 text-amber-600 dark:bg-amber-900/50 dark:text-amber-400' },
-            'av5': { type: 'icon', icon: 'ph-alien', color: 'bg-orange-100 text-orange-600 dark:bg-orange-900/50 dark:text-orange-400' },
-            'av6': { type: 'icon', icon: 'ph-robot', color: 'bg-teal-100 text-teal-600 dark:bg-teal-900/50 dark:text-teal-400' },
-            'av7': { type: 'icon', icon: 'ph-lightning', color: 'bg-yellow-100 text-yellow-600 dark:bg-yellow-900/50 dark:text-yellow-400' },
-            'av8': { type: 'icon', icon: 'ph-crown', color: 'bg-rose-100 text-rose-600 dark:bg-rose-900/50 dark:text-rose-400' }
-        };
-
-        window.getAvatarHTML = (avatarId, sizeCls = 'text-3xl') => {
-            if (avatarId && avatarId.startsWith('data:image')) {
-                return `<img src="${avatarId}" class="w-full h-full object-cover rounded-xl">`;
-            }
-            let av = AVATARS[avatarId] || AVATARS['default'];
-            if (av.type === 'img') return `<img src="${av.src}" class="w-full h-full object-cover rounded-xl">`;
-            return `<div class="w-full h-full rounded-xl flex items-center justify-center ${av.color} shadow-inner"><i class="ph-fill ${av.icon} ${sizeCls}"></i></div>`;
-        };
-
         // دالة تحويل التبويبات الرئيسية للإدارة
         window.switchAdminMainTab = (tab) => {
             window.adminMainTab = tab;
-            
             const btnAccounts = document.getElementById('main-tab-accounts');
             const btnContent = document.getElementById('main-tab-content');
             const secAccounts = document.getElementById('admin-accounts-section');
@@ -613,7 +576,7 @@
         };
 
         const getBranchIcon = (title) => {
-            if(title.includes('شهادات') || title.includes('شهادة') || title.includes('تجريبية')) return '<i class="ph-fill ph-certificate"></i>';
+            if(title.includes('شهادتك') || title.includes('شهادات') || title.includes('تجريبية')) return '<i class="ph-fill ph-certificate"></i>';
             if(title.includes('الكهرباء') || title.includes('كهربائية')) return '<i class="ph-fill ph-lightning"></i>';
             if(title.includes('المادة') || title.includes('كيمياء') || title.includes('تحولات')) return '<i class="ph-fill ph-flask"></i>';
             if(title.includes('ميكانيك') || title.includes('حركة')) return '<i class="ph-fill ph-gear-six"></i>';
@@ -671,7 +634,7 @@
             document.getElementById(screenId).classList.add('active');
         };
 
-        // المنهج الافتراضي المحدث كاملاً ويشمل الوحدة الجديدة للرابعة متوسط
+        // المنهج الافتراضي المتكامل للطورين
         const defaultProgramData = [
             { 
                 id: "part_middle", 
@@ -714,7 +677,8 @@
                             { id: "m4_b2", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [], exams: [] } },
                             { id: "m4_b3", title: "الظواهر الميكانيكية", categories: { lessons: [], exercises: [], exams: [] } },
                             { id: "m4_b4", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [], exams: [] } },
-                            { id: "m4_b5", title: "شهادات تجريبية", categories: { lessons: [], exercises: [], exams: [] } }
+                            // وحدة الشهادات ذات تصنيفات خاصة
+                            { id: "m4_b5", title: "شهادتك 🎓", categories: { 'past_exams': [], 'mock_exams': [] } } 
                         ] 
                     }
                 ] 
@@ -764,7 +728,31 @@
                 isAuthReady = true;
                 try {
                     const progDoc = await getDoc(doc(programCol, 'main'));
-                    if (!progDoc.exists()) await setDoc(doc(programCol, 'main'), { sections: defaultProgramData });
+                    if (!progDoc.exists()) {
+                        await setDoc(doc(programCol, 'main'), { sections: defaultProgramData });
+                    } else {
+                        // إضافة أو تحديث وحدة "شهادتك 🎓" برمجياً إذا لم تكن موجودة أو بالهيكل القديم
+                        let data = progDoc.data();
+                        let needsUpdate = false;
+                        data.sections.forEach(part => {
+                            part.years.forEach(year => {
+                                if (year.id === 'm_y4') {
+                                    let existingB5 = year.branches.find(b => b.id === 'm4_b5');
+                                    if (!existingB5) {
+                                        year.branches.push({ id: "m4_b5", title: "شهادتك 🎓", categories: { 'past_exams': [], 'mock_exams': [] } });
+                                        needsUpdate = true;
+                                    } else if (existingB5.title !== "شهادتك 🎓" || existingB5.categories['lessons']) {
+                                        // تحديث الهيكل إذا كان قديما
+                                        existingB5.title = "شهادتك 🎓";
+                                        existingB5.categories = { 'past_exams': existingB5.categories.past_exams || [], 'mock_exams': existingB5.categories.mock_exams || [] };
+                                        needsUpdate = true;
+                                    }
+                                }
+                            });
+                        });
+                        if (needsUpdate) await updateDoc(doc(programCol, 'main'), { sections: data.sections });
+                    }
+
                     const adminDoc = await getDoc(doc(usersCol, 'admin'));
                     if (!adminDoc.exists()) await setDoc(doc(usersCol, 'admin'), { password: 'adminpassword', role: 'admin', approved: true, clickedLinks: [] });
                 } catch(e) { console.error(e); }
@@ -817,7 +805,7 @@
                     if (userSnap.exists()) { showToast("اسم المستخدم مستخدم مسبقاً، اختر اسماً آخر", "error"); } 
                     else {
                         await setDoc(userRef, { 
-                            password: password, role: 'student', approved: false, clickedLinks: [], avatar: 'default',
+                            password: password, role: 'student', approved: false, clickedLinks: [],
                             level: level, parentName: parentName, phoneNumber: phoneNumber
                         });
                         document.getElementById('registration-success-modal').classList.remove('hidden');
@@ -837,7 +825,6 @@
                         } else {
                             document.getElementById('display-username').innerText = username;
                             document.getElementById('student-level-badge').innerText = levelNames[window.currentUserRecord.level];
-                            document.getElementById('student-header-avatar').innerHTML = window.getAvatarHTML(window.currentUserRecord.avatar);
                             
                             const lastQuoteDate = localStorage.getItem('last_quote_date');
                             const today = new Date().toDateString();
@@ -879,24 +866,33 @@
             
             document.getElementById('display-username').innerText = window.currentUserRecord.username;
             document.getElementById('student-level-badge').innerText = levelNames[window.currentUserRecord.level];
-            document.getElementById('student-header-avatar').innerHTML = window.getAvatarHTML(window.currentUserRecord.avatar);
+            
+            // تفعيل وضع المراقبة (إخفاء أزرار الدردشة والإعدادات والخروج والوضع الليلي)
             document.getElementById('return-admin-btn').classList.remove('hidden');
             document.getElementById('student-settings-btn').classList.add('hidden'); 
+            document.getElementById('student-chat-btn').classList.add('hidden'); 
+            document.getElementById('student-dark-btn').classList.add('hidden'); 
+            document.getElementById('student-logout-btn').classList.add('hidden'); 
 
             if(unsubscribeUsers) unsubscribeUsers();
             if(unsubscribeChatMeta) unsubscribeChatMeta();
 
             switchScreen('app-screen');
             startStudentListeners();
-            showToast(`أنت الآن داخل حساب: ${studentUsername}`);
+            showToast(`أنت الآن داخل حساب التلميذ في وضع المراقبة`);
         };
 
         window.returnToAdmin = () => {
             if(!window.originalAdminRecord) return;
             window.currentUserRecord = { ...window.originalAdminRecord };
             window.originalAdminRecord = null;
+            
+            // إلغاء وضع المراقبة وإرجاع الأزرار لطبيعتها
             document.getElementById('return-admin-btn').classList.add('hidden');
             document.getElementById('student-settings-btn').classList.remove('hidden');
+            document.getElementById('student-chat-btn').classList.remove('hidden');
+            document.getElementById('student-dark-btn').classList.remove('hidden');
+            document.getElementById('student-logout-btn').classList.remove('hidden');
 
             if(unsubscribeUsers) unsubscribeUsers();
             if(unsubscribeChatMeta) unsubscribeChatMeta();
@@ -910,8 +906,14 @@
             if(await confirmAction("هل أنت متأكد أنك تريد تسجيل الخروج من حسابك؟")) {
                 window.currentUserRecord = null; window.originalAdminRecord = null;
                 document.getElementById('password').value = '';
+                
+                // إعادة الأزرار لحالتها الأصلية احتياطياً
                 document.getElementById('return-admin-btn').classList.add('hidden');
                 document.getElementById('student-settings-btn').classList.remove('hidden');
+                document.getElementById('student-chat-btn').classList.remove('hidden');
+                document.getElementById('student-dark-btn').classList.remove('hidden');
+                document.getElementById('student-logout-btn').classList.remove('hidden');
+
                 if(unsubscribeProgram) unsubscribeProgram();
                 if(unsubscribeUsers) unsubscribeUsers();
                 if(unsubscribeChat) unsubscribeChat();
@@ -921,58 +923,18 @@
             }
         };
 
-        // دالة قص وضغط الصورة الشخصية
-        window.handleImageUpload = (event) => {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            if (file.size > 5 * 1024 * 1024) { 
-                showToast("حجم الصورة كبير جداً، يرجى اختيار صورة أصغر من 5 ميغابايت", "error");
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const MAX_SIZE = 150; 
-                    const size = Math.min(img.width, img.height);
-                    const sx = (img.width - size) / 2;
-                    const sy = (img.height - size) / 2;
-
-                    canvas.width = MAX_SIZE;
-                    canvas.height = MAX_SIZE;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, sx, sy, size, size, 0, 0, MAX_SIZE, MAX_SIZE);
-
-                    const base64Str = canvas.toDataURL('image/jpeg', 0.8);
-                    window.selectedAvatarId = base64Str;
-                    window.renderAvatarGrid();
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        };
-
         window.openSettings = () => {
             document.getElementById('settings-username').value = window.currentUserRecord.username;
             document.getElementById('settings-new-password').value = window.currentUserRecord.password;
             
             const phoneContainer = document.getElementById('settings-phone-container');
             const phoneInput = document.getElementById('settings-new-phone');
-            const avatarContainer = document.getElementById('settings-avatar-container');
             
             if(window.currentUserRecord.role === 'admin') {
                 phoneContainer.style.display = 'none';
-                avatarContainer.style.display = 'none';
             } else {
                 phoneContainer.style.display = 'block';
                 phoneInput.value = window.currentUserRecord.phoneNumber || '';
-                
-                avatarContainer.style.display = 'block';
-                window.selectedAvatarId = window.currentUserRecord.avatar || 'default';
-                renderAvatarGrid();
             }
 
             const modal = document.getElementById('settings-modal'); const content = document.getElementById('settings-content');
@@ -980,27 +942,6 @@
             setTimeout(() => { content.classList.remove('scale-95'); content.classList.add('scale-100'); }, 10);
         };
 
-        window.renderAvatarGrid = () => {
-            let html = '';
-            Object.keys(AVATARS).forEach(key => {
-                let isSel = key === window.selectedAvatarId;
-                let cls = isSel ? 'ring-4 ring-blue-500 scale-105 shadow-md' : 'border border-slate-200 dark:border-slate-700 hover:scale-105';
-                html += `<button type="button" onclick="selectAvatar('${key}')" class="w-16 h-16 rounded-2xl p-1 transition-all flex-shrink-0 ${cls} bg-white dark:bg-slate-800">${window.getAvatarHTML(key, 'text-4xl')}</button>`;
-            });
-            
-            // إضافة الصورة المحملة كخيار في الشبكة
-            if (window.selectedAvatarId && window.selectedAvatarId.startsWith('data:image')) {
-                html += `<button type="button" onclick="selectAvatar('${window.selectedAvatarId}')" class="w-16 h-16 rounded-2xl p-1 transition-all flex-shrink-0 ring-4 ring-blue-500 scale-105 shadow-md bg-white dark:bg-slate-800"><img src="${window.selectedAvatarId}" class="w-full h-full object-cover rounded-xl"></button>`;
-            }
-            
-            document.getElementById('avatar-grid').innerHTML = html;
-        };
-
-        window.selectAvatar = (id) => {
-            window.selectedAvatarId = id;
-            renderAvatarGrid();
-        };
-        
         window.closeSettings = () => {
             const modal = document.getElementById('settings-modal'); const content = document.getElementById('settings-content');
             content.classList.remove('scale-100'); content.classList.add('scale-95');
@@ -1020,17 +961,13 @@
                 const phoneRegex = /^(05|06|07)\d{8}$/;
                 if(newPhone && !phoneRegex.test(newPhone)) return showToast("رقم الهاتف غير صحيح! يجب أن يبدأ بـ 05، 06، أو 07", "error");
                 updates.phoneNumber = newPhone;
-                updates.avatar = window.selectedAvatarId;
             }
 
             try {
                 await updateDoc(doc(usersCol, window.currentUserRecord.username), updates);
                 window.currentUserRecord.password = updates.password;
                 if(updates.phoneNumber) window.currentUserRecord.phoneNumber = updates.phoneNumber;
-                if(updates.avatar) {
-                    window.currentUserRecord.avatar = updates.avatar;
-                    document.getElementById('student-header-avatar').innerHTML = window.getAvatarHTML(updates.avatar);
-                }
+                
                 showToast("تم تحديث الإعدادات بنجاح 💾");
                 closeSettings();
             } catch(e) { showToast("حدث خطأ أثناء الحفظ", "error"); }
@@ -1042,7 +979,9 @@
             sections.forEach(p => p.years.forEach(y => {
                 if(y.id === levelId) {
                     y.branches.forEach(b => {
-                        ['lessons', 'exercises', 'exams'].forEach(cat => {
+                        // دعم التصنيفات القديمة والجديدة (للشهادات)
+                        let cats = b.id === 'm4_b5' ? ['past_exams', 'mock_exams'] : ['lessons', 'exercises', 'exams'];
+                        cats.forEach(cat => {
                             let links = b.categories[cat] || [];
                             totalLinks += links.length;
                             links.forEach((_, lIdx) => { if(clickedLinks.includes(`${b.id}_${cat}_${lIdx}`)) xp += XP_PER_ITEM; });
@@ -1065,6 +1004,12 @@
         window.trackLinkClick = async (branchId, cat, lIdx, url) => {
             window.open(url, '_blank');
             if (window.currentUserRecord && window.currentUserRecord.role !== 'admin') {
+                // منع احتساب النقاط إذا كان الأستاذ في وضع المراقبة
+                if (window.originalAdminRecord) {
+                    showToast("أنت في وضع المراقبة، لن يتم تسجيل هذا الدرس كمقروء ولن تحسب النقاط للتلميذ.", "error");
+                    return;
+                }
+
                 let clickedLinks = [...(window.currentUserRecord.clickedLinks || [])];
                 let linkId = `${branchId}_${cat}_${lIdx}`;
                 if (!clickedLinks.includes(linkId)) {
@@ -1081,6 +1026,15 @@
             }
         };
 
+        // التكوين الخاص بالتصنيفات
+        const catConfig = {
+            'lessons': { title: 'الدروس', icon: '<i class="ph-fill ph-books"></i>', bg: 'bg-blue-50/50 dark:bg-blue-900/10', text: 'text-blue-700 dark:text-blue-400', border: 'border-blue-100 dark:border-blue-900/30' },
+            'exercises': { title: 'التمارين', icon: '<i class="ph-fill ph-pencil-simple"></i>', bg: 'bg-orange-50/50 dark:bg-orange-900/10', text: 'text-orange-700 dark:text-orange-400', border: 'border-orange-100 dark:border-orange-900/30' },
+            'exams': { title: 'الفروض والإختبارات', icon: '<i class="ph-fill ph-exam"></i>', bg: 'bg-purple-50/50 dark:bg-purple-900/10', text: 'text-purple-700 dark:text-purple-400', border: 'border-purple-100 dark:border-purple-900/30' },
+            'past_exams': { title: 'شهادات تعليم متوسط سابقة', icon: '<i class="ph-fill ph-certificate"></i>', bg: 'bg-emerald-50/50 dark:bg-emerald-900/10', text: 'text-emerald-700 dark:text-emerald-400', border: 'border-emerald-100 dark:border-emerald-900/30' },
+            'mock_exams': { title: 'شهادات تجريبية', icon: '<i class="ph-fill ph-file-text"></i>', bg: 'bg-amber-50/50 dark:bg-amber-900/10', text: 'text-amber-700 dark:text-amber-400', border: 'border-amber-100 dark:border-amber-900/30' }
+        };
+
         window.executeStudentSearch = () => {
             const query = document.getElementById('lesson-search').value.toLowerCase().trim();
             const container = document.getElementById('student-program-view');
@@ -1095,7 +1049,8 @@
             window.currentSections.forEach(p => p.years.forEach(y => {
                 if(y.id === userLevel) {
                     y.branches.forEach(branch => {
-                        ['lessons', 'exercises', 'exams'].forEach(cat => {
+                        let cats = branch.id === 'm4_b5' ? ['past_exams', 'mock_exams'] : ['lessons', 'exercises', 'exams'];
+                        cats.forEach(cat => {
                             let links = branch.categories[cat] || []; let conf = catConfig[cat];
                             links.forEach((lnk, lIdx) => {
                                 if(lnk.title.toLowerCase().includes(query) || branch.title.toLowerCase().includes(query)) {
@@ -1240,7 +1195,16 @@
                 let levelDisplay = data.level ? (levelNames[data.level] || data.level) : "غير محدد";
                 let prog = calculateProgressXP(data.level, data, window.currentSections);
                 
-                let parentInfo = data.parentName ? `<div class="font-black text-slate-800 dark:text-slate-200">${data.parentName}</div>` : '<div class="text-sm text-slate-400 dark:text-slate-500 font-bold">غير متوفر</div>';
+                // زر الواتساب الذكي للإعلام بالتقدم - تم تعديل مظهره
+                let waProgMsg = encodeURIComponent(`السلام عليكم ولي أمر التلميذ(ة) ${d.id}. نعلمكم من منصة المجتهد للعلوم الفيزيائية أن نسبة إنجاز ابنكم في الدروس هي ${prog.percent}% بمجموع نقاط ${prog.xp} XP. لأي استفسار يرجى مراسلتنا.`);
+                let waProgLink = data.phoneNumber ? `https://wa.me/213${data.phoneNumber.substring(1)}?text=${waProgMsg}` : '#';
+
+                let parentInfo = data.parentName ? 
+                    `<div class="flex items-center gap-2">
+                        <span class="font-black text-slate-800 dark:text-slate-200">${data.parentName}</span>
+                        ${data.phoneNumber ? `<a href="${waProgLink}" target="_blank" class="text-[#25D366] hover:text-[#128C7E] transition hover:scale-110" title="إعلام بالتقدم عبر الواتساب"><i class="ph-fill ph-whatsapp-logo text-2xl drop-shadow-sm"></i></a>` : ''}
+                    </div>` 
+                    : '<div class="text-sm text-slate-400 dark:text-slate-500 font-bold">غير متوفر</div>';
 
                 let unreadCount = window.adminChatsData[d.id]?.unreadAdmin || 0;
                 let chatBadge = unreadCount > 0 ? `<span class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full animate-bounce shadow-md border border-white">${unreadCount}</span>` : '';
@@ -1254,13 +1218,13 @@
                         <td class="p-4 text-center border-b border-slate-100 dark:border-slate-700"><input type="checkbox" class="student-cb custom-cb" value="${d.id}"></td>
                         <td class="p-4 border-b border-slate-100 dark:border-slate-700">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 flex-shrink-0">${window.getAvatarHTML(data.avatar, 'text-2xl')}</div>
+                                <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400 text-2xl flex-shrink-0 shadow-inner border border-blue-200/50 dark:border-blue-800/50"><i class="ph-fill ph-user"></i></div>
                                 <div>
                                     <div class="font-black text-slate-800 dark:text-white text-lg group-hover:text-blue-600 transition">${d.id}</div>
                                     <div class="text-xs text-slate-500 dark:text-slate-400 font-bold mt-1 flex items-center gap-1.5"><i class="ph-fill ph-key opacity-70"></i> <span class="text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded border border-blue-200/50 dark:border-blue-800/50">${data.password}</span></div>
                                 </div>
                             </div>
-                            <div class="mt-3 bg-slate-50 dark:bg-slate-900/50 p-2 rounded-lg border border-slate-100 dark:border-slate-700">${parentInfo}</div>
+                            <div class="mt-3 bg-slate-50 dark:bg-slate-900/50 p-2.5 rounded-lg border border-slate-100 dark:border-slate-700">${parentInfo}</div>
                         </td>
                         <td class="p-4 text-sm font-black text-slate-600 dark:text-slate-300 text-center border-b border-slate-100 dark:border-slate-700">${levelDisplay}</td>
                         <td class="p-4 text-center border-b border-slate-100 dark:border-slate-700">
@@ -1341,7 +1305,6 @@
                     if(d.id === window.currentUserRecord.username) {
                         window.currentUserRecord.clickedLinks = data.clickedLinks || [];
                         window.currentUserRecord.phoneNumber = data.phoneNumber || ''; 
-                        window.currentUserRecord.avatar = data.avatar || 'default'; 
                         updateProgressUI(window.currentSections || []); 
                         
                         if(document.getElementById('lesson-search').value.trim() === '') { renderProgramUI(window.currentSections || [], 'student-program-view', false); } 
@@ -1455,12 +1418,6 @@
             }
         };
 
-        const catConfig = {
-            lessons: { title: 'الدروس', icon: '<i class="ph-fill ph-books"></i>', bg: 'bg-blue-50/50 dark:bg-blue-900/10', text: 'text-blue-700 dark:text-blue-400', border: 'border-blue-100 dark:border-blue-900/30' },
-            exercises: { title: 'التمارين', icon: '<i class="ph-fill ph-pencil-simple"></i>', bg: 'bg-orange-50/50 dark:bg-orange-900/10', text: 'text-orange-700 dark:text-orange-400', border: 'border-orange-100 dark:border-orange-900/30' },
-            exams: { title: 'الفروض والإختبارات', icon: '<i class="ph-fill ph-exam"></i>', bg: 'bg-purple-50/50 dark:bg-purple-900/10', text: 'text-purple-700 dark:text-purple-400', border: 'border-purple-100 dark:border-purple-900/30' }
-        };
-        
         const getEmptyStateHTML = (title) => `<div class="flex flex-col items-center justify-center p-6 text-center bg-white/50 dark:bg-slate-800/30 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700"><i class="ph-fill ph-folder-open text-5xl text-slate-300 dark:text-slate-600 mb-2"></i><h3 class="text-sm font-black text-slate-500 dark:text-slate-400">لا يوجد ${title} حالياً</h3></div>`;
 
         const renderProgramUI = (sections, containerId, isAdmin) => {
@@ -1482,13 +1439,17 @@
                     userYearData.branches.forEach(branch => {
                         if (window.studentActiveBranchTab !== branch.id) return; 
                         let branchLinksTotal = 0; let branchLinksClicked = 0;
-                        ['lessons', 'exercises', 'exams'].forEach(cat => {
+                        let cats = branch.id === 'm4_b5' ? ['past_exams', 'mock_exams'] : ['lessons', 'exercises', 'exams'];
+                        
+                        cats.forEach(cat => {
                             let links = branch.categories[cat] || []; branchLinksTotal += links.length;
                             links.forEach((_, lIdx) => { if(clickedLinks.includes(`${branch.id}_${cat}_${lIdx}`)) branchLinksClicked++; });
                         });
                         let unitProg = branchLinksTotal === 0 ? 0 : Math.round((branchLinksClicked / branchLinksTotal) * 100);
                         let isComp = branchLinksTotal > 0 && unitProg === 100;
                         let cardCls = isComp ? 'border-emerald-400 dark:border-emerald-600 bg-emerald-50/30 dark:bg-emerald-900/10' : 'border-slate-200 dark:border-slate-700 bg-white/90 dark:bg-slate-800/90';
+                        
+                        let gridCols = branch.id === 'm4_b5' ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 md:grid-cols-3';
 
                         html += `
                         <div class="student-branch-wrapper rounded-[2rem] shadow-sm border-2 overflow-hidden interactive-card backdrop-blur-xl ${cardCls} animate-[fadeInTab_0.3s_ease]">
@@ -1513,9 +1474,9 @@
                                 </div>
                             </div>
                             <div class="p-5 md:p-6 bg-slate-50/80 dark:bg-slate-900/80">
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">`;
+                                <div class="grid ${gridCols} gap-5">`;
 
-                        ['lessons', 'exercises', 'exams'].forEach(cat => {
+                        cats.forEach(cat => {
                             let links = branch.categories[cat] || []; let conf = catConfig[cat];
                             let linksList = links.length ? links.map((lnk, lIdx) => {
                                 let linkId = `${branch.id}_${cat}_${lIdx}`; let isRead = clickedLinks.includes(linkId);
@@ -1554,10 +1515,15 @@
                             html += `</div>`;
                             year.branches.forEach((branch, bIdx) => {
                                 if (window.adminActiveBranch[year.id] !== branch.id) return;
+                                
+                                let cats = branch.id === 'm4_b5' ? ['past_exams', 'mock_exams'] : ['lessons', 'exercises', 'exams'];
+                                let gridCols = branch.id === 'm4_b5' ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 md:grid-cols-3';
+
                                 html += `<div class="border-2 rounded-[2rem] p-5 md:p-6 bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 shadow-sm animate-[fadeInTab_0.3s_ease]">
                                     <h4 class="font-black text-slate-800 dark:text-white text-xl flex items-center gap-2 mb-5 border-b border-slate-100 dark:border-slate-700 pb-3"><span class="text-${pColor}-500 text-3xl">${getBranchIcon(branch.title)}</span> ${branch.title}</h4>
-                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">`;
-                                ['lessons', 'exercises', 'exams'].forEach(cat => {
+                                    <div class="grid ${gridCols} gap-5">`;
+                                
+                                cats.forEach(cat => {
                                     let links = branch.categories[cat] || []; let conf = catConfig[cat];
                                     let linksList = links.length ? links.map((lnk, lIdx) => `<div class="flex justify-between items-center bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm text-sm mb-2 group interactive-card"><a href="${lnk.url}" target="_blank" class="${conf.text} font-bold truncate w-2/3 hover:underline flex items-center gap-2"><i class="ph-bold ph-link text-lg opacity-70"></i> ${lnk.title}</a><div class="flex gap-1"><button onclick="adminEditLinkModal(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" class="text-slate-400 hover:text-amber-500 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg transition"><i class="ph-bold ph-pencil"></i></button><button onclick="adminDeleteLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" class="text-slate-400 hover:text-red-500 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg transition"><i class="ph-bold ph-trash"></i></button></div></div>`).join('') : getEmptyStateHTML('محتوى');
                                     html += `<div class="${conf.bg} ${conf.border} p-5 rounded-2xl border flex flex-col h-full"><h5 class="font-black ${conf.text} text-base mb-3 flex items-center gap-2">${conf.icon} ${conf.title}</h5><div class="mb-2 max-h-60 overflow-y-auto pr-1 scroll-smooth flex-1">${linksList}</div><div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 space-y-2 mt-auto"><input type="text" id="title_${branch.id}_${cat}" class="w-full text-xs font-bold p-3 border border-slate-200 dark:border-slate-600 rounded-lg outline-none focus:border-blue-400 bg-white dark:bg-slate-900 text-slate-700 dark:text-white transition-all" placeholder="عنوان المحتوى..."><input type="text" id="url_${branch.id}_${cat}" class="w-full text-xs p-3 border border-slate-200 dark:border-slate-600 rounded-lg outline-none focus:border-blue-400 bg-white dark:bg-slate-900 text-slate-600 dark:text-white text-left font-bold transition-all" dir="ltr" placeholder="https://..."><button onclick="adminAddLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', '${branch.id}')" class="w-full bg-slate-800 dark:bg-blue-600 hover:bg-slate-700 dark:hover:bg-blue-700 text-white text-xs font-black py-2.5 rounded-lg transition-all flex items-center justify-center gap-1"><i class="ph-bold ph-plus"></i> إضافة</button></div></div>`;
