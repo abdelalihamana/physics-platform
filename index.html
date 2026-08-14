@@ -306,7 +306,7 @@
                 </div>
                 <div class="flex items-center gap-3 w-full md:w-auto justify-end flex-wrap relative">
                     
-                    <!-- إحصائيات الإدارة العائمة -->
+                    <!-- إحصائيات الإدارة العائمة (تظهر على اليمين - للداخل) -->
                     <div class="relative group z-50">
                         <button class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-blue-600 dark:text-blue-400 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" title="إحصائيات التلاميذ">
                             <i class="ph-fill ph-chart-bar"></i>
@@ -400,6 +400,7 @@
         <div id="app-screen" class="screen">
             <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-4 md:p-6 rounded-[2.5rem] shadow-lg border border-white/50 dark:border-slate-700 mb-8 gap-5 sticky top-4 z-40">
                 <div class="flex items-center gap-4 w-full md:w-auto">
+                    <!-- أيقونة التلميذ الثابتة -->
                     <div class="w-14 h-14 rounded-2xl shadow-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-slate-100 dark:border-slate-700 text-3xl">
                         <i class="ph-fill ph-user-circle"></i>
                     </div>
@@ -413,6 +414,8 @@
                 </div>
                 
                 <div class="flex items-center justify-between md:justify-end gap-3 w-full md:w-auto flex-wrap">
+                    
+                    <!-- قائمة أبطال المستوى -->
                     <div class="relative inline-block z-50">
                         <details class="group" id="leaderboard-dropdown-details">
                             <summary class="bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-5 py-3 rounded-2xl text-lg font-black hover:bg-amber-100 dark:hover:bg-amber-900/50 transition border border-amber-200 dark:border-amber-800 shadow-sm flex items-center gap-2 cursor-pointer outline-none">
@@ -427,13 +430,17 @@
                         </details>
                     </div>
 
+                    <!-- زر العودة للإدارة الجديد -->
                     <button id="return-admin-btn" onclick="returnToAdmin()" class="hidden relative px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-2xl text-lg shadow-[0_0_15px_rgba(249,115,22,0.6)] animate-pulse hover:animate-none transition-all flex items-center gap-2 border border-orange-300 dark:border-orange-700" title="العودة للإدارة">
                         <i class="ph-bold ph-arrow-right"></i> العودة للإدارة
                     </button>
 
                     <button id="student-dark-btn" onclick="toggleDarkMode()" class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-amber-400 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" title="الوضع الليلي"><i class="ph-fill ph-moon"></i></button>
+
+                    <!-- زر الإعدادات للتلميذ -->
                     <button id="student-settings-btn" onclick="openSettings()" class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" title="إعدادات الحساب"><i class="ph-fill ph-gear-six"></i></button>
 
+                    <!-- زر الدردشة -->
                     <button id="student-chat-btn" onclick="openChat('admin')" class="relative bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-2xl font-black text-lg hover:from-blue-700 hover:to-indigo-700 transition btn-modern shadow-md shadow-blue-500/30 flex items-center gap-2">
                         <span class="hidden sm:inline">الدردشة</span> <i class="ph-fill ph-chat-circle-dots text-2xl"></i>
                         <span id="student-chat-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-[12px] font-black w-6 h-6 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-sm hidden animate-bounce">0</span>
@@ -443,47 +450,30 @@
                 </div>
             </header>
 
-            <!-- تبويبات التبديل بين المحتوى والمحاكاة -->
-            <div class="flex bg-slate-100 dark:bg-slate-900 p-1.5 rounded-2xl shadow-inner border border-slate-200 dark:border-slate-700 w-full md:w-fit mx-auto mb-8 relative z-10 transition-all">
-                <button onclick="switchStudentMainTab('theory')" id="student-tab-theory" class="flex-1 md:w-48 py-3 rounded-xl font-black text-base transition-all bg-white dark:bg-slate-700 text-blue-600 dark:text-white shadow-md flex items-center justify-center gap-2">
-                    <i class="ph-fill ph-book-open"></i> الشرح النظري
-                </button>
-                <button onclick="switchStudentMainTab('simulation')" id="student-tab-simulation" class="flex-1 md:w-48 py-3 rounded-xl font-black text-base transition-all text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 flex items-center justify-center gap-2">
-                    <i class="ph-fill ph-flask"></i> المحاكاة العملية
-                </button>
-            </div>
+            <div class="flex flex-col md:flex-row gap-6 mb-8 items-center">
+                <div class="w-full md:w-1/2 relative group">
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-bold ph-magnifying-glass"></i></div>
+                    <input type="text" id="lesson-search" onkeyup="executeStudentSearch()" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400 shadow-sm" placeholder="ابحث عن درس، تمرين، أو وحدة...">
+                </div>
 
-            <!-- حاوية الشرح النظري -->
-            <div id="student-theory-container" class="animate-[fadeInTab_0.3s_ease]">
-                <div class="flex flex-col md:flex-row gap-6 mb-8 items-center">
-                    <div class="w-full md:w-1/2 relative group">
-                        <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-bold ph-magnifying-glass"></i></div>
-                        <input type="text" id="lesson-search" onkeyup="executeStudentSearch()" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400 shadow-sm" placeholder="ابحث عن درس، تمرين، أو وحدة...">
-                    </div>
-
-                    <div class="w-full md:w-1/2 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-5 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 flex items-center justify-between interactive-card">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-xl flex items-center justify-center text-2xl shadow-inner"><i class="ph-fill ph-shooting-star"></i></div>
-                            <div>
-                                <h3 class="font-black text-slate-700 dark:text-slate-300 text-lg">نقاط الخبرة (XP)</h3>
-                                <div class="w-48 bg-slate-100 dark:bg-slate-700 rounded-full h-2.5 mt-2 overflow-hidden shadow-inner">
-                                    <div id="progress-bar-fill" class="bg-gradient-to-l from-emerald-400 to-teal-500 h-full rounded-full transition-all duration-1000 w-0"></div>
-                                </div>
+                <div class="w-full md:w-1/2 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-5 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 flex items-center justify-between interactive-card">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-xl flex items-center justify-center text-2xl shadow-inner"><i class="ph-fill ph-shooting-star"></i></div>
+                        <div>
+                            <h3 class="font-black text-slate-700 dark:text-slate-300 text-lg">نقاط الخبرة (XP)</h3>
+                            <div class="w-48 bg-slate-100 dark:bg-slate-700 rounded-full h-2.5 mt-2 overflow-hidden shadow-inner">
+                                <div id="progress-bar-fill" class="bg-gradient-to-l from-emerald-400 to-teal-500 h-full rounded-full transition-all duration-1000 w-0"></div>
                             </div>
                         </div>
-                        <div class="flex items-baseline gap-1">
-                            <span id="progress-text-xp" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500 tracking-tighter drop-shadow-sm">0</span>
-                            <span class="text-lg font-bold text-slate-400">XP</span>
-                        </div>
+                    </div>
+                    <div class="flex items-baseline gap-1">
+                        <span id="progress-text-xp" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500 tracking-tighter drop-shadow-sm">0</span>
+                        <span class="text-lg font-bold text-slate-400">XP</span>
                     </div>
                 </div>
-                <div id="student-program-view" class="pb-20"></div>
             </div>
-
-            <!-- حاوية المحاكاة العملية (Iframe) -->
-            <div id="student-simulation-view" class="hidden animate-[fadeInTab_0.3s_ease] pb-20 w-full h-[85vh] min-h-[700px]">
-                <iframe id="sim-iframe" class="w-full h-full rounded-[2.5rem] border-2 border-slate-200 dark:border-slate-700 shadow-2xl bg-white dark:bg-slate-800 transition-all duration-300" frameborder="0"></iframe>
-            </div>
+            
+            <div id="student-program-view" class="pb-20"></div>
         </div>
     </div>
 
@@ -516,38 +506,37 @@
 
         const XP_PER_ITEM = 10;
 
-        // المتغيرات العامة - معرّفة مرة واحدة فقط
-        window.isAuthReady = false;
+        let isAuthReady = false;
         window.currentUserRecord = null;
         window.originalAdminRecord = null; 
         
-        window.unsubscribeProgram = null;
-        window.unsubscribeUsers = null;
-        window.unsubscribeChat = null;
-        window.unsubscribeChatMeta = null;
+        let unsubscribeProgram = null;
+        let unsubscribeUsers = null;
+        let unsubscribeChat = null;
+        let unsubscribeChatMeta = null;
         
         window.activeChatUser = null; 
         window.currentSections = [];
         window.currentEditParams = null; 
         
+        // Admin & Student States
         window.adminMainTab = 'accounts'; 
         window.adminActivePart = 'part_middle';
         window.adminActiveYear = {}; 
         window.adminActiveBranch = {}; 
         window.adminStudentsFilter = 'all'; 
         window.studentActiveBranchTab = null;
-        window.isRegistering = false;
         
         window.adminUsersList = [];
         window.adminChatsData = {};
         window.allStudentsProgress = []; 
 
-        window.levelNames = {
+        const levelNames = {
             "m_y1": "الأولى متوسط", "m_y2": "الثانية متوسط", "m_y3": "الثالثة متوسط", "m_y4": "الرابعة متوسط",
             "h_y1": "أولى ثانوي", "h_y2": "الثانية ثانوي", "h_y3": "الثالثة ثانوي"
         };
 
-        window.motivationalQuotes = [
+        const motivationalQuotes = [
             "النجاح يجذب النجاح، استمر في محاولاتك ولا تتوقف! 🌟",
             "الفيزياء ليست مجرد معادلات، بل هي لغة الكون. استمتع باكتشافها! 🔭",
             "كل جهد تبذله اليوم، هو خطوة ثابتة نحو مستقبلك المشرق. 🚀",
@@ -557,86 +546,44 @@
             "طريق الألف ميل يبدأ بخطوة واحدة، وأنت الآن في المسار الصحيح. 🚶‍♂️"
         ];
 
-        window.catConfig = {
-            'lessons': { title: 'الدروس', icon: '<i class="ph-fill ph-books"></i>', bg: 'bg-blue-50/50 dark:bg-blue-900/10', text: 'text-blue-700 dark:text-blue-400', border: 'border-blue-100 dark:border-blue-900/30' },
-            'exercises': { title: 'التمارين', icon: '<i class="ph-fill ph-pencil-simple"></i>', bg: 'bg-orange-50/50 dark:bg-orange-900/10', text: 'text-orange-700 dark:text-orange-400', border: 'border-orange-100 dark:border-orange-900/30' },
-            'exams': { title: 'الفروض والإختبارات', icon: '<i class="ph-fill ph-exam"></i>', bg: 'bg-purple-50/50 dark:bg-purple-900/10', text: 'text-purple-700 dark:text-purple-400', border: 'border-purple-100 dark:border-purple-900/30' },
-            'past_exams': { title: 'مواضيع سابقة', icon: '<i class="ph-fill ph-certificate"></i>', bg: 'bg-emerald-50/50 dark:bg-emerald-900/10', text: 'text-emerald-700 dark:text-emerald-400', border: 'border-emerald-100 dark:border-emerald-900/30' },
-            'mock_exams': { title: 'مواضيع مقترحة', icon: '<i class="ph-fill ph-file-text"></i>', bg: 'bg-amber-50/50 dark:bg-amber-900/10', text: 'text-amber-700 dark:text-amber-400', border: 'border-amber-100 dark:border-amber-900/30' }
-        };
+        // دالة تحويل التبويبات الرئيسية للإدارة
+        window.switchAdminMainTab = (tab) => {
+            window.adminMainTab = tab;
+            const btnAccounts = document.getElementById('main-tab-accounts');
+            const btnContent = document.getElementById('main-tab-content');
+            const secAccounts = document.getElementById('admin-accounts-section');
+            const secContent = document.getElementById('admin-content-section');
 
-        const defaultProgramData = [
-            { 
-                id: "part_middle", title: "التعليم المتوسط", color: "blue", 
-                years: [
-                    { id: "m_y1", title: "السنة الأولى متوسط", branches: [ { id: "m1_b1", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m1_b2", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m1_b3", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [], exams: [] } }] },
-                    { id: "m_y2", title: "السنة الثانية متوسط", branches: [ { id: "m2_b1", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m2_b2", title: "الظواهر الميكانيكية", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m2_b3", title: "الظواهر الكهرومغناطيسية", categories: { lessons: [], exercises: [], exams: [] } }] },
-                    { id: "m_y3", title: "السنة الثالثة متوسط", branches: [ { id: "m3_b1", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m3_b2", title: "الطاقة", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m3_b3", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m3_b4", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [], exams: [] } }] },
-                    { id: "m_y4", title: "السنة الرابعة متوسط", branches: [ { id: "m4_b1", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m4_b2", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m4_b3", title: "الظواهر الميكانيكية", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m4_b4", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [], exams: [] } }, { id: "m4_b5", title: "شهادتك 🎓", categories: { 'past_exams': [], 'mock_exams': [] } }] }
-                ] 
-            },
-            { 
-                id: "part_high", title: "التعليم الثانوي", color: "indigo", 
-                years: [
-                    { id: "h_y1", title: "السنة أولى ثانوي", branches: [ { id: "h1_b1", title: "بنية وهندسة أفراد بعض الأنواع الكيميائية", categories: { lessons: [], exercises: [], exams: [] } }, { id: "h1_b2", title: "القوة والحركات المستقيمة", categories: { lessons: [], exercises: [], exams: [] } }] },
-                    { id: "h_y2", title: "السنة الثانية ثانوي", branches: [ { id: "h2_b1", title: "المقاربة الكيفية لطاقة جملة وانحفاظها", categories: { lessons: [], exercises: [], exams: [] } }, { id: "h2_b2", title: "العمل والطاقة الحركية", categories: { lessons: [], exercises: [], exams: [] } }] },
-                    { id: "h_y3", title: "السنة الثالثة ثانوي", branches: [ { id: "h3_b1", title: "تطور جملة كيميائية نحو حالة التوازن", categories: { lessons: [], exercises: [], exams: [] } }, { id: "h3_b2", title: "التحولات النووية", categories: { lessons: [], exercises: [], exams: [] } }, { id: "h3_b3", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [], exams: [] } }] }
-                ] 
+            if (tab === 'accounts') {
+                secAccounts.classList.remove('hidden'); secAccounts.classList.add('flex');
+                secContent.classList.add('hidden');
+                
+                btnAccounts.className = "flex-1 min-w-[200px] py-4 rounded-2xl font-black text-lg transition-all bg-blue-600 text-white shadow-lg shadow-blue-500/30 flex justify-center items-center gap-2";
+                btnContent.className = "flex-1 min-w-[200px] py-4 rounded-2xl font-black text-lg transition-all bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 shadow-sm flex justify-center items-center gap-2";
+            } else {
+                secAccounts.classList.remove('flex'); secAccounts.classList.add('hidden');
+                secContent.classList.remove('hidden');
+                
+                btnContent.className = "flex-1 min-w-[200px] py-4 rounded-2xl font-black text-lg transition-all bg-blue-600 text-white shadow-lg shadow-blue-500/30 flex justify-center items-center gap-2";
+                btnAccounts.className = "flex-1 min-w-[200px] py-4 rounded-2xl font-black text-lg transition-all bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 shadow-sm flex justify-center items-center gap-2";
             }
-        ];
-
-        // تهيئة Firebase
-        const initAuth = async () => {
-            try { await signInAnonymously(auth); } 
-            catch (error) { console.error("Auth Error:", error); }
         };
-        initAuth();
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                window.isAuthReady = true;
-                try {
-                    const progDoc = await getDoc(doc(programCol, 'main'));
-                    if (!progDoc.exists()) {
-                        await setDoc(doc(programCol, 'main'), { sections: defaultProgramData });
-                    } else {
-                        let data = progDoc.data();
-                        let needsUpdate = false;
-                        data.sections.forEach(part => {
-                            part.years.forEach(year => {
-                                if (year.id === 'm_y4') {
-                                    let existingB5 = year.branches.find(b => b.id === 'm4_b5');
-                                    if (!existingB5) {
-                                        year.branches.push({ id: "m4_b5", title: "شهادتك 🎓", categories: { 'past_exams': [], 'mock_exams': [] } });
-                                        needsUpdate = true;
-                                    } else {
-                                        if (!existingB5.categories) { existingB5.categories = {}; needsUpdate = true; }
-                                        if (!existingB5.categories['past_exams']) { existingB5.categories['past_exams'] = existingB5.categories['lessons'] || []; needsUpdate = true; }
-                                        if (!existingB5.categories['mock_exams']) { existingB5.categories['mock_exams'] = existingB5.categories['exercises'] || []; needsUpdate = true; }
-                                        if (existingB5.categories['lessons']) { delete existingB5.categories['lessons']; needsUpdate = true; }
-                                        if (existingB5.categories['exercises']) { delete existingB5.categories['exercises']; needsUpdate = true; }
-                                        if (existingB5.categories['exams']) { delete existingB5.categories['exams']; needsUpdate = true; }
-                                    }
-                                }
-                            });
-                        });
-                        if (needsUpdate) await updateDoc(doc(programCol, 'main'), { sections: data.sections });
-                    }
-
-                    const adminDoc = await getDoc(doc(usersCol, 'admin'));
-                    if (!adminDoc.exists()) await setDoc(doc(usersCol, 'admin'), { password: 'adminpassword', role: 'admin', approved: true, clickedLinks: [] });
-                } catch(e) { console.error(e); }
-            }
-        });
-
-        // ----------------------------------------------------
-        // تعريف جميع الدوال العامة بشكل فريد (دون تكرار)
-        // ----------------------------------------------------
 
         window.toggleDarkMode = () => {
             document.documentElement.classList.toggle('dark');
             const isDark = document.documentElement.classList.contains('dark');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        };
+
+        const getBranchIcon = (title) => {
+            if(title.includes('شهادتك') || title.includes('شهادات') || title.includes('تجريبية')) return '<i class="ph-fill ph-certificate"></i>';
+            if(title.includes('الكهرباء') || title.includes('كهربائية')) return '<i class="ph-fill ph-lightning"></i>';
+            if(title.includes('المادة') || title.includes('كيمياء') || title.includes('تحولات')) return '<i class="ph-fill ph-flask"></i>';
+            if(title.includes('ميكانيك') || title.includes('حركة')) return '<i class="ph-fill ph-gear-six"></i>';
+            if(title.includes('ضوء') || title.includes('بصريات') || title.includes('الضوئية')) return '<i class="ph-fill ph-lightbulb"></i>';
+            if(title.includes('طاقة') || title.includes('عمل')) return '<i class="ph-fill ph-battery-full"></i>';
+            if(title.includes('مغناطيس') || title.includes('كهرومغناطيسية')) return '<i class="ph-fill ph-magnet"></i>';
+            return '<i class="ph-fill ph-book-bookmark"></i>'; 
         };
 
         window.showToast = (msg, type = 'success') => {
@@ -663,7 +610,7 @@
         };
 
         window.closeConfirm = null;
-        window.confirmAction = (msg) => {
+        const confirmAction = (msg) => {
             return new Promise((resolve) => {
                 document.getElementById('confirm-message').innerText = msg;
                 const modal = document.getElementById('confirm-modal');
@@ -676,10 +623,146 @@
             });
         };
 
-        window.switchScreen = (screenId) => {
+        window.closeRegModal = () => {
+            document.getElementById('registration-success-modal').classList.add('hidden');
+            document.getElementById('registration-success-modal').classList.remove('flex');
+            window.toggleAuthMode();
+        };
+
+        const switchScreen = (screenId) => {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
         };
+
+        // المنهج الافتراضي المتكامل للطورين
+        const defaultProgramData = [
+            { 
+                id: "part_middle", 
+                title: "التعليم المتوسط", 
+                color: "blue", 
+                years: [
+                    { 
+                        id: "m_y1", 
+                        title: "السنة الأولى متوسط", 
+                        branches: [
+                            { id: "m1_b1", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [], exams: [] } },
+                            { id: "m1_b2", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [], exams: [] } },
+                            { id: "m1_b3", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [], exams: [] } }
+                        ] 
+                    },
+                    { 
+                        id: "m_y2", 
+                        title: "السنة الثانية متوسط", 
+                        branches: [
+                            { id: "m2_b1", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [], exams: [] } },
+                            { id: "m2_b2", title: "الظواهر الميكانيكية", categories: { lessons: [], exercises: [], exams: [] } },
+                            { id: "m2_b3", title: "الظواهر الكهرومغناطيسية", categories: { lessons: [], exercises: [], exams: [] } }
+                        ] 
+                    },
+                    { 
+                        id: "m_y3", 
+                        title: "السنة الثالثة متوسط", 
+                        branches: [
+                            { id: "m3_b1", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [], exams: [] } },
+                            { id: "m3_b2", title: "الطاقة", categories: { lessons: [], exercises: [], exams: [] } },
+                            { id: "m3_b3", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [], exams: [] } },
+                            { id: "m3_b4", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [], exams: [] } }
+                        ] 
+                    },
+                    { 
+                        id: "m_y4", 
+                        title: "السنة الرابعة متوسط", 
+                        branches: [
+                            { id: "m4_b1", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [], exams: [] } },
+                            { id: "m4_b2", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [], exams: [] } },
+                            { id: "m4_b3", title: "الظواهر الميكانيكية", categories: { lessons: [], exercises: [], exams: [] } },
+                            { id: "m4_b4", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [], exams: [] } },
+                            // وحدة الشهادات ذات التصنيفين: مواضيع سابقة ومقترحة
+                            { id: "m4_b5", title: "شهادتك 🎓", categories: { 'past_exams': [], 'mock_exams': [] } } 
+                        ] 
+                    }
+                ] 
+            },
+            { 
+                id: "part_high", 
+                title: "التعليم الثانوي", 
+                color: "indigo", 
+                years: [
+                    { 
+                        id: "h_y1", 
+                        title: "السنة أولى ثانوي", 
+                        branches: [
+                            { id: "h1_b1", title: "بنية وهندسة أفراد بعض الأنواع الكيميائية", categories: { lessons: [], exercises: [], exams: [] } },
+                            { id: "h1_b2", title: "القوة والحركات المستقيمة", categories: { lessons: [], exercises: [], exams: [] } }
+                        ] 
+                    },
+                    { 
+                        id: "h_y2", 
+                        title: "السنة الثانية ثانوي", 
+                        branches: [
+                            { id: "h2_b1", title: "المقاربة الكيفية لطاقة جملة وانحفاظها", categories: { lessons: [], exercises: [], exams: [] } },
+                            { id: "h2_b2", title: "العمل والطاقة الحركية", categories: { lessons: [], exercises: [], exams: [] } }
+                        ] 
+                    },
+                    { 
+                        id: "h_y3", 
+                        title: "السنة الثالثة ثانوي", 
+                        branches: [
+                            { id: "h3_b1", title: "تطور جملة كيميائية نحو حالة التوازن", categories: { lessons: [], exercises: [], exams: [] } },
+                            { id: "h3_b2", title: "التحولات النووية", categories: { lessons: [], exercises: [], exams: [] } },
+                            { id: "h3_b3", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [], exams: [] } }
+                        ] 
+                    }
+                ] 
+            }
+        ];
+
+        const initAuth = async () => {
+            try { await signInAnonymously(auth); } 
+            catch (error) { console.error("Auth Error:", error); }
+        };
+        initAuth();
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                isAuthReady = true;
+                try {
+                    const progDoc = await getDoc(doc(programCol, 'main'));
+                    if (!progDoc.exists()) {
+                        await setDoc(doc(programCol, 'main'), { sections: defaultProgramData });
+                    } else {
+                        // إضافة أو تحديث وحدة "شهادتك 🎓" برمجياً وإصلاح التصنيفات لتكون (مواضيع سابقة ومقترحة)
+                        let data = progDoc.data();
+                        let needsUpdate = false;
+                        data.sections.forEach(part => {
+                            part.years.forEach(year => {
+                                if (year.id === 'm_y4') {
+                                    let existingB5 = year.branches.find(b => b.id === 'm4_b5');
+                                    if (!existingB5) {
+                                        year.branches.push({ id: "m4_b5", title: "شهادتك 🎓", categories: { 'past_exams': [], 'mock_exams': [] } });
+                                        needsUpdate = true;
+                                    } else {
+                                        // إصلاح هيكل التصنيفات إذا كان يحتوي على lessons أو إذا لم تكن المصفوفات موجودة
+                                        if (!existingB5.categories) { existingB5.categories = {}; needsUpdate = true; }
+                                        if (!existingB5.categories['past_exams']) { existingB5.categories['past_exams'] = existingB5.categories['lessons'] || []; needsUpdate = true; }
+                                        if (!existingB5.categories['mock_exams']) { existingB5.categories['mock_exams'] = existingB5.categories['exercises'] || []; needsUpdate = true; }
+                                        
+                                        // تنظيف التصنيفات القديمة إن وجدت
+                                        if (existingB5.categories['lessons']) { delete existingB5.categories['lessons']; needsUpdate = true; }
+                                        if (existingB5.categories['exercises']) { delete existingB5.categories['exercises']; needsUpdate = true; }
+                                        if (existingB5.categories['exams']) { delete existingB5.categories['exams']; needsUpdate = true; }
+                                    }
+                                }
+                            });
+                        });
+                        if (needsUpdate) await updateDoc(doc(programCol, 'main'), { sections: data.sections });
+                    }
+
+                    const adminDoc = await getDoc(doc(usersCol, 'admin'));
+                    if (!adminDoc.exists()) await setDoc(doc(usersCol, 'admin'), { password: 'adminpassword', role: 'admin', approved: true, clickedLinks: [] });
+                } catch(e) { console.error(e); }
+            }
+        });
 
         window.toggleAuthMode = () => {
             window.isRegistering = !window.isRegistering;
@@ -699,14 +782,8 @@
             }
         };
 
-        window.closeRegModal = () => {
-            document.getElementById('registration-success-modal').classList.add('hidden');
-            document.getElementById('registration-success-modal').classList.remove('flex');
-            window.toggleAuthMode();
-        };
-
         window.handleAuth = async () => {
-            if (!window.isAuthReady) return window.showToast("يتم الاتصال بالسحابة... يرجى الانتظار", "error");
+            if (!isAuthReady) return showToast("يتم الاتصال بالسحابة... يرجى الانتظار", "error");
             
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value.trim();
@@ -714,11 +791,11 @@
             const parentName = document.getElementById('parent-name').value.trim();
             const phoneNumber = document.getElementById('phone-number').value.trim();
 
-            if (!username || !password) return window.showToast("يرجى ملء اسم المستخدم وكلمة المرور", "error");
+            if (!username || !password) return showToast("يرجى ملء اسم المستخدم وكلمة المرور", "error");
             if (window.isRegistering) {
-                if (!level || !parentName || !phoneNumber) return window.showToast("يرجى تعبئة جميع الحقول بدقة", "error");
+                if (!level || !parentName || !phoneNumber) return showToast("يرجى تعبئة جميع الحقول بدقة", "error");
                 const phoneRegex = /^(05|06|07)\d{8}$/;
-                if(!phoneRegex.test(phoneNumber)) return window.showToast("رقم الهاتف غير صحيح! يجب أن يتكون من 10 أرقام ويبدأ بـ 05، 06، أو 07", "error");
+                if(!phoneRegex.test(phoneNumber)) return showToast("رقم الهاتف غير صحيح! يجب أن يتكون من 10 أرقام ويبدأ بـ 05، 06، أو 07", "error");
             }
 
             const btn = document.getElementById('auth-action-btn');
@@ -730,7 +807,7 @@
                 const userSnap = await getDoc(userRef);
 
                 if (window.isRegistering) {
-                    if (userSnap.exists()) { window.showToast("اسم المستخدم مستخدم مسبقاً، اختر اسماً آخر", "error"); } 
+                    if (userSnap.exists()) { showToast("اسم المستخدم مستخدم مسبقاً، اختر اسماً آخر", "error"); } 
                     else {
                         await setDoc(userRef, { 
                             password: password, role: 'student', approved: false, clickedLinks: [],
@@ -742,41 +819,40 @@
                         document.getElementById('parent-name').value = ''; document.getElementById('phone-number').value = '';
                     }
                 } else {
-                    if (!userSnap.exists() || userSnap.data().password !== password) { window.showToast("بيانات الدخول غير صحيحة", "error"); } 
+                    if (!userSnap.exists() || userSnap.data().password !== password) { showToast("بيانات الدخول غير صحيحة", "error"); } 
                     else {
                         window.currentUserRecord = { username, ...userSnap.data() };
                         if (window.currentUserRecord.role === 'admin') {
-                            window.switchScreen('admin-screen');
-                            window.startAdminListeners();
+                            switchScreen('admin-screen');
+                            startAdminListeners();
                         } else if (!window.currentUserRecord.approved) {
-                            window.switchScreen('pending-screen');
+                            switchScreen('pending-screen');
                         } else {
                             document.getElementById('display-username').innerText = username;
-                            document.getElementById('student-level-badge').innerText = window.levelNames[window.currentUserRecord.level];
+                            document.getElementById('student-level-badge').innerText = levelNames[window.currentUserRecord.level];
                             
                             const lastQuoteDate = localStorage.getItem('last_quote_date');
                             const today = new Date().toDateString();
                             if (lastQuoteDate !== today) {
                                 let availableQuotes = JSON.parse(localStorage.getItem('available_quotes')) || [];
-                                if (availableQuotes.length === 0) availableQuotes = [...Array(window.motivationalQuotes.length).keys()];
+                                if (availableQuotes.length === 0) availableQuotes = [...Array(motivationalQuotes.length).keys()];
                                 let randomIndex = Math.floor(Math.random() * availableQuotes.length);
                                 let quoteIndex = availableQuotes[randomIndex];
                                 availableQuotes.splice(randomIndex, 1);
                                 localStorage.setItem('available_quotes', JSON.stringify(availableQuotes));
                                 localStorage.setItem('last_quote_date', today);
                                 
-                                document.getElementById('welcome-quote-text').innerText = window.motivationalQuotes[quoteIndex];
+                                document.getElementById('welcome-quote-text').innerText = motivationalQuotes[quoteIndex];
                                 const screen = document.getElementById('welcome-quote-screen');
                                 screen.classList.remove('welcome-hidden');
                                 setTimeout(() => { screen.classList.add('welcome-visible'); }, 10);
                             }
-                            window.switchScreen('app-screen');
-                            window.switchStudentMainTab('theory');
-                            window.startStudentListeners();
+                            switchScreen('app-screen');
+                            startStudentListeners();
                         }
                     }
                 }
-            } catch (err) { console.error(err); window.showToast("خطأ في الاتصال بالإنترنت", "error"); }
+            } catch (err) { console.error(err); showToast("خطأ في الاتصال بالإنترنت", "error"); }
             btn.disabled = false; btn.innerHTML = originalHTML;
         };
 
@@ -786,28 +862,69 @@
             screen.classList.add('welcome-hidden');
         };
 
+        window.loginAsStudent = (studentUsername) => {
+            const studentObj = window.adminUsersList.find(u => u.id === studentUsername);
+            if(!studentObj) return;
+
+            window.originalAdminRecord = { ...window.currentUserRecord };
+            window.currentUserRecord = { username: studentObj.id, ...studentObj.data };
+            
+            document.getElementById('display-username').innerText = window.currentUserRecord.username;
+            document.getElementById('student-level-badge').innerText = levelNames[window.currentUserRecord.level];
+            
+            // تفعيل وضع المراقبة (إخفاء أزرار الدردشة والإعدادات والخروج والوضع الليلي)
+            document.getElementById('return-admin-btn').classList.remove('hidden');
+            document.getElementById('student-settings-btn').classList.add('hidden'); 
+            document.getElementById('student-chat-btn').classList.add('hidden'); 
+            document.getElementById('student-dark-btn').classList.add('hidden'); 
+            document.getElementById('student-logout-btn').classList.add('hidden'); 
+
+            if(unsubscribeUsers) unsubscribeUsers();
+            if(unsubscribeChatMeta) unsubscribeChatMeta();
+
+            switchScreen('app-screen');
+            startStudentListeners();
+            showToast(`أنت الآن داخل حساب التلميذ في وضع المراقبة`);
+        };
+
+        window.returnToAdmin = () => {
+            if(!window.originalAdminRecord) return;
+            window.currentUserRecord = { ...window.originalAdminRecord };
+            window.originalAdminRecord = null;
+            
+            // إلغاء وضع المراقبة وإرجاع الأزرار لطبيعتها
+            document.getElementById('return-admin-btn').classList.add('hidden');
+            document.getElementById('student-settings-btn').classList.remove('hidden');
+            document.getElementById('student-chat-btn').classList.remove('hidden');
+            document.getElementById('student-dark-btn').classList.remove('hidden');
+            document.getElementById('student-logout-btn').classList.remove('hidden');
+
+            if(unsubscribeUsers) unsubscribeUsers();
+            if(unsubscribeChatMeta) unsubscribeChatMeta();
+
+            switchScreen('admin-screen');
+            startAdminListeners();
+            showToast("تمت العودة للوحة الإدارة بنجاح");
+        };
+
         window.logout = async () => {
-            if(await window.confirmAction("هل أنت متأكد أنك تريد تسجيل الخروج من حسابك؟")) {
+            if(await confirmAction("هل أنت متأكد أنك تريد تسجيل الخروج من حسابك؟")) {
                 window.currentUserRecord = null; window.originalAdminRecord = null;
                 document.getElementById('password').value = '';
                 
+                // إعادة الأزرار لحالتها الأصلية احتياطياً
                 document.getElementById('return-admin-btn').classList.add('hidden');
                 document.getElementById('student-settings-btn').classList.remove('hidden');
                 document.getElementById('student-chat-btn').classList.remove('hidden');
                 document.getElementById('student-dark-btn').classList.remove('hidden');
                 document.getElementById('student-logout-btn').classList.remove('hidden');
 
-                if(window.unsubscribeProgram) window.unsubscribeProgram();
-                if(window.unsubscribeUsers) window.unsubscribeUsers();
-                if(window.unsubscribeChat) window.unsubscribeChat();
-                if(window.unsubscribeChatMeta) window.unsubscribeChatMeta();
-                if (typeof window.closeChat === 'function') window.closeChat();
-                
-                // مسح الإطار لعدم تشغيل المحاكاة في الخلفية
-                const iframe = document.getElementById('sim-iframe');
-                iframe.srcdoc = '';
-                
-                window.switchScreen('auth-screen');
+                if(unsubscribeProgram) unsubscribeProgram();
+                if(unsubscribeUsers) unsubscribeUsers();
+                if(unsubscribeChat) unsubscribeChat();
+                if(unsubscribeChatMeta) unsubscribeChatMeta();
+                if (typeof closeChat === 'function') closeChat();
+                switchScreen('auth-screen');
             }
         };
 
@@ -841,13 +958,13 @@
             const phoneInput = document.getElementById('settings-new-phone');
             let updates = {};
             
-            if(!newPass) return window.showToast("كلمة المرور لا يمكن أن تكون فارغة", "error");
+            if(!newPass) return showToast("كلمة المرور لا يمكن أن تكون فارغة", "error");
             updates.password = newPass;
 
             if(window.currentUserRecord.role !== 'admin') {
                 const newPhone = phoneInput.value.trim();
                 const phoneRegex = /^(05|06|07)\d{8}$/;
-                if(newPhone && !phoneRegex.test(newPhone)) return window.showToast("رقم الهاتف غير صحيح! يجب أن يبدأ بـ 05، 06، أو 07", "error");
+                if(newPhone && !phoneRegex.test(newPhone)) return showToast("رقم الهاتف غير صحيح! يجب أن يبدأ بـ 05، 06، أو 07", "error");
                 updates.phoneNumber = newPhone;
             }
 
@@ -856,63 +973,12 @@
                 window.currentUserRecord.password = updates.password;
                 if(updates.phoneNumber) window.currentUserRecord.phoneNumber = updates.phoneNumber;
                 
-                window.showToast("تم تحديث الإعدادات بنجاح 💾");
-                window.closeSettings();
-            } catch(e) { window.showToast("حدث خطأ أثناء الحفظ", "error"); }
+                showToast("تم تحديث الإعدادات بنجاح 💾");
+                closeSettings();
+            } catch(e) { showToast("حدث خطأ أثناء الحفظ", "error"); }
         };
 
-        window.switchAdminMainTab = (tab) => {
-            window.adminMainTab = tab;
-            const btnAccounts = document.getElementById('main-tab-accounts');
-            const btnContent = document.getElementById('main-tab-content');
-            const secAccounts = document.getElementById('admin-accounts-section');
-            const secContent = document.getElementById('admin-content-section');
-
-            if (tab === 'accounts') {
-                secAccounts.classList.remove('hidden'); secAccounts.classList.add('flex');
-                secContent.classList.add('hidden');
-                btnAccounts.className = "flex-1 min-w-[200px] py-4 rounded-2xl font-black text-lg transition-all bg-blue-600 text-white shadow-lg shadow-blue-500/30 flex justify-center items-center gap-2";
-                btnContent.className = "flex-1 min-w-[200px] py-4 rounded-2xl font-black text-lg transition-all bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 shadow-sm flex justify-center items-center gap-2";
-            } else {
-                secAccounts.classList.remove('flex'); secAccounts.classList.add('hidden');
-                secContent.classList.remove('hidden');
-                btnContent.className = "flex-1 min-w-[200px] py-4 rounded-2xl font-black text-lg transition-all bg-blue-600 text-white shadow-lg shadow-blue-500/30 flex justify-center items-center gap-2";
-                btnAccounts.className = "flex-1 min-w-[200px] py-4 rounded-2xl font-black text-lg transition-all bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 shadow-sm flex justify-center items-center gap-2";
-            }
-        };
-
-        // الدالة الأساسية لتبديل وعرض المحاكاة داخل التلميذ
-        window.switchStudentMainTab = (tab) => {
-            const theoryView = document.getElementById('student-theory-container');
-            const simView = document.getElementById('student-simulation-view');
-            const btnTheory = document.getElementById('student-tab-theory');
-            const btnSim = document.getElementById('student-tab-simulation');
-
-            if (tab === 'theory') {
-                theoryView.classList.remove('hidden');
-                simView.classList.add('hidden');
-                btnTheory.className = "flex-1 md:w-48 py-3 rounded-xl font-black text-base transition-all bg-white dark:bg-slate-700 text-blue-600 dark:text-white shadow-md flex items-center justify-center gap-2";
-                btnSim.className = "flex-1 md:w-48 py-3 rounded-xl font-black text-base transition-all text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 flex items-center justify-center gap-2";
-            } else {
-                theoryView.classList.add('hidden');
-                simView.classList.remove('hidden');
-                btnSim.className = "flex-1 md:w-48 py-3 rounded-xl font-black text-base transition-all bg-white dark:bg-slate-700 text-blue-600 dark:text-white shadow-md flex items-center justify-center gap-2";
-                btnTheory.className = "flex-1 md:w-48 py-3 rounded-xl font-black text-base transition-all text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 flex items-center justify-center gap-2";
-
-                // حقن وبناء المحاكاة داخل الـ Iframe بطريقة آمنة
-                const iframe = document.getElementById('sim-iframe');
-                if (!iframe.srcdoc) {
-                    let simCode = document.getElementById('sim-html').textContent;
-                    // استبدال كود الحماية بـ </script> ليعمل بشكل طبيعي داخل الـ Iframe
-                    iframe.srcdoc = simCode.split('<\\/script>').join('</script>');
-                } else {
-                    // إذا كان موجوداً مسبقاً، تحفيز حدث تغيير الحجم لمعالجة الأبعاد عند إعادة الظهور
-                    if(iframe.contentWindow) iframe.contentWindow.dispatchEvent(new Event('resize'));
-                }
-            }
-        };
-
-        window.calculateProgressXP = (levelId, data, sections) => {
+        const calculateProgressXP = (levelId, data, sections) => {
             if(!sections || !levelId) return { xp: 0, percent: 0 };
             let xp = 0; let totalLinks = 0; let clickedLinks = data.clickedLinks || [];
             sections.forEach(p => p.years.forEach(y => {
@@ -931,9 +997,9 @@
             return { xp, percent };
         };
 
-        window.updateProgressUI = (sections) => {
+        const updateProgressUI = (sections) => {
             if(!window.currentUserRecord || window.currentUserRecord.role === 'admin') return;
-            let result = window.calculateProgressXP(window.currentUserRecord.level, window.currentUserRecord, sections);
+            let result = calculateProgressXP(window.currentUserRecord.level, window.currentUserRecord, sections);
             const bar = document.getElementById('progress-bar-fill'); const txt = document.getElementById('progress-text-xp');
             if(bar) bar.style.width = `${result.percent}%`; 
             if(txt) txt.innerText = `${result.xp}`;
@@ -942,8 +1008,9 @@
         window.trackLinkClick = async (branchId, cat, lIdx, url) => {
             window.open(url, '_blank');
             if (window.currentUserRecord && window.currentUserRecord.role !== 'admin') {
+                // منع احتساب النقاط إذا كان الأستاذ في وضع المراقبة
                 if (window.originalAdminRecord) {
-                    window.showToast("أنت في وضع المراقبة، لن يتم تسجيل هذا الدرس كمقروء ولن تحسب النقاط للتلميذ.", "error");
+                    showToast("أنت في وضع المراقبة، لن يتم تسجيل هذا الدرس كمقروء ولن تحسب النقاط للتلميذ.", "error");
                     return;
                 }
 
@@ -953,21 +1020,30 @@
                     clickedLinks.push(linkId);
                     window.currentUserRecord.clickedLinks = clickedLinks;
                     window.fireConfetti();
-                    window.showToast(`+${XP_PER_ITEM} XP ! أحسنت 🌟`);
-                    window.updateProgressUI(window.currentSections);
+                    showToast(`+${XP_PER_ITEM} XP ! أحسنت 🌟`);
+                    updateProgressUI(window.currentSections);
                     if(document.getElementById('lesson-search').value.trim() === '') {
-                        window.renderProgramUI(window.currentSections, 'student-program-view', false);
+                        renderProgramUI(window.currentSections, 'student-program-view', false);
                     } else { window.executeStudentSearch(); }
                     await updateDoc(doc(usersCol, window.currentUserRecord.username), { clickedLinks: clickedLinks });
                 }
             }
         };
 
+        // التكوين الخاص بالتصنيفات
+        const catConfig = {
+            'lessons': { title: 'الدروس', icon: '<i class="ph-fill ph-books"></i>', bg: 'bg-blue-50/50 dark:bg-blue-900/10', text: 'text-blue-700 dark:text-blue-400', border: 'border-blue-100 dark:border-blue-900/30' },
+            'exercises': { title: 'التمارين', icon: '<i class="ph-fill ph-pencil-simple"></i>', bg: 'bg-orange-50/50 dark:bg-orange-900/10', text: 'text-orange-700 dark:text-orange-400', border: 'border-orange-100 dark:border-orange-900/30' },
+            'exams': { title: 'الفروض والإختبارات', icon: '<i class="ph-fill ph-exam"></i>', bg: 'bg-purple-50/50 dark:bg-purple-900/10', text: 'text-purple-700 dark:text-purple-400', border: 'border-purple-100 dark:border-purple-900/30' },
+            'past_exams': { title: 'مواضيع سابقة', icon: '<i class="ph-fill ph-certificate"></i>', bg: 'bg-emerald-50/50 dark:bg-emerald-900/10', text: 'text-emerald-700 dark:text-emerald-400', border: 'border-emerald-100 dark:border-emerald-900/30' },
+            'mock_exams': { title: 'مواضيع مقترحة', icon: '<i class="ph-fill ph-file-text"></i>', bg: 'bg-amber-50/50 dark:bg-amber-900/10', text: 'text-amber-700 dark:text-amber-400', border: 'border-amber-100 dark:border-amber-900/30' }
+        };
+
         window.executeStudentSearch = () => {
             const query = document.getElementById('lesson-search').value.toLowerCase().trim();
             const container = document.getElementById('student-program-view');
             
-            if (query === '') { window.renderProgramUI(window.currentSections, 'student-program-view', false); return; }
+            if (query === '') { renderProgramUI(window.currentSections, 'student-program-view', false); return; }
 
             let html = `<div class="bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl rounded-[2rem] border border-blue-200 dark:border-blue-800 p-6 shadow-lg animate-[fadeInTab_0.3s_ease]">
                             <h3 class="text-xl font-black text-blue-600 dark:text-blue-400 mb-6 flex items-center gap-2"><i class="ph-bold ph-magnifying-glass"></i> نتائج البحث عن: "${query}"</h3>
@@ -979,7 +1055,7 @@
                     y.branches.forEach(branch => {
                         let cats = branch.id === 'm4_b5' ? ['past_exams', 'mock_exams'] : ['lessons', 'exercises', 'exams'];
                         cats.forEach(cat => {
-                            let links = branch.categories[cat] || []; let conf = window.catConfig[cat];
+                            let links = branch.categories[cat] || []; let conf = catConfig[cat];
                             links.forEach((lnk, lIdx) => {
                                 if(lnk.title.toLowerCase().includes(query) || branch.title.toLowerCase().includes(query)) {
                                     found = true; let linkId = `${branch.id}_${cat}_${lIdx}`; let isRead = clickedLinks.includes(linkId);
@@ -1007,17 +1083,7 @@
             html += `</div></div>`; container.innerHTML = html;
         };
 
-        const getBranchIcon = (title) => {
-            if(title.includes('شهادتك') || title.includes('شهادات') || title.includes('تجريبية')) return '<i class="ph-fill ph-certificate"></i>';
-            if(title.includes('الكهرباء') || title.includes('كهربائية')) return '<i class="ph-fill ph-lightning"></i>';
-            if(title.includes('المادة') || title.includes('كيمياء') || title.includes('تحولات')) return '<i class="ph-fill ph-flask"></i>';
-            if(title.includes('ميكانيك') || title.includes('حركة')) return '<i class="ph-fill ph-gear-six"></i>';
-            if(title.includes('ضوء') || title.includes('بصريات') || title.includes('الضوئية')) return '<i class="ph-fill ph-lightbulb"></i>';
-            if(title.includes('طاقة') || title.includes('عمل')) return '<i class="ph-fill ph-battery-full"></i>';
-            if(title.includes('مغناطيس') || title.includes('كهرومغناطيسية')) return '<i class="ph-fill ph-magnet"></i>';
-            return '<i class="ph-fill ph-book-bookmark"></i>'; 
-        };
-
+        // Admin Tabs & Filters
         window.switchAdminPart = (partId) => {
             window.adminActivePart = partId;
             document.querySelectorAll(`.admin-part-content`).forEach(el => el.classList.remove('active'));
@@ -1026,7 +1092,6 @@
             document.getElementById(`tab-btn-${partId}`).classList.add('bg-white', 'text-blue-600', 'shadow-md', 'dark:bg-slate-700', 'dark:text-white');
             document.getElementById(`tab-btn-${partId}`).classList.remove('text-slate-500', 'dark:text-slate-400');
         };
-
         window.switchAdminYear = (partId, yearId) => {
             window.adminActiveYear[partId] = yearId;
             document.querySelectorAll(`.admin-year-content-${partId}`).forEach(el => el.classList.add('hidden'));
@@ -1035,10 +1100,8 @@
             document.getElementById(`btn-${partId}-${yearId}`).classList.add('border-blue-500', 'text-blue-600', 'dark:text-blue-400');
             document.getElementById(`btn-${partId}-${yearId}`).classList.remove('border-transparent', 'text-slate-500', 'dark:text-slate-400');
         };
-
-        window.switchAdminBranch = (yearId, branchId) => { window.adminActiveBranch[yearId] = branchId; window.renderProgramUI(window.currentSections, 'admin-program-view', true); };
-        window.switchStudentTab = (branchId) => { window.studentActiveBranchTab = branchId; document.getElementById('lesson-search').value = ''; window.renderProgramUI(window.currentSections, 'student-program-view', false); };
-        
+        window.switchAdminBranch = (yearId, branchId) => { window.adminActiveBranch[yearId] = branchId; renderProgramUI(window.currentSections, 'admin-program-view', true); };
+        window.switchStudentTab = (branchId) => { window.studentActiveBranchTab = branchId; document.getElementById('lesson-search').value = ''; renderProgramUI(window.currentSections, 'student-program-view', false); };
         window.filterStudentsTable = (filterType) => {
             window.adminStudentsFilter = filterType;
             ['all', 'middle', 'high'].forEach(t => {
@@ -1046,16 +1109,17 @@
                 if(t === filterType) { btn.classList.add('bg-white', 'dark:bg-slate-700', 'text-blue-600', 'dark:text-white', 'shadow-sm'); btn.classList.remove('text-slate-500', 'dark:text-slate-400'); } 
                 else { btn.classList.remove('bg-white', 'dark:bg-slate-700', 'text-blue-600', 'dark:text-white', 'shadow-sm'); btn.classList.add('text-slate-500', 'dark:text-slate-400'); }
             });
-            window.renderAdminTable();
+            renderAdminTable();
         };
 
+        // Admin Actions
         window.toggleSelectAll = () => { const state = document.getElementById('select-all-cb').checked; document.querySelectorAll('.student-cb').forEach(cb => cb.checked = state); };
         
         window.toggleUserStatus = async (uid, isApproved, phone) => {
             if (isApproved) {
-                if(await window.confirmAction("هل أنت متأكد من إلغاء تفعيل هذا الحساب؟")) {
+                if(await confirmAction("هل أنت متأكد من إلغاء تفعيل هذا الحساب؟")) {
                     await updateDoc(doc(usersCol, uid), { approved: false });
-                    window.showToast("تم إلغاء التفعيل");
+                    showToast("تم إلغاء التفعيل");
                 }
             } else {
                 let waLink = null;
@@ -1067,30 +1131,30 @@
                 
                 try {
                     await updateDoc(doc(usersCol, uid), { approved: true });
-                    window.showToast("تم تفعيل الحساب بنجاح ✅");
+                    showToast("تم تفعيل الحساب بنجاح ✅");
                 } catch(e) {
-                    if(win) win.close(); window.showToast("حدث خطأ أثناء التفعيل", "error");
+                    if(win) win.close(); showToast("حدث خطأ أثناء التفعيل", "error");
                 }
             }
         };
 
         window.bulkAction = async (action) => {
             const checked = Array.from(document.querySelectorAll('.student-cb:checked')).map(cb => cb.value);
-            if(checked.length === 0) return window.showToast("يرجى تحديد تلميذ واحد على الأقل", "error");
+            if(checked.length === 0) return showToast("يرجى تحديد تلميذ واحد على الأقل", "error");
             
             const actionText = action === 'approve' ? 'تفعيل' : (action === 'deactivate' ? 'إلغاء تفعيل' : 'حذف نهائي لـ');
-            if(!await window.confirmAction(`هل أنت متأكد من ${actionText} ${checked.length} حساب(ات)؟`)) return;
+            if(!await confirmAction(`هل أنت متأكد من ${actionText} ${checked.length} حساب(ات)؟`)) return;
 
             for(let username of checked) {
                 if(action === 'approve') { await updateDoc(doc(usersCol, username), { approved: true }); } 
                 else if (action === 'deactivate') { await updateDoc(doc(usersCol, username), { approved: false }); } 
                 else if (action === 'delete') { await deleteDoc(doc(usersCol, username)); }
             }
-            window.showToast(`تم ${actionText} الحسابات المحددة بنجاح 🚀`);
+            showToast(`تم ${actionText} الحسابات المحددة بنجاح 🚀`);
             document.getElementById('select-all-cb').checked = false;
         };
 
-        window.renderLeaderboard = () => {
+        const renderLeaderboard = () => {
             if(!window.currentUserRecord || window.currentUserRecord.role === 'admin') return;
             const container = document.getElementById('leaderboard-container');
             container.innerHTML = '';
@@ -1118,7 +1182,7 @@
             html += '</div>'; container.innerHTML = html;
         };
 
-        window.renderAdminTable = () => {
+        const renderAdminTable = () => {
             const tbody = document.getElementById('students-table-body');
             tbody.innerHTML = ''; let studentCount = 0; let levelStats = {}; 
 
@@ -1132,8 +1196,8 @@
                 if(window.adminStudentsFilter === 'middle' && !isMiddle) return;
                 if(window.adminStudentsFilter === 'high' && !isHigh) return;
                 
-                let levelDisplay = data.level ? (window.levelNames[data.level] || data.level) : "غير محدد";
-                let prog = window.calculateProgressXP(data.level, data, window.currentSections);
+                let levelDisplay = data.level ? (levelNames[data.level] || data.level) : "غير محدد";
+                let prog = calculateProgressXP(data.level, data, window.currentSections);
                 
                 let waProgMsg = encodeURIComponent(`السلام عليكم ولي أمر التلميذ(ة) ${d.id}. نعلمكم من منصة المجتهد للعلوم الفيزيائية أن نسبة إنجاز ابنكم في الدروس هي ${prog.percent}% بمجموع نقاط ${prog.xp} XP. لأي استفسار يرجى مراسلتنا.`);
                 let waProgLink = data.phoneNumber ? `https://wa.me/213${data.phoneNumber.substring(1)}?text=${waProgMsg}` : '#';
@@ -1192,122 +1256,76 @@
                     let c = colors[i % colors.length];
                     statsContainer.innerHTML += `
                         <div class="p-3 rounded-xl border flex justify-between items-center text-center shadow-sm ${c}">
-                            <span class="text-xs font-black">${window.levelNames[lvl] || lvl}</span>
+                            <span class="text-xs font-black">${levelNames[lvl] || lvl}</span>
                             <span class="text-lg font-black">${levelStats[lvl]}</span>
                         </div>`;
                 });
             }
         };
 
-        window.startAdminListeners = () => {
-            window.unsubscribeProgram = onSnapshot(doc(programCol, 'main'), (docSnap) => {
-                if(docSnap.exists()) { window.currentSections = docSnap.data().sections; window.renderProgramUI(window.currentSections, 'admin-program-view', true); window.renderAdminTable(); }
+        const startAdminListeners = () => {
+            unsubscribeProgram = onSnapshot(doc(programCol, 'main'), (docSnap) => {
+                if(docSnap.exists()) { window.currentSections = docSnap.data().sections; renderProgramUI(window.currentSections, 'admin-program-view', true); renderAdminTable(); }
             });
 
-            if(window.unsubscribeUsers) window.unsubscribeUsers();
-            window.unsubscribeUsers = onSnapshot(usersCol, (snapshot) => {
+            if(unsubscribeUsers) unsubscribeUsers();
+            unsubscribeUsers = onSnapshot(usersCol, (snapshot) => {
                 window.adminUsersList = []; window.allStudentsProgress = []; 
                 snapshot.forEach(d => { 
                     if(d.data().role !== 'admin') {
                         let data = d.data(); window.adminUsersList.push({id: d.id, data: data}); 
-                        let prog = window.calculateProgressXP(data.level, data, window.currentSections);
+                        let prog = calculateProgressXP(data.level, data, window.currentSections);
                         window.allStudentsProgress.push({ id: d.id, level: data.level, xp: prog.xp, approved: data.approved });
                     }
                 });
-                window.renderAdminTable();
+                renderAdminTable();
             });
 
-            if(window.unsubscribeChatMeta) window.unsubscribeChatMeta();
-            window.unsubscribeChatMeta = onSnapshot(collection(db, chatsPath), (snapshot) => {
-                window.adminChatsData = {}; snapshot.forEach(d => { window.adminChatsData[d.id] = d.data(); }); window.renderAdminTable();
+            if(unsubscribeChatMeta) unsubscribeChatMeta();
+            unsubscribeChatMeta = onSnapshot(collection(db, chatsPath), (snapshot) => {
+                window.adminChatsData = {}; snapshot.forEach(d => { window.adminChatsData[d.id] = d.data(); }); renderAdminTable();
             });
         };
 
-        window.startStudentListeners = () => {
-            window.unsubscribeProgram = onSnapshot(doc(programCol, 'main'), (docSnap) => {
+        const startStudentListeners = () => {
+            unsubscribeProgram = onSnapshot(doc(programCol, 'main'), (docSnap) => {
                 if(docSnap.exists()) { 
                     window.currentSections = docSnap.data().sections; 
-                    if(document.getElementById('lesson-search').value.trim() === '') { window.renderProgramUI(window.currentSections, 'student-program-view', false); }
-                    window.updateProgressUI(window.currentSections); window.renderLeaderboard(); 
+                    if(document.getElementById('lesson-search').value.trim() === '') { renderProgramUI(window.currentSections, 'student-program-view', false); }
+                    updateProgressUI(window.currentSections); renderLeaderboard(); 
                 }
             });
             
-            if(window.unsubscribeUsers) window.unsubscribeUsers();
-            window.unsubscribeUsers = onSnapshot(usersCol, (snapshot) => {
+            if(unsubscribeUsers) unsubscribeUsers();
+            unsubscribeUsers = onSnapshot(usersCol, (snapshot) => {
                 window.allStudentsProgress = [];
                 snapshot.forEach(d => {
                     let data = d.data();
                     if(data.role !== 'admin') {
-                        let prog = window.calculateProgressXP(data.level, data, window.currentSections);
+                        let prog = calculateProgressXP(data.level, data, window.currentSections);
                         window.allStudentsProgress.push({ id: d.id, level: data.level, xp: prog.xp, approved: data.approved });
                     }
                     if(d.id === window.currentUserRecord.username) {
                         window.currentUserRecord.clickedLinks = data.clickedLinks || [];
                         window.currentUserRecord.phoneNumber = data.phoneNumber || ''; 
-                        window.updateProgressUI(window.currentSections || []); 
+                        updateProgressUI(window.currentSections || []); 
                         
-                        if(document.getElementById('lesson-search').value.trim() === '') { window.renderProgramUI(window.currentSections || [], 'student-program-view', false); } 
+                        if(document.getElementById('lesson-search').value.trim() === '') { renderProgramUI(window.currentSections || [], 'student-program-view', false); } 
                         else { window.executeStudentSearch(); }
                     }
                 });
-                window.renderLeaderboard(); 
+                renderLeaderboard(); 
             });
 
-            if(window.unsubscribeChatMeta) window.unsubscribeChatMeta();
-            window.unsubscribeChatMeta = onSnapshot(doc(db, chatsPath, window.currentUserRecord.username), (docSnap) => {
+            if(unsubscribeChatMeta) unsubscribeChatMeta();
+            unsubscribeChatMeta = onSnapshot(doc(db, chatsPath, window.currentUserRecord.username), (docSnap) => {
                 const badge = document.getElementById('student-chat-badge');
                 if(docSnap.exists() && docSnap.data().unreadStudent > 0) { badge.innerText = docSnap.data().unreadStudent; badge.classList.remove('hidden'); } 
                 else { badge.classList.add('hidden'); }
             });
         };
 
-        window.loginAsStudent = (studentUsername) => {
-            const studentObj = window.adminUsersList.find(u => u.id === studentUsername);
-            if(!studentObj) return;
-
-            window.originalAdminRecord = { ...window.currentUserRecord };
-            window.currentUserRecord = { username: studentObj.id, ...studentObj.data };
-            
-            document.getElementById('display-username').innerText = window.currentUserRecord.username;
-            document.getElementById('student-level-badge').innerText = window.levelNames[window.currentUserRecord.level];
-            
-            // تفعيل وضع المراقبة (إخفاء أزرار الدردشة والإعدادات والخروج والوضع الليلي)
-            document.getElementById('return-admin-btn').classList.remove('hidden');
-            document.getElementById('student-settings-btn').classList.add('hidden'); 
-            document.getElementById('student-chat-btn').classList.add('hidden'); 
-            document.getElementById('student-dark-btn').classList.add('hidden'); 
-            document.getElementById('student-logout-btn').classList.add('hidden'); 
-
-            if(window.unsubscribeUsers) window.unsubscribeUsers();
-            if(window.unsubscribeChatMeta) window.unsubscribeChatMeta();
-
-            window.switchScreen('app-screen');
-            window.switchStudentMainTab('theory');
-            window.startStudentListeners();
-            window.showToast(`أنت الآن داخل حساب التلميذ في وضع المراقبة`);
-        };
-
-        window.returnToAdmin = () => {
-            if(!window.originalAdminRecord) return;
-            window.currentUserRecord = { ...window.originalAdminRecord };
-            window.originalAdminRecord = null;
-            
-            // إلغاء وضع المراقبة وإرجاع الأزرار لطبيعتها
-            document.getElementById('return-admin-btn').classList.add('hidden');
-            document.getElementById('student-settings-btn').classList.remove('hidden');
-            document.getElementById('student-chat-btn').classList.remove('hidden');
-            document.getElementById('student-dark-btn').classList.remove('hidden');
-            document.getElementById('student-logout-btn').classList.remove('hidden');
-
-            if(window.unsubscribeUsers) window.unsubscribeUsers();
-            if(window.unsubscribeChatMeta) window.unsubscribeChatMeta();
-
-            window.switchScreen('admin-screen');
-            window.startAdminListeners();
-            window.showToast("تمت العودة للوحة الإدارة بنجاح");
-        };
-
-        window.linkify = (text) => {
+        const linkify = (text) => {
             const urlRegex = /(https?:\/\/[^\s]+)/g;
             return text.replace(urlRegex, function(url) { return '<a href="' + url + '" target="_blank" class="text-blue-500 dark:text-blue-400 font-bold underline decoration-2 underline-offset-2 hover:text-blue-700 dark:hover:text-blue-300 transition inline-flex items-center gap-1"><i class="ph-bold ph-link"></i> رابط</a>'; });
         };
@@ -1326,8 +1344,8 @@
             const chatDocRef = doc(db, chatsPath, chatRoomId);
             await setDoc(chatDocRef, { [window.currentUserRecord.role === 'admin' ? 'unreadAdmin' : 'unreadStudent']: 0 }, { merge: true });
 
-            if(window.unsubscribeChat) window.unsubscribeChat();
-            window.unsubscribeChat = onSnapshot(messagesRef, (snapshot) => {
+            if(unsubscribeChat) unsubscribeChat();
+            unsubscribeChat = onSnapshot(messagesRef, (snapshot) => {
                 let msgs = []; snapshot.forEach(d => msgs.push({ id: d.id, ...d.data() }));
                 msgs.sort((a, b) => a.timestamp - b.timestamp); 
                 
@@ -1337,7 +1355,7 @@
                     let bubbleClass = isMine ? 'chat-mine dark:bg-blue-900/30 dark:border-blue-800' : 'chat-other dark:bg-slate-800 dark:border-slate-700';
                     let alignment = isMine ? 'self-end' : 'self-start';
                     let textColor = isAdminMsg && !isMine ? 'text-red-600 dark:text-red-400 font-bold' : 'text-slate-700 dark:text-slate-200';
-                    chatHtml += `<div class="chat-bubble ${bubbleClass} ${alignment} shadow-sm transition hover:shadow-md"><p class="text-[14px] whitespace-pre-wrap break-words ${textColor}" dir="auto">${window.linkify(m.text)}</p></div>`;
+                    chatHtml += `<div class="chat-bubble ${bubbleClass} ${alignment} shadow-sm transition hover:shadow-md"><p class="text-[14px] whitespace-pre-wrap break-words ${textColor}" dir="auto">${linkify(m.text)}</p></div>`;
                 });
                 
                 const msgBox = document.getElementById('chat-messages');
@@ -1347,7 +1365,7 @@
             }, e => { console.error("Chat Error", e); });
         };
 
-        window.closeChat = () => { document.getElementById('chat-modal').classList.add('hidden'); document.getElementById('chat-modal').classList.remove('flex'); if(window.unsubscribeChat) window.unsubscribeChat(); window.activeChatUser = null; };
+        window.closeChat = () => { document.getElementById('chat-modal').classList.add('hidden'); document.getElementById('chat-modal').classList.remove('flex'); if(unsubscribeChat) unsubscribeChat(); window.activeChatUser = null; };
 
         window.sendChatMessage = async () => {
             let inputEl = document.getElementById('chat-input'); let text = inputEl.value.trim();
@@ -1362,34 +1380,36 @@
                 await setDoc(doc(messagesRef, Date.now().toString()), { sender: window.currentUserRecord.role, text: text, timestamp: Date.now() });
                 await setDoc(chatDocRef, { [window.currentUserRecord.role === 'admin' ? 'unreadStudent' : 'unreadAdmin']: increment(1) }, { merge: true });
                 inputEl.value = ''; setTimeout(() => { const msgBox = document.getElementById('chat-messages'); msgBox.scrollTop = msgBox.scrollHeight; }, 100);
-            } catch(e) { console.error(e); window.showToast("فشل الإرسال. تأكد من اتصالك بالإنترنت", "error"); }
+            } catch(e) { console.error(e); showToast("فشل الإرسال. تأكد من اتصالك بالإنترنت", "error"); }
             btn.disabled = false; btn.innerHTML = origHtml;
         };
 
+        // Admin Links functions
         window.adminAddLink = async (pIdx, yIdx, bIdx, cat, branchId) => {
             let title = document.getElementById(`title_${branchId}_${cat}`).value.trim(); 
             let url = document.getElementById(`url_${branchId}_${cat}`).value.trim();
             
-            if(!title || !url) return window.showToast("يرجى إدخال العنوان والرابط", "error");
+            if(!title || !url) return showToast("يرجى إدخال العنوان والرابط", "error");
             if(!url.startsWith('http')) url = 'https://' + url;
             
             const docRef = doc(programCol, 'main'); 
             let sections = window.currentSections;
             
+            // إصلاح هام: التأكد من وجود المصفوفة في قاعدة البيانات لإنشاء التصنيف تلقائياً إذا كان مفقوداً
             if (!sections[pIdx].years[yIdx].branches[bIdx].categories[cat]) {
                 sections[pIdx].years[yIdx].branches[bIdx].categories[cat] = [];
             }
             
             sections[pIdx].years[yIdx].branches[bIdx].categories[cat].push({title, url});
             await updateDoc(docRef, { sections }); 
-            window.showToast("تمت الإضافة بنجاح للمنهج 📚");
+            showToast("تمت الإضافة بنجاح للمنهج 📚");
         };
 
         window.adminDeleteLink = async (pIdx, yIdx, bIdx, cat, lIdx) => {
-            if(await window.confirmAction("هل أنت متأكد من مسح هذا الرابط نهائياً؟")) {
+            if(await confirmAction("هل أنت متأكد من مسح هذا الرابط نهائياً؟")) {
                 const docRef = doc(programCol, 'main'); let sections = window.currentSections;
                 sections[pIdx].years[yIdx].branches[bIdx].categories[cat].splice(lIdx, 1);
-                await updateDoc(docRef, { sections }); window.showToast("تم مسح الرابط");
+                await updateDoc(docRef, { sections }); showToast("تم مسح الرابط");
             }
         };
 
@@ -1404,17 +1424,17 @@
 
         window.saveEditedLink = async () => {
             let newTitle = document.getElementById('edit-link-title').value.trim(); let newUrl = document.getElementById('edit-link-url').value.trim();
-            if(!newTitle || !newUrl) return window.showToast("يرجى إدخال العنوان والرابط", "error"); if(!newUrl.startsWith('http')) newUrl = 'https://' + newUrl;
+            if(!newTitle || !newUrl) return showToast("يرجى إدخال العنوان والرابط", "error"); if(!newUrl.startsWith('http')) newUrl = 'https://' + newUrl;
             if(window.currentEditParams) {
                 let { pIdx, yIdx, bIdx, cat, lIdx } = window.currentEditParams; let sections = window.currentSections;
                 sections[pIdx].years[yIdx].branches[bIdx].categories[cat][lIdx] = { title: newTitle, url: newUrl };
-                await updateDoc(doc(programCol, 'main'), { sections }); window.showToast("تم التعديل بنجاح ✏️"); window.closeEditModal();
+                await updateDoc(doc(programCol, 'main'), { sections }); showToast("تم التعديل بنجاح ✏️"); closeEditModal();
             }
         };
 
-        window.getEmptyStateHTML = (title) => `<div class="flex flex-col items-center justify-center p-6 text-center bg-white/50 dark:bg-slate-800/30 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700"><i class="ph-fill ph-folder-open text-5xl text-slate-300 dark:text-slate-600 mb-2"></i><h3 class="text-sm font-black text-slate-500 dark:text-slate-400">لا يوجد ${title} حالياً</h3></div>`;
+        const getEmptyStateHTML = (title) => `<div class="flex flex-col items-center justify-center p-6 text-center bg-white/50 dark:bg-slate-800/30 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700"><i class="ph-fill ph-folder-open text-5xl text-slate-300 dark:text-slate-600 mb-2"></i><h3 class="text-sm font-black text-slate-500 dark:text-slate-400">لا يوجد ${title} حالياً</h3></div>`;
 
-        window.renderProgramUI = (sections, containerId, isAdmin) => {
+        const renderProgramUI = (sections, containerId, isAdmin) => {
             if(!sections) return; window.currentSections = sections; let html = '';
             let clickedLinks = (!isAdmin && window.currentUserRecord) ? (window.currentUserRecord.clickedLinks || []) : [];
             let userLevel = (!isAdmin && window.currentUserRecord) ? window.currentUserRecord.level : null;
@@ -1471,11 +1491,11 @@
                                 <div class="grid ${gridCols} gap-5">`;
 
                         cats.forEach(cat => {
-                            let links = branch.categories[cat] || []; let conf = window.catConfig[cat];
+                            let links = branch.categories[cat] || []; let conf = catConfig[cat];
                             let linksList = links.length ? links.map((lnk, lIdx) => {
                                 let linkId = `${branch.id}_${cat}_${lIdx}`; let isRead = clickedLinks.includes(linkId);
                                 return `<a href="#" onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}'); return false;" class="lesson-item flex items-center justify-between gap-3 bg-white dark:bg-slate-800 p-3 rounded-2xl border ${isRead ? 'border-emerald-200 dark:border-emerald-800 shadow-sm' : 'border-slate-100 dark:border-slate-700'} hover:shadow-md transition group/link relative overflow-hidden"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl group-hover/link:bg-blue-600 group-hover/link:text-white transition shadow-inner"><i class="ph-bold ph-link"></i></div><span class="${conf.text} font-bold text-sm truncate max-w-[140px] sm:max-w-[180px] group-hover/link:underline decoration-2 underline-offset-4">${lnk.title}</span></div>${isRead ? `<span class="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 text-[10px] font-black px-2 py-1 rounded-md flex items-center gap-1"><i class="ph-bold ph-check"></i> مقروء</span>` : ''}</a>`;
-                            }).join('') : window.getEmptyStateHTML(conf.title);
+                            }).join('') : getEmptyStateHTML(conf.title);
                             html += `<div class="${conf.bg} ${conf.border} p-5 rounded-3xl border shadow-sm"><h5 class="font-black ${conf.text} text-lg mb-4 flex items-center gap-2">${conf.icon} ${conf.title}</h5><div class="space-y-2">${linksList}</div></div>`;
                         });
                         html += `</div></div></div>`; 
@@ -1518,8 +1538,8 @@
                                     <div class="grid ${gridCols} gap-5">`;
                                 
                                 cats.forEach(cat => {
-                                    let links = branch.categories[cat] || []; let conf = window.catConfig[cat];
-                                    let linksList = links.length ? links.map((lnk, lIdx) => `<div class="flex justify-between items-center bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm text-sm mb-2 group interactive-card"><a href="${lnk.url}" target="_blank" class="${conf.text} font-bold truncate w-2/3 hover:underline flex items-center gap-2"><i class="ph-bold ph-link text-lg opacity-70"></i> ${lnk.title}</a><div class="flex gap-1"><button onclick="adminEditLinkModal(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" class="text-slate-400 hover:text-amber-500 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg transition"><i class="ph-bold ph-pencil"></i></button><button onclick="adminDeleteLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" class="text-slate-400 hover:text-red-500 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg transition"><i class="ph-bold ph-trash"></i></button></div></div>`).join('') : window.getEmptyStateHTML('محتوى');
+                                    let links = branch.categories[cat] || []; let conf = catConfig[cat];
+                                    let linksList = links.length ? links.map((lnk, lIdx) => `<div class="flex justify-between items-center bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm text-sm mb-2 group interactive-card"><a href="${lnk.url}" target="_blank" class="${conf.text} font-bold truncate w-2/3 hover:underline flex items-center gap-2"><i class="ph-bold ph-link text-lg opacity-70"></i> ${lnk.title}</a><div class="flex gap-1"><button onclick="adminEditLinkModal(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" class="text-slate-400 hover:text-amber-500 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg transition"><i class="ph-bold ph-pencil"></i></button><button onclick="adminDeleteLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" class="text-slate-400 hover:text-red-500 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg transition"><i class="ph-bold ph-trash"></i></button></div></div>`).join('') : getEmptyStateHTML('محتوى');
                                     html += `<div class="${conf.bg} ${conf.border} p-5 rounded-2xl border flex flex-col h-full"><h5 class="font-black ${conf.text} text-base mb-3 flex items-center gap-2">${conf.icon} ${conf.title}</h5><div class="mb-2 max-h-60 overflow-y-auto pr-1 scroll-smooth flex-1">${linksList}</div><div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 space-y-2 mt-auto"><input type="text" id="title_${branch.id}_${cat}" class="w-full text-xs font-bold p-3 border border-slate-200 dark:border-slate-600 rounded-lg outline-none focus:border-blue-400 bg-white dark:bg-slate-900 text-slate-700 dark:text-white transition-all" placeholder="عنوان المحتوى..."><input type="text" id="url_${branch.id}_${cat}" class="w-full text-xs p-3 border border-slate-200 dark:border-slate-600 rounded-lg outline-none focus:border-blue-400 bg-white dark:bg-slate-900 text-slate-600 dark:text-white text-left font-bold transition-all" dir="ltr" placeholder="https://..."><button onclick="adminAddLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', '${branch.id}')" class="w-full bg-slate-800 dark:bg-blue-600 hover:bg-slate-700 dark:hover:bg-blue-700 text-white text-xs font-black py-2.5 rounded-lg transition-all flex items-center justify-center gap-1"><i class="ph-bold ph-plus"></i> إضافة</button></div></div>`;
                                 });
                                 html += `</div></div>`; 
@@ -1532,816 +1552,6 @@
             }
             document.getElementById(containerId).innerHTML = html;
         };
-    </script>
-    
-    <!-- ============================================================== -->
-    <!-- كود المحاكاة المعزول تماماً عن كود المنصة لمنع أي تضارب -->
-    <!-- ============================================================== -->
-    <script type="text/plain" id="sim-html">
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محاكاة ظاهرة التكهرب</title>
-    <script src="https://cdn.tailwindcss.com"><\/script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"><\/script>
-    
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap');
-        
-        body {
-            font-family: 'Tajawal', sans-serif;
-            background-color: #f1f5f9;
-            margin: 0;
-            padding: 0;
-        }
-
-        .tab-btn { transition: all 0.3s ease; }
-        .tab-btn.active {
-            background-color: #2563eb;
-            color: #ffffff;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-            border-color: #2563eb;
-        }
-
-        .sub-tab-btn { transition: all 0.2s ease; }
-        .sub-tab-btn.active {
-            background-color: #10b981;
-            color: #ffffff;
-            border-color: #10b981;
-            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
-        }
-
-        .hidden-controls { display: none !important; }
-        canvas { display: block; border-radius: 1.5rem; outline: none; }
-    </style>
-</head>
-<body class="min-h-screen flex flex-col items-center p-4 md:p-6 lg:p-8 gap-6">
-
-    <header class="w-full max-w-[1400px] bg-white rounded-[2rem] shadow-sm border border-slate-200 p-6 flex flex-col items-center gap-6 relative z-10">
-        <div class="w-full flex flex-col md:flex-row items-center justify-center relative md:pb-2 gap-4">
-            <div class="md:absolute md:right-0 bg-blue-50 border border-blue-200 text-blue-900 px-4 py-1.5 rounded-xl font-bold text-xs lg:text-sm flex items-center gap-1.5 shadow-sm transition-transform hover:scale-105">
-                <span class="text-lg">👨‍🏫</span>
-                إعداد: الأستاذ حمانة عبدالعالي
-            </div>
-            <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-l from-blue-900 via-blue-600 to-cyan-500 text-center drop-shadow-sm pb-2">
-                محاكاة ظاهرة التكهرب
-            </h1>
-        </div>
-
-        <div class="flex flex-col items-center w-full gap-4">
-            <div class="flex flex-wrap justify-center bg-slate-100 p-1.5 rounded-2xl gap-2 w-full max-w-3xl">
-                <button id="btn-friction" class="tab-btn active flex-1 min-w-[140px] px-6 py-3 rounded-xl font-bold text-lg text-slate-600 bg-transparent hover:bg-slate-200/50" onclick="setMode('friction')">التكهرب بالدلك</button>
-                <button id="btn-contact" class="tab-btn flex-1 min-w-[140px] px-6 py-3 rounded-xl font-bold text-lg text-slate-600 bg-transparent hover:bg-slate-200/50" onclick="setMode('contact')">التكهرب باللمس</button>
-                <button id="btn-induction" class="tab-btn flex-1 min-w-[140px] px-6 py-3 rounded-xl font-bold text-lg text-slate-600 bg-transparent hover:bg-slate-200/50" onclick="setMode('induction')">التكهرب بالتأثير</button>
-            </div>
-
-            <div class="w-full border-t border-dashed border-slate-200 pt-4 flex justify-center">
-                <div id="friction-controls" class="flex flex-wrap justify-center gap-3">
-                    <button id="btn-plastic" class="sub-tab-btn active px-5 py-2.5 rounded-xl font-semibold border border-slate-200 text-slate-600 bg-white hover:bg-slate-50" onclick="setFrictionType('plastic')">بلاستيك وصوف (-)</button>
-                    <button id="btn-glass" class="sub-tab-btn px-5 py-2.5 rounded-xl font-semibold border border-slate-200 text-slate-600 bg-white hover:bg-slate-50" onclick="setFrictionType('glass')">زجاج وحرير (+)</button>
-                </div>
-                <div id="contact-controls" class="hidden-controls flex flex-wrap justify-center gap-3">
-                    <button id="btn-contact-plastic" class="sub-tab-btn active px-5 py-2.5 rounded-xl font-semibold border border-slate-200 text-slate-600 bg-white hover:bg-slate-50" onclick="setContactType('plastic')">بلاستيك سالب ونواس متعادل</button>
-                    <button id="btn-contact-glass" class="sub-tab-btn px-5 py-2.5 rounded-xl font-semibold border border-slate-200 text-slate-600 bg-white hover:bg-slate-50" onclick="setContactType('glass')">زجاج موجب ونواس متعادل</button>
-                </div>
-                <div id="induction-controls" class="hidden-controls flex flex-wrap justify-center gap-3">
-                    <button id="btn-induction-plastic" class="sub-tab-btn active px-5 py-2.5 rounded-xl font-semibold border border-slate-200 text-slate-600 bg-white hover:bg-slate-50" onclick="setInductionType('plastic')">بلاستيك سالب وكشاف</button>
-                    <button id="btn-induction-glass" class="sub-tab-btn px-5 py-2.5 rounded-xl font-semibold border border-slate-200 text-slate-600 bg-white hover:bg-slate-50" onclick="setInductionType('glass')">زجاج موجب وكشاف</button>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <main class="w-full max-w-[1400px] flex flex-col lg:flex-row gap-6 flex-grow items-stretch relative">
-        <aside class="w-full lg:w-[340px] flex-shrink-0 bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200 flex flex-col gap-6 relative z-10">
-            <div class="flex flex-col gap-3">
-                <h2 id="info-title" class="text-2xl font-black text-blue-900 border-b-2 border-blue-50 pb-3">التكهرب بالدلك</h2>
-                <p id="info-desc" class="text-slate-600 text-base leading-relaxed font-medium">توضح هذه التجربة كيفية انتقال الإلكترونات عند احتكاك جسمين متعادلين ببعضهما.</p>
-            </div>
-            
-            <div class="bg-emerald-50/50 rounded-2xl p-5 border border-emerald-100 mt-auto flex flex-col gap-3">
-                <h3 class="text-emerald-800 font-bold text-lg flex items-center gap-2">
-                    <span class="bg-emerald-100 p-1.5 rounded-lg text-xl leading-none">💡</span> إرشادات التجربة:
-                </h3>
-                <ol id="info-steps" class="list-decimal list-inside text-sm text-emerald-800 space-y-3 font-medium leading-relaxed pl-2">
-                    <li>انقر بمؤشر الماوس على قطعة الصوف.</li>
-                    <li>اسحب القطعة فوق القضيب المتعادل بحركة (ذهاب وإياب) قوية لمحاكاة الدلك.</li>
-                    <li>راقب انتقال الشحنات السالبة وبقاء الشحنات الموجبة في مكانها.</li>
-                </ol>
-            </div>
-            <p class="text-xs text-center text-slate-400 font-medium">تلميح: تأكد من النقر داخل مساحة العمل لتفعيل الصوت.</p>
-        </aside>
-
-        <section class="flex-grow relative bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden flex flex-col min-h-[500px] lg:min-h-[600px]">
-            <button onclick="resetExperiment()" class="absolute top-5 left-5 z-20 bg-white/80 hover:bg-red-50 text-red-500 border border-red-100 hover:border-red-300 px-3 py-2 rounded-xl text-sm font-bold shadow-sm transition-all duration-300 flex items-center gap-1.5 cursor-pointer backdrop-blur-md group">
-                <span class="text-lg leading-none group-hover:-rotate-180 transition-transform duration-500">↺</span> 
-                <span>إعادة</span>
-            </button>
-            <div id="canvas-container" class="w-full h-full flex-grow flex justify-center items-center relative z-0 bg-slate-50/50"></div>
-        </section>
-    </main>
-
-    <script>
-        let currentMode = 'friction'; 
-        let frictionType = 'plastic'; 
-        let contactType = 'plastic'; 
-        let inductionType = 'plastic'; 
-        let simulationState = 0; 
-        
-        let rod, cloth, electroscope, pendulum;
-        let charges = []; 
-
-        let frictionEnergy = 0; 
-        let sparkTimer = 0; 
-        let canvasContainer;
-
-        let audioCtx;
-        let isAudioInit = false;
-
-        function initAudio() {
-            if (!isAudioInit) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                isAudioInit = true;
-            }
-            if (audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-        }
-
-        function playZap() {
-            if (!audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(1000, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
-            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.1);
-        }
-
-        function playRub() {
-            if (!audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(80 + Math.random()*40, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.1);
-        }
-
-        function setMode(mode) {
-            currentMode = mode;
-            simulationState = 0;
-            charges = []; 
-            sparkTimer = 0;
-
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`btn-${mode}`).classList.add('active');
-
-            ['friction', 'contact', 'induction'].forEach(m => {
-                document.getElementById(`${m}-controls`).classList.add('hidden-controls');
-                document.getElementById(`${m}-controls`).classList.remove('flex');
-            });
-            document.getElementById(`${mode}-controls`).classList.remove('hidden-controls');
-            document.getElementById(`${mode}-controls`).classList.add('flex');
-
-            if(mode === 'friction') { updateFrictionInfo(); initFrictionObjects(); }
-            else if (mode === 'contact') { updateContactInfo(); initContactObjects(); }
-            else if (mode === 'induction') { updateInductionInfo(); initInductionObjects(); }
-        }
-
-        function setFrictionType(type) {
-            frictionType = type;
-            document.querySelectorAll('#friction-controls button').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`btn-${type}`).classList.add('active');
-            updateFrictionInfo(); initFrictionObjects();
-        }
-
-        function setContactType(type) {
-            contactType = type;
-            document.querySelectorAll('#contact-controls button').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`btn-contact-${type}`).classList.add('active');
-            updateContactInfo(); initContactObjects();
-        }
-
-        function setInductionType(type) {
-            inductionType = type;
-            document.querySelectorAll('#induction-controls button').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`btn-induction-${type}`).classList.add('active');
-            updateInductionInfo(); initInductionObjects();
-        }
-
-        function updateFrictionInfo() {
-            let isPlastic = frictionType === 'plastic';
-            document.getElementById('info-title').innerText = isPlastic ? "التكهرب بالدلك (بلاستيك)" : "التكهرب بالدلك (زجاج)";
-            document.getElementById('info-desc').innerText = "توضح هذه التجربة كيفية انتقال الإلكترونات عند احتكاك جسمين متعادلين ببعضهما.";
-            document.getElementById('info-steps').innerHTML = `
-                <li>انقر بمؤشر الماوس مع الاستمرار على <b>${isPlastic ? 'قطعة الصوف' : 'قطعة الحرير'}</b>.</li>
-                <li>اسحب القطعة فوق القضيب بحركة (ذهاب وإياب) قوية وسريعة لمحاكاة عملية الدلك.</li>
-                <li>راقب انتقال الإلكترونات (الشحنات السالبة) بوضوح.</li>
-                <li>لاحظ أن الجسمين أصبحا مشحونين بشحنتين مختلفتين نتيجة انتقال الشحنات.</li>
-            `;
-        }
-
-        function updateContactInfo() {
-            let isPlastic = contactType === 'plastic';
-            document.getElementById('info-title').innerText = isPlastic ? "التكهرب باللمس (بلاستيك سالب)" : "التكهرب باللمس (زجاج موجب)";
-            document.getElementById('info-desc').innerText = "تبين التجربة انتقال الشحنات عند تلامس جسم مشحون مع جسم آخر متعادل لتتوزع الشحنة بينهما.";
-            document.getElementById('info-steps').innerHTML = `
-                <li>اضغط مع الاستمرار على القضيب المشحون الموجود على اليسار.</li>
-                <li>اسحب القضيب وقرّبه ببطء من كرية النواس المتعادلة.</li>
-                <li>انتظر لحظة عند التلامس المباشر لتسمح للشحنات بالانتقال.</li>
-                <li>ستتنافر الكرية مع القضيب فجأة لأنها اكتسبت نفس نوع شحنته.</li>
-            `;
-        }
-
-        function updateInductionInfo() {
-            let isPlastic = inductionType === 'plastic';
-            document.getElementById('info-title').innerText = isPlastic ? "التكهرب بالتأثير (بلاستيك سالب)" : "التكهرب بالتأثير (زجاج موجب)";
-            document.getElementById('info-desc').innerText = "توضح التجربة ظاهرة 'الاستقطاب' حيث يتم فصل الشحنات داخل جسم متعادل دون حدوث تلامس مباشر.";
-            document.getElementById('info-steps').innerHTML = `
-                <li>اسحب القضيب المشحون ببطء نحو القرص العلوي للكشاف الكهربائي (دون لمسه).</li>
-                <li>لاحظ انفراج ورقتي الكشاف بسبب تنافر الشحنات المنجذبة والمنفرة (حالة تأثير/استقطاب مؤقتة).</li>
-                <li>الآن، قم بملامسة القضيب للقرص المعدني مباشرة.</li>
-                <li>ستنتقل الشحنات ويصبح الكشاف مشحوناً بالكامل بشكل دائم.</li>
-            `;
-        }
-
-        function initFrictionObjects() {
-            let cx = width / 2;
-            let cy = height / 2;
-            
-            rod = { x: cx - 180, y: cy + 30, width: 220, height: 45, charge: 0, type: frictionType };
-            cloth = { x: cx + 50, y: cy - 80, width: 140, height: 120, charge: 0, isDragging: false };
-            charges = [];
-            frictionEnergy = 0;
-            
-            for(let i=0; i<5; i++) {
-                let ox = 30 + i*40;
-                charges.push({x: rod.x + ox, y: rod.y + 12, type: '+', parent: 'rod', offsetOnRod: ox, offsetY: 12, active: true});
-                charges.push({x: rod.x + ox, y: rod.y + 32, type: '-', parent: 'rod', offsetOnRod: ox, offsetY: 32, active: true});
-            }
-            for(let i=0; i<6; i++) {
-                let ox_plus = 25 + (i%3)*40, oy_plus = 25 + Math.floor(i/3)*40;
-                charges.push({x: cloth.x + ox_plus, y: cloth.y + oy_plus, type: '+', parent: 'cloth', offsetX: ox_plus, offsetY: oy_plus, active: true});
-                let ox_minus = 35 + (i%3)*40, oy_minus = 35 + Math.floor(i/3)*40;
-                charges.push({x: cloth.x + ox_minus, y: cloth.y + oy_minus, type: '-', parent: 'cloth', offsetX: ox_minus, offsetY: oy_minus, active: true});
-            }
-        }
-
-        function initContactObjects() {
-            let cx = width / 2;
-            let cy = height / 2;
-            
-            charges = []; simulationState = 0; sparkTimer = 0;
-            pendulum = { pivotX: cx - 120, pivotY: cy - 150, length: 220, radius: 28, angle: 0, charge: 0 };
-            let rCharge = contactType === 'plastic' ? -6 : 6;
-            rod = { x: cx + 100, y: cy + 30, width: 180, height: 40, charge: rCharge, isDragging: false };
-            
-            for(let i=0; i<4; i++) {
-                let ox1 = random(-14,14), oy1 = random(-14,14);
-                charges.push({x: 0, y: 0, type: '+', parent: 'pendulum_base', offsetX: ox1, offsetY: oy1, originalOffsetX: ox1, originalOffsetY: oy1, active: true});
-                let ox2 = random(-14,14), oy2 = random(-14,14);
-                charges.push({x: 0, y: 0, type: '-', parent: 'pendulum_base', offsetX: ox2, offsetY: oy2, originalOffsetX: ox2, originalOffsetY: oy2, active: true});
-            }
-
-            for(let i=0; i<6; i++) {
-                let cType = contactType === 'plastic' ? '-' : '+';
-                charges.push({x: rod.x + 30 + i*24, y: rod.y + 20, type: cType, parent: 'rod', active: true, offsetOnRod: 30 + i*24});
-            }
-        }
-
-        function initInductionObjects() {
-            let cx = width / 2;
-            let cy = height / 2;
-            
-            charges = [];
-            let rCharge = inductionType === 'plastic' ? -6 : 6;
-            rod = { x: cx + 220, y: cy - 70, width: 180, height: 40, charge: rCharge, isDragging: false };
-            electroscope = { 
-                diskX: cx - 120, diskY: cy - 120, diskRadius: 50, 
-                rodX: cx - 120, rodY: cy - 120, rodLength: 200, 
-                leafAngle: 0, maxAngle: Math.PI / 3,
-                touched: false
-            };
-            
-            for(let i=0; i<6; i++) {
-                let cType = inductionType === 'plastic' ? '-' : '+';
-                charges.push({x: rod.x + 30 + i*24, y: rod.y + 20, type: cType, parent: 'rod', offsetOnRod: 30 + i*24, active: true});
-            }
-        }
-
-        function setup() {
-            canvasContainer = document.getElementById('canvas-container');
-            let w = canvasContainer.offsetWidth;
-            let h = canvasContainer.offsetHeight;
-            let canvas = createCanvas(w > 0 ? w : 800, h > 0 ? h : 600);
-            canvas.parent('canvas-container');
-            textAlign(CENTER, CENTER);
-            
-            initFrictionObjects();
-            updateFrictionInfo();
-        }
-
-        function windowResized() {
-            if (canvasContainer) {
-                let w = canvasContainer.offsetWidth;
-                let h = canvasContainer.offsetHeight;
-                if (w > 0 && h > 0) {
-                    resizeCanvas(w, h);
-                    resetExperiment(); 
-                }
-            }
-        }
-
-        function resetExperiment() {
-            if (currentMode === 'friction') initFrictionObjects();
-            else if (currentMode === 'contact') initContactObjects();
-            else if (currentMode === 'induction') initInductionObjects();
-        }
-
-        function draw() {
-            clear(); 
-            background(248, 250, 252, 200); 
-            drawGrid();
-
-            if (currentMode === 'friction') drawFriction();
-            else if (currentMode === 'contact') drawContact();
-            else if (currentMode === 'induction') drawInduction();
-            
-            drawCharges();
-            drawTooltips();
-        }
-
-        function drawGrid() {
-            stroke(226, 232, 240, 150); 
-            strokeWeight(1);
-            for (let x = 0; x < width; x += 60) line(x, 0, x, height);
-            for (let y = 0; y < height; y += 60) line(0, y, width, y);
-        }
-
-        function drawFriction() {
-            push();
-            frictionType === 'plastic' ? fill(148, 163, 184) : fill(186, 230, 253, 200);
-            stroke(frictionType === 'plastic' ? 71 : 56, 85, 105);
-            strokeWeight(3);
-            rect(rod.x, rod.y, rod.width, rod.height, 25);
-            pop();
-
-            push();
-            frictionType === 'plastic' ? fill(214, 180, 154) : fill(244, 114, 182, 220);
-            strokeWeight(3); stroke(146, 110, 85);
-            beginShape();
-            vertex(cloth.x, cloth.y + 15); vertex(cloth.x + cloth.width, cloth.y);
-            vertex(cloth.x + cloth.width - 15, cloth.y + cloth.height); vertex(cloth.x + 15, cloth.y + cloth.height - 10);
-            endShape(CLOSE);
-            pop();
-
-            if (cloth.isDragging) {
-                let oldX = cloth.x, oldY = cloth.y;
-                cloth.x = constrain(mouseX - cloth.width / 2, 0, width - cloth.width);
-                cloth.y = constrain(mouseY - cloth.height / 2, 0, height - cloth.height);
-
-                let isOverlapping = (cloth.x < rod.x + rod.width && cloth.x + cloth.width > rod.x &&
-                                     cloth.y < rod.y + rod.height && cloth.y + cloth.height > rod.y);
-
-                if (isOverlapping) {
-                    let moveDist = dist(cloth.x, cloth.y, oldX, oldY);
-                    if (moveDist > 5) {
-                        frictionEnergy += moveDist;
-                        if (frameCount % 8 === 0) playRub();
-                    }
-
-                    if (frictionEnergy > 200) {
-                        frictionEnergy = 0;
-                        if (frictionType === 'plastic' && rod.charge > -5) {
-                            rod.charge -= 1; cloth.charge += 1;
-                            let clothNeg = charges.find(c => c.parent === 'cloth' && c.type === '-' && c.active && !c.isTransferring);
-                            if(clothNeg) {
-                                clothNeg.isTransferring = true;
-                                clothNeg.parent = 'rod';
-                                clothNeg.offsetOnRod = random(20, rod.width-20); 
-                                clothNeg.targetY = rod.y + random(10, 35);
-                            }
-                        } else if (frictionType === 'glass' && rod.charge < 5) {
-                            rod.charge += 1; cloth.charge -= 1;
-                            let rodNeg = charges.find(c => c.parent === 'rod' && c.type === '-' && c.active && !c.isTransferring);
-                            if (rodNeg) {
-                                rodNeg.isTransferring = true;
-                                rodNeg.parent = 'cloth';
-                                rodNeg.offsetX = random(20, cloth.width-20);
-                                rodNeg.offsetY = random(20, cloth.height-20);
-                            }
-                        }
-                    }
-                } else {
-                    frictionEnergy = 0; 
-                }
-            }
-
-            charges.forEach(c => {
-                if (c.parent === 'cloth') {
-                    if (c.isTransferring) {
-                        c.x = lerp(c.x, cloth.x + c.offsetX, 0.1);
-                        c.y = lerp(c.y, cloth.y + c.offsetY, 0.1);
-                        if (dist(c.x, c.y, cloth.x + c.offsetX, cloth.y + c.offsetY) < 2) c.isTransferring = false;
-                    } else {
-                        c.x = cloth.x + (c.offsetX || 0); c.y = cloth.y + (c.offsetY || 0);
-                    }
-                } else if (c.parent === 'rod') {
-                    if (c.isTransferring) {
-                        let tx = rod.x + c.offsetOnRod;
-                        c.x = lerp(c.x, tx, 0.1);
-                        c.y = lerp(c.y, c.targetY, 0.1);
-                        if (dist(c.x, c.y, tx, c.targetY) < 2) {
-                            c.isTransferring = false;
-                            c.offsetY = c.y - rod.y;
-                        }
-                    } else if (c.offsetOnRod !== undefined) {
-                        c.x = rod.x + c.offsetOnRod;
-                        c.y = rod.y + (c.offsetY || 20);
-                    }
-                }
-            });
-
-            if (!cloth.isDragging) {
-                charges.forEach(c => {
-                    if(c.parent === 'cloth' && !c.isTransferring) {
-                        c.offsetX = c.x - cloth.x; c.offsetY = c.y - cloth.y;
-                    }
-                });
-            }
-        }
-
-        function drawContact() {
-            push();
-            fill(100); stroke(71, 85, 105); strokeWeight(3);
-            rect(pendulum.pivotX - 70, pendulum.pivotY - 20, 140, 20, 8); 
-            rect(pendulum.pivotX - 6, pendulum.pivotY, 12, 25); 
-            let bobX = pendulum.pivotX + Math.sin(pendulum.angle) * pendulum.length;
-            let bobY = pendulum.pivotY + Math.cos(pendulum.angle) * pendulum.length;
-            stroke(100); line(pendulum.pivotX, pendulum.pivotY + 20, bobX, bobY);
-            fill(241, 245, 249); stroke(148, 163, 184); ellipse(bobX, bobY, pendulum.radius * 2);
-            pop();
-
-            push();
-            contactType === 'plastic' ? fill(148, 163, 184) : fill(186, 230, 253, 200);
-            strokeWeight(3); rect(rod.x, rod.y, rod.width, rod.height, 25);
-            pop();
-
-            if (rod.isDragging) {
-                rod.x = constrain(mouseX - rod.width / 2, 0, width - rod.width);
-                rod.y = constrain(mouseY - rod.height / 2, 0, height - rod.height);
-            }
-
-            let closestX = constrain(bobX, rod.x, rod.x + rod.width);
-            let closestY = constrain(bobY, rod.y, rod.y + rod.height);
-            let distanceToRod = dist(bobX, bobY, closestX, closestY);
-
-            let isRodClose = distanceToRod < 180;
-            charges.forEach(c => {
-                if (c.parent === 'rod' && c.offsetOnRod !== undefined) {
-                    c.x = rod.x + c.offsetOnRod; c.y = rod.y + rod.height/2;
-                }
-                
-                if (c.parent === 'pendulum_base') {
-                    if (simulationState === 0 && isRodClose) {
-                        let pushDir = (rod.x > bobX) ? -1 : 1; 
-                        let targetX = 0;
-                        if (contactType === 'plastic') {
-                             targetX = c.type === '-' ? pushDir * 16 : -pushDir * 16; 
-                        } else {
-                             targetX = c.type === '+' ? pushDir * 16 : -pushDir * 16; 
-                        }
-                        c.offsetX = lerp(c.offsetX, targetX, 0.05); 
-                    } else if (simulationState === 0) {
-                        c.offsetX = lerp(c.offsetX, c.originalOffsetX, 0.02); 
-                    }
-                    c.x = bobX + c.offsetX; c.y = bobY + c.offsetY;
-                }
-
-                if (c.parent === 'pendulum_acquired') {
-                    c.x = bobX + c.offsetX; c.y = bobY + c.offsetY;
-                }
-            });
-
-            if (simulationState === 0) {
-                if (distanceToRod <= pendulum.radius + 2) {
-                    sparkTimer++;
-                    if (sparkTimer === 1) {
-                        playZap();
-                        simulationState = 1; 
-                    }
-                    push();
-                    stroke(100, 200, 255);
-                    strokeWeight(random(2, 5));
-                    line(closestX, closestY, bobX + random(-8,8), bobY + random(-8,8));
-                    pop();
-                } else if (distanceToRod < 180) {
-                    let attractionForce = map(distanceToRod, pendulum.radius, 180, Math.PI/4.5, 0);
-                    let targetAngle = (rod.x + rod.width/2 > bobX) ? attractionForce : -attractionForce;
-                    pendulum.angle = lerp(pendulum.angle, targetAngle, 0.03); 
-                    sparkTimer = 0;
-                } else {
-                    pendulum.angle = lerp(pendulum.angle, 0, 0.02); 
-                    sparkTimer = 0;
-                }
-            } 
-
-            if (simulationState === 1) {
-                if (pendulum.charge === 0) {
-                    if (contactType === 'plastic') {
-                        pendulum.charge = -3; rod.charge += 3;
-                        let transfer = charges.filter(c => c.parent === 'rod' && c.active).slice(0, 3);
-                        transfer.forEach(c => { c.parent = 'pendulum_acquired'; c.offsetX = random(-18, 18); c.offsetY = random(-18, 18); });
-                    } else {
-                        pendulum.charge = 3; rod.charge -= 3;
-                        let pNegs = charges.filter(c => c.parent === 'pendulum_base' && c.type === '-').slice(0, 3);
-                        pNegs.forEach(c => {
-                            c.parent = 'transfer_to_rod';
-                            c.targetX = rod.x + random(20, rod.width-20);
-                            c.targetY = rod.y + 20;
-                        });
-                    }
-                }
-
-                let targetAngle = 0;
-                if (distanceToRod < 300) {
-                    let repulsionForce = map(distanceToRod, 0, 300, Math.PI/2.2, 0);
-                    targetAngle = (rod.x + rod.width/2 < bobX) ? repulsionForce : -repulsionForce;
-                }
-                pendulum.angle = lerp(pendulum.angle, targetAngle, 0.03); 
-            }
-
-            charges.forEach(c => {
-                if (c.parent === 'transfer_to_rod') {
-                    c.x = lerp(c.x, c.targetX, 0.1); 
-                    c.y = lerp(c.y, c.targetY, 0.1);
-                    if (dist(c.x, c.y, c.targetX, c.targetY) < 5) c.active = false;
-                }
-            });
-        }
-
-        function drawInduction() {
-             push();
-             stroke(148, 163, 184); strokeWeight(3);
-             fill(255, 255, 255, 120); stroke(203, 213, 225);
-             rect(electroscope.rodX - 70, electroscope.diskY + 35, 140, electroscope.rodLength + 50, 15, 15, 25, 25);
-             fill(51, 65, 85); noStroke(); rect(electroscope.rodX - 25, electroscope.diskY + 25, 50, 15);
-             stroke(113, 113, 122); strokeWeight(5);
-             line(electroscope.rodX, electroscope.diskY + 15, electroscope.rodX, electroscope.rodY + electroscope.rodLength);
-             fill(253, 224, 71); stroke(202, 138, 4); strokeWeight(3);
-             ellipse(electroscope.diskX, electroscope.diskY, electroscope.diskRadius * 2, 30);
-             pop();
-
-             let distance = dist(rod.x + rod.width/2, rod.y + rod.height/2, electroscope.diskX, electroscope.diskY);
-             
-             if (!electroscope.touched && distance > 350) {
-                 drawChargeObj(electroscope.diskX - 25, electroscope.diskY, '+');
-                 drawChargeObj(electroscope.diskX + 25, electroscope.diskY, '-');
-                 drawChargeObj(electroscope.rodX - 20, electroscope.rodY + electroscope.rodLength + 15, '+');
-                 drawChargeObj(electroscope.rodX + 20, electroscope.rodY + electroscope.rodLength + 15, '-');
-             }
-
-             let isTouching = (rod.x < electroscope.diskX + electroscope.diskRadius &&
-                               rod.x + rod.width > electroscope.diskX - electroscope.diskRadius &&
-                               rod.y < electroscope.diskY + 25 &&
-                               rod.y + rod.height > electroscope.diskY - 25);
-
-             if (isTouching && !electroscope.touched) {
-                 electroscope.touched = true;
-                 playZap();
-                 
-                 if (inductionType === 'plastic') {
-                     let transferred = 0;
-                     charges.forEach(c => {
-                          if (c.parent === 'rod' && c.active && transferred < 3) {
-                              c.active = false; transferred++;
-                          }
-                     });
-                     for(let i=0; i<3; i++) {
-                          charges.push({
-                              x: electroscope.diskX + random(-20, 20),
-                              y: electroscope.diskY,
-                              type: '-',
-                              parent: 'electroscope_traveling_down',
-                              targetY: electroscope.rodY + electroscope.rodLength - 15,
-                              active: true
-                          });
-                     }
-                 } else {
-                     for(let i=0; i<3; i++) {
-                          charges.push({
-                              x: electroscope.rodX + random(-15, 15),
-                              y: electroscope.rodY + electroscope.rodLength,
-                              type: '-',
-                              parent: 'electroscope_traveling_up',
-                              targetX: rod.x + random(25, rod.width-25),
-                              active: true
-                          });
-                     }
-                 }
-             }
-
-             if (!electroscope.touched) {
-                 let influence = map(constrain(distance, 60, 350), 60, 350, 1, 0); 
-                 electroscope.leafAngle = lerp(electroscope.leafAngle, influence * electroscope.maxAngle, 0.04);
-
-                 if (influence > 0.05) {
-                     push();
-                     textSize(28); textStyle(BOLD);
-                     let diskChargeStr = inductionType === 'plastic' ? '+++' : '---';
-                     let leafChargeStr = inductionType === 'plastic' ? '-' : '+';
-                     let diskColor = inductionType === 'plastic' ? color(239, 68, 68) : color(59, 130, 246);
-                     let leafColor = inductionType === 'plastic' ? color(59, 130, 246) : color(239, 68, 68);
-
-                     fill(diskColor); text(diskChargeStr, electroscope.diskX, electroscope.diskY - 25);
-                     fill(leafColor);
-                     let leafXOffset = Math.sin(electroscope.leafAngle) * 70;
-                     let leafYOffset = Math.cos(electroscope.leafAngle) * 70;
-                     text(leafChargeStr, electroscope.rodX - leafXOffset - 20, electroscope.rodY + electroscope.rodLength + leafYOffset);
-                     text(leafChargeStr, electroscope.rodX + leafXOffset + 20, electroscope.rodY + electroscope.rodLength + leafYOffset);
-                     pop();
-                 }
-             } else {
-                 electroscope.leafAngle = lerp(electroscope.leafAngle, electroscope.maxAngle, 0.04); 
-                 push();
-                 textSize(28); textStyle(BOLD);
-                 let diskChargeStr = inductionType === 'plastic' ? '---' : '+++';
-                 let diskColor = inductionType === 'plastic' ? color(59, 130, 246) : color(239, 68, 68);
-                 fill(diskColor); 
-                 text(diskChargeStr, electroscope.diskX, electroscope.diskY - 25);
-                 text(diskChargeStr.charAt(0), electroscope.rodX - 30, electroscope.rodY + electroscope.rodLength + 25);
-                 text(diskChargeStr.charAt(0), electroscope.rodX + 30, electroscope.rodY + electroscope.rodLength + 25);
-                 pop();
-             }
-
-             push();
-             translate(electroscope.rodX, electroscope.rodY + electroscope.rodLength);
-             stroke(250, 204, 21); strokeWeight(5);
-             rotate(-electroscope.leafAngle); line(0, 0, 0, 60);
-             rotate(electroscope.leafAngle * 2); line(0, 0, 0, 60);
-             pop();
-
-             push();
-             inductionType === 'plastic' ? fill(148, 163, 184) : fill(186, 230, 253, 200);
-             strokeWeight(3); rect(rod.x, rod.y, rod.width, rod.height, 25);
-             pop();
-
-             if (rod.isDragging) {
-                 rod.x = constrain(mouseX - rod.width / 2, 0, width - rod.width);
-                 rod.y = constrain(mouseY - rod.height / 2, 0, height - rod.height);
-             }
-
-             charges.forEach(c => {
-                 if (c.parent === 'rod' && c.offsetOnRod !== undefined) {
-                     c.x = rod.x + c.offsetOnRod; c.y = rod.y + rod.height/2;
-                 } else if (c.parent === 'electroscope_traveling_down') {
-                     c.y = lerp(c.y, c.targetY, 0.03); 
-                     c.x = lerp(c.x, electroscope.rodX, 0.04); 
-                     if (abs(c.y - c.targetY) < 5) {
-                         c.parent = 'electroscope_arrived';
-                         c.offsetX = random(-35, 35); 
-                     }
-                 } else if (c.parent === 'electroscope_traveling_up') {
-                     if (c.y > electroscope.diskY + 25) {
-                         c.y = lerp(c.y, electroscope.diskY, 0.03); 
-                         c.x = lerp(c.x, electroscope.rodX, 0.04);
-                     } else {
-                         c.y = lerp(c.y, rod.y + rod.height/2, 0.03);
-                         c.x = lerp(c.x, c.targetX, 0.04);
-                         if (dist(c.x, c.y, c.targetX, rod.y + rod.height/2) < 12) c.active = false; 
-                     }
-                 } else if (c.parent === 'electroscope_arrived') {
-                     c.x = lerp(c.x, electroscope.rodX + c.offsetX, 0.04); 
-                     c.y = lerp(c.y, electroscope.rodY + electroscope.rodLength + 35, 0.04);
-                 }
-             });
-        }
-
-        function drawChargeObj(x, y, type) {
-            push(); textSize(16); textAlign(CENTER, CENTER); strokeWeight(1); textStyle(BOLD);
-            type === '+' ? (fill(239, 68, 68), stroke(185, 28, 28)) : (fill(59, 130, 246), stroke(29, 78, 216));
-            ellipse(x, y, 22, 22);
-            fill(255); noStroke(); text(type, x, y + 1); 
-            pop();
-        }
-
-        function drawCharges() {
-            charges.forEach(c => {
-                if (!c.active) return;
-                drawChargeObj(c.x, c.y, c.type);
-            });
-        }
-
-        function drawTooltips() {
-            let tooltipText = null;
-            let isDraggableHovered = false; 
-            
-            if (mouseX > rod.x && mouseX < rod.x + rod.width && mouseY > rod.y && mouseY < rod.y + rod.height) {
-                if (currentMode === 'contact' || currentMode === 'induction') isDraggableHovered = true;
-                
-                let rName = rod.type === 'plastic' || (currentMode !== 'friction' && contactType === 'plastic' && inductionType === 'plastic') ? 'قضيب بلاستيكي' : 'قضيب زجاجي';
-                if (currentMode === 'friction') {
-                    tooltipText = `${rName}: ${rod.charge === 0 ? 'متعادل كهربائياً' : (rod.charge < 0 ? 'سالب الشحنة' : 'موجب الشحنة')}`;
-                } else {
-                    tooltipText = `${rName}: ${rod.charge < 0 ? 'مشحون بشحنة سالبة' : 'مشحون بشحنة موجبة'}`;
-                }
-            }
-            else if (currentMode === 'friction' && mouseX > cloth.x && mouseX < cloth.x + cloth.width && mouseY > cloth.y && mouseY < cloth.y + cloth.height) {
-                isDraggableHovered = true; 
-                let cName = frictionType === 'plastic' ? 'قطعة صوف' : 'قطعة حرير';
-                tooltipText = `${cName}: ${cloth.charge === 0 ? 'متعادل كهربائياً' : (cloth.charge < 0 ? 'سالب الشحنة' : 'موجب الشحنة')}`;
-            }
-            else if (currentMode === 'contact') {
-                let bobX = pendulum.pivotX + Math.sin(pendulum.angle) * pendulum.length;
-                let bobY = pendulum.pivotY + Math.cos(pendulum.angle) * pendulum.length;
-                if (dist(mouseX, mouseY, bobX, bobY) < pendulum.radius) {
-                    tooltipText = `كرية النواس: ${pendulum.charge === 0 ? 'متعادل كهربائياً' : (pendulum.charge < 0 ? 'اكتسبت إلكترونات (سالب)' : 'فقدت إلكترونات (موجب)')}`;
-                }
-            }
-            else if (currentMode === 'induction') {
-                if (dist(mouseX, mouseY, electroscope.diskX, electroscope.diskY) < electroscope.diskRadius || 
-                   (mouseX > electroscope.rodX - 25 && mouseX < electroscope.rodX + 25 && mouseY > electroscope.diskY && mouseY < electroscope.rodY + electroscope.rodLength)) {
-                    if (electroscope.touched) {
-                        tooltipText = "كشاف كهربائي: مشحون باللمس (الورقتان منفرجتان دائماً)";
-                    } else if (electroscope.leafAngle > 0.05) {
-                        tooltipText = "كشاف كهربائي: استقطاب بالتأثير (الشحنات مفصولة مؤقتاً)";
-                    } else {
-                        tooltipText = "كشاف كهربائي: متعادل كهربائياً";
-                    }
-                }
-            }
-
-            if ((currentMode === 'friction' && cloth.isDragging) || 
-                ((currentMode === 'contact' || currentMode === 'induction') && rod.isDragging)) {
-                cursor('grabbing'); 
-            } else if (isDraggableHovered) {
-                cursor('grab'); 
-            } else {
-                cursor(ARROW); 
-            }
-
-            if (tooltipText) {
-                push();
-                fill(15, 23, 42, 230); 
-                noStroke();
-                textSize(16);
-                let tWidth = textWidth(tooltipText) + 40;
-                
-                let rectX = width / 2 - tWidth / 2;
-                let rectY = 20; 
-                
-                rect(rectX, rectY, tWidth, 40, 20); 
-                
-                fill(255);
-                textAlign(CENTER, CENTER);
-                text(tooltipText, rectX + tWidth / 2, rectY + 20);
-                pop();
-            }
-        }
-
-        function mousePressed() {
-            initAudio(); 
-            
-            if (currentMode === 'friction') {
-                if (mouseX > cloth.x && mouseX < cloth.x + cloth.width && mouseY > cloth.y && mouseY < cloth.y + cloth.height) {
-                    cloth.isDragging = true;
-                }
-            } else if (currentMode === 'contact' || currentMode === 'induction') {
-                if (mouseX > rod.x && mouseX < rod.x + rod.width && mouseY > rod.y && mouseY < rod.y + rod.height) {
-                    rod.isDragging = true;
-                }
-            }
-        }
-
-        function mouseReleased() {
-            if (currentMode === 'friction') cloth.isDragging = false;
-            else if (currentMode === 'contact' || currentMode === 'induction') rod.isDragging = false;
-        }
-
-        function touchStarted() {
-            mousePressed();
-            return false; 
-        }
-
-        function touchEnded() {
-            mouseReleased();
-            return false;
-        }
-    <\/script>
-</body>
-</html>
     </script>
 </body>
 </html>
