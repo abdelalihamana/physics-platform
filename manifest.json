@@ -11,4 +11,19 @@
     {"src": "icon.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"}]}
+      "purpose": "any maskable"}]
+"screenshots": [
+    {
+      "src": "mobile-screen.png",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "desktop-screen.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ]
+}
