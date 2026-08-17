@@ -16,6 +16,8 @@
       "type": "image/png"
     }
   ], 
+  "description": "المنصة التي تحتاجها لتعلم الظواهر الفيزيائية وإجراء التجارب العلمية بسهولة.",
+  "orientation": "portrait",
   "screenshots": [
     {
       "src": "mobile-screen.png",
