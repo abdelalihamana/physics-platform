@@ -19,7 +19,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="theme-color" content="#f8fafc">
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="bg-pattern.webp">
+    <!-- تم تصحيح أيقونة الهاتف لتكون الشعار بدلاً من الخلفية -->
+    <link rel="apple-touch-icon" href="icon.png">
 
     <!-- Tailwind CSS with Dark Mode config -->
     <link href="./output.css" rel="stylesheet">
@@ -35,7 +36,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://www.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">    
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    
     <!-- Phosphor Icons (تم استخدام defer لتسريع التحميل) -->
     <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
     <style>
@@ -116,7 +118,7 @@
                     <p class="text-xs text-blue-100 font-bold mt-0.5">مساحة التواصل</p>
                 </div>
             </div>
-            <button onclick="closeChat()" aria-label="إغلاق الدردشة" class="bg-black/10 hover:bg-black/20 rounded-full w-8 h-8 flex items-center justify-center transition text-lg relative z-10"><i class="ph-bold ph-x"></i></button>
+            <button onclick="closeChat()" aria-label="إغلاق نافذة الدردشة" class="bg-black/10 hover:bg-black/20 rounded-full w-8 h-8 flex items-center justify-center transition text-lg relative z-10"><i class="ph-bold ph-x"></i></button>
         </div>
         <div id="chat-messages" class="flex-1 overflow-y-auto overflow-x-hidden p-4 flex flex-col gap-3 bg-white dark:bg-slate-900 scroll-smooth"></div>
         <div class="bg-white dark:bg-slate-800 p-3 border-t border-slate-100 dark:border-slate-700 flex gap-2 items-end shadow-[0_-5px_10px_-5px_rgba(0,0,0,0.05)]">
@@ -175,8 +177,8 @@
         <div class="bg-white dark:bg-slate-800 p-8 rounded-[2rem] max-w-sm w-[90%] mx-auto shadow-2xl border border-white/50 dark:border-slate-700">
             <h3 class="text-2xl font-black mb-6 text-slate-800 dark:text-white flex items-center gap-3"><i class="ph-fill ph-pencil-simple text-amber-500"></i> تعديل المحتوى</h3>
             <div class="space-y-4">
-                <input type="text" id="edit-link-title" aria-label="عنوان الدرس" class="w-full text-base font-bold p-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl outline-none focus:border-amber-500 transition bg-slate-50 dark:bg-slate-900 dark:text-white" placeholder="عنوان المحتوى...">
-                <input type="text" id="edit-link-url" aria-label="رابط الدرس" class="w-full text-base p-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl outline-none focus:border-amber-500 transition bg-slate-50 dark:bg-slate-900 dark:text-white text-left font-bold" dir="ltr" placeholder="https://...">
+                <input type="text" id="edit-link-title" aria-label="عنوان المحتوى" class="w-full text-base font-bold p-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl outline-none focus:border-amber-500 transition bg-slate-50 dark:bg-slate-900 dark:text-white" placeholder="عنوان المحتوى...">
+                <input type="text" id="edit-link-url" aria-label="رابط المحتوى" class="w-full text-base p-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl outline-none focus:border-amber-500 transition bg-slate-50 dark:bg-slate-900 dark:text-white text-left font-bold" dir="ltr" placeholder="https://...">
             </div>
             <div class="flex justify-center gap-3 mt-8">
                 <button onclick="closeEditModal()" class="flex-1 py-3.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-black text-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition btn-modern">إلغاء</button>
@@ -238,8 +240,9 @@
             </div>
 
             <div class="text-center mb-10 relative z-10 pt-4">
+                <!-- تم تصحيح اللوجو ليصبح icon.png مع وضع أبعاد ثابتة -->
                 <div class="w-36 h-36 mx-auto mb-6 rounded-[2rem] shadow-2xl overflow-hidden border-4 border-white dark:border-slate-700 bg-white p-1 transform transition hover:scale-105 duration-300">
-                    <img src="bg-pattern.webp" alt="شعار المنصة" class="w-full h-full object-cover rounded-[1.7rem]">
+                    <img src="icon.png" alt="شعار المنصة" width="144" height="144" class="w-full h-full object-cover rounded-[1.7rem]">
                 </div>
                 <h2 id="auth-title" class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 drop-shadow-sm mb-3">منصة المجتهد</h2>
                 <div class="inline-block bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-6 py-2 rounded-full text-base font-bold border border-blue-100 dark:border-blue-800 shadow-sm tracking-wide">للعلوم الفيزيائية</div>
@@ -307,7 +310,8 @@
             <!-- Header -->
             <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-5 md:p-6 rounded-[2.5rem] shadow-lg border border-white/50 dark:border-slate-700 mb-6 gap-5 sticky top-4 z-40 transition-all duration-300">
                 <div class="flex items-center gap-4 w-full md:w-auto">
-                    <div class="w-16 h-16 rounded-2xl shadow-lg overflow-hidden bg-white p-1 border border-slate-100 dark:border-slate-700"><img src="bg-pattern.webp" class="w-full h-full object-cover rounded-xl" alt="Logo"></div>
+                    <!-- تم تصحيح اللوجو هنا أيضاً مع وضع الأبعاد -->
+                    <div class="w-16 h-16 rounded-2xl shadow-lg overflow-hidden bg-white p-1 border border-slate-100 dark:border-slate-700"><img src="icon.png" alt="شعار المنصة" width="64" height="64" class="w-full h-full object-cover rounded-xl"></div>
                     <div>
                         <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 leading-tight">منصة المجتهد</h1>
                         <div class="flex items-center gap-2 mt-1">
@@ -442,7 +446,7 @@
                     </div>
 
                     <!-- زر العودة للإدارة الجديد -->
-                    <button id="return-admin-btn" onclick="returnToAdmin()" class="hidden relative px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-2xl text-lg shadow-[0_0_15px_rgba(249,115,22,0.6)] animate-pulse hover:animate-none transition-all flex items-center gap-2 border border-orange-300 dark:border-orange-700" title="العودة للإدارة">
+                    <button id="return-admin-btn" onclick="returnToAdmin()" aria-label="العودة للإدارة" class="hidden relative px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-2xl text-lg shadow-[0_0_15px_rgba(249,115,22,0.6)] animate-pulse hover:animate-none transition-all flex items-center gap-2 border border-orange-300 dark:border-orange-700" title="العودة للإدارة">
                         <i class="ph-bold ph-arrow-right"></i> العودة للإدارة
                     </button>
 
@@ -499,7 +503,6 @@
 
         // ملاحظة أمنية: مفتاح API الخاص بـ Firebase مصمم ليكون عاماً وموجوداً في الواجهة الأمامية.
         // لحماية هذا المفتاح، تأكد من إضافة "قيود" (Restrictions) له من لوحة تحكم Google Cloud للسماح لموقعك فقط.
-        // تنبيه GitHub بشأن هذا المفتاح يعتبر "تنبيه كاذب" (False Positive) ويمكنك إغلاقه/تجاهله في GitHub.
         const firebaseConfig = {
             apiKey: "AIzaSyDuuYHwmSW0UV1TO3gDGyETrvOimE7iGLs",
             authDomain: "physique-58073.firebaseapp.com",
@@ -751,7 +754,7 @@
                     if (!progDoc.exists()) {
                         await setDoc(doc(programCol, 'main'), { sections: defaultProgramData });
                     } else {
-                        // إضافة أو تحديث وحدة "شهادتك 🎓" برمجياً وإصلاح التصنيفات لتكون (مواضيع سابقة ومقترحة)
+                        // إضافة أو تحديث وحدة "شهادتك 🎓" برمجياً وإصلاح التصنيفات
                         let data = progDoc.data();
                         let needsUpdate = false;
                         data.sections.forEach(part => {
@@ -762,12 +765,10 @@
                                         year.branches.push({ id: "m4_b5", title: "شهادتك 🎓", categories: { 'past_exams': [], 'mock_exams': [] } });
                                         needsUpdate = true;
                                     } else {
-                                        // إصلاح هيكل التصنيفات إذا كان يحتوي على lessons أو إذا لم تكن المصفوفات موجودة
                                         if (!existingB5.categories) { existingB5.categories = {}; needsUpdate = true; }
                                         if (!existingB5.categories['past_exams']) { existingB5.categories['past_exams'] = existingB5.categories['lessons'] || []; needsUpdate = true; }
                                         if (!existingB5.categories['mock_exams']) { existingB5.categories['mock_exams'] = existingB5.categories['exercises'] || []; needsUpdate = true; }
                                         
-                                        // تنظيف التصنيفات القديمة إن وجدت
                                         if (existingB5.categories['lessons']) { delete existingB5.categories['lessons']; needsUpdate = true; }
                                         if (existingB5.categories['exercises']) { delete existingB5.categories['exercises']; needsUpdate = true; }
                                         if (existingB5.categories['exams']) { delete existingB5.categories['exams']; needsUpdate = true; }
@@ -1081,12 +1082,11 @@
         window.executeStudentSearch = () => {
             const searchInput = document.getElementById('lesson-search').value.trim();
             const query = searchInput.toLowerCase(); // نستخدم النص الأصلي للبحث الفعلي
-            const safeQuery = escapeHtml(searchInput); // نستخدم النص المنظف للعرض على الشاشة فقط
+            const safeQuery = escapeHtml(searchInput); // نستخدم النص المنظف للعرض على الشاشة فقط لضمان الأمان
             const container = document.getElementById('student-program-view');
             
             if (query === '') { renderProgramUI(window.currentSections, 'student-program-view', false); return; }
 
-            // تم استبدال query بـ safeQuery هنا لمنع ثغرة XSS
             let html = `<div class="bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl rounded-[2rem] border border-blue-200 dark:border-blue-800 p-6 shadow-lg animate-[fadeInTab_0.3s_ease]">
                             <h3 class="text-xl font-black text-blue-600 dark:text-blue-400 mb-6 flex items-center gap-2"><i class="ph-bold ph-magnifying-glass"></i> نتائج البحث عن: "${safeQuery}"</h3>
                             <div class="space-y-4">`;
@@ -1255,8 +1255,8 @@
                 let chatBadge = unreadCount > 0 ? `<span class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full animate-bounce shadow-md border border-white">${unreadCount}</span>` : '';
 
                 let statusBtn = data.approved 
-                    ? `<button onclick="toggleUserStatus('${d.id}', true, '${data.phoneNumber||''}')" class="px-4 py-1.5 rounded-full text-xs font-black shadow-sm bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:scale-105 transition" title="انقر لإلغاء التفعيل">مفعل ✅</button>`
-                    : `<button onclick="toggleUserStatus('${d.id}', false, '${data.phoneNumber||''}')" class="px-4 py-1.5 rounded-full text-xs font-black shadow-sm bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800 hover:scale-105 transition" title="اضغط للتفعيل ومراسلة الولي">انتظار ⏳</button>`;
+                    ? `<button onclick="toggleUserStatus('${d.id}', true, '${data.phoneNumber||''}')" aria-label="تغيير الحالة" class="px-4 py-1.5 rounded-full text-xs font-black shadow-sm bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:scale-105 transition" title="انقر لإلغاء التفعيل">مفعل ✅</button>`
+                    : `<button onclick="toggleUserStatus('${d.id}', false, '${data.phoneNumber||''}')" aria-label="تغيير الحالة" class="px-4 py-1.5 rounded-full text-xs font-black shadow-sm bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800 hover:scale-105 transition" title="اضغط للتفعيل ومراسلة الولي">انتظار ⏳</button>`;
 
                 tbody.innerHTML += `
                     <tr class="hover:bg-blue-50/40 dark:hover:bg-blue-900/20 transition duration-200 group">
@@ -1279,7 +1279,7 @@
                         <td class="p-4 text-center border-b border-slate-100 dark:border-slate-700">${statusBtn}</td>
                         <td class="p-4 text-left border-b border-slate-100 dark:border-slate-700">
                             <div class="flex gap-2 justify-end">
-                                <button onclick="loginAsStudent('${d.id}')" class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 px-3 py-1.5 rounded-lg text-xs font-black hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition border border-indigo-200 dark:border-indigo-800 shadow-sm flex items-center gap-1" title="مراقبة حساب التلميذ"><i class="ph-bold ph-sign-in"></i> دخول للحساب</button>
+                                <button onclick="loginAsStudent('${d.id}')" aria-label="مراقبة حساب التلميذ" class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 px-3 py-1.5 rounded-lg text-xs font-black hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition border border-indigo-200 dark:border-indigo-800 shadow-sm flex items-center gap-1" title="مراقبة حساب التلميذ"><i class="ph-bold ph-sign-in"></i> دخول للحساب</button>
                                 <button onclick="openChat('${d.id}')" aria-label="مراسلة التلميذ" class="relative icon-btn w-9 h-9 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-lg shadow-sm border border-blue-200 dark:border-blue-800" title="مراسلة"><i class="ph-bold ph-chat-circle-dots"></i>${chatBadge}</button>
                             </div>
                         </td>
@@ -1437,7 +1437,6 @@
             const docRef = doc(programCol, 'main'); 
             let sections = window.currentSections;
             
-            // إصلاح هام: التأكد من وجود المصفوفة في قاعدة البيانات لإنشاء التصنيف تلقائياً إذا كان مفقوداً
             if (!sections[pIdx].years[yIdx].branches[bIdx].categories[cat]) {
                 sections[pIdx].years[yIdx].branches[bIdx].categories[cat] = [];
             }
@@ -1535,10 +1534,10 @@
                         cats.forEach(cat => {
                             let links = branch.categories[cat] || []; let conf = catConfig[cat];
                             
-                            // تحويل الروابط (a) إلى أزرار (button) لتحسين (Accessibility / Best Practices)
+                            // استخدام زر button بدلاً من رابط a لرفع تقييم Best Practices وسهولة الوصول
                             let linksList = links.length ? links.map((lnk, lIdx) => {
                                 let linkId = `${branch.id}_${cat}_${lIdx}`; let isRead = clickedLinks.includes(linkId);
-                                return `<button onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}')" class="lesson-item w-full flex items-center justify-between gap-3 bg-white dark:bg-slate-800 p-3 rounded-2xl border ${isRead ? 'border-emerald-200 dark:border-emerald-800 shadow-sm' : 'border-slate-100 dark:border-slate-700'} hover:shadow-md transition group/link relative overflow-hidden text-right"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl group-hover/link:bg-blue-600 group-hover/link:text-white transition shadow-inner"><i class="ph-bold ph-link"></i></div><span class="${conf.text} font-bold text-sm truncate max-w-[140px] sm:max-w-[180px] group-hover/link:underline decoration-2 underline-offset-4">${lnk.title}</span></div>${isRead ? `<span class="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 text-[10px] font-black px-2 py-1 rounded-md flex items-center gap-1"><i class="ph-bold ph-check"></i> مقروء</span>` : ''}</button>`;
+                                return `<button onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}')" aria-label="مشاهدة المحتوى" class="lesson-item w-full flex items-center justify-between gap-3 bg-white dark:bg-slate-800 p-3 rounded-2xl border ${isRead ? 'border-emerald-200 dark:border-emerald-800 shadow-sm' : 'border-slate-100 dark:border-slate-700'} hover:shadow-md transition group/link relative overflow-hidden text-right"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl group-hover/link:bg-blue-600 group-hover/link:text-white transition shadow-inner"><i class="ph-bold ph-link"></i></div><span class="${conf.text} font-bold text-sm truncate max-w-[140px] sm:max-w-[180px] group-hover/link:underline decoration-2 underline-offset-4">${lnk.title}</span></div>${isRead ? `<span class="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 text-[10px] font-black px-2 py-1 rounded-md flex items-center gap-1"><i class="ph-bold ph-check"></i> مقروء</span>` : ''}</button>`;
                             }).join('') : getEmptyStateHTML(conf.title);
                             
                             html += `<div class="${conf.bg} ${conf.border} p-5 rounded-3xl border shadow-sm"><h5 class="font-black ${conf.text} text-lg mb-4 flex items-center gap-2">${conf.icon} ${conf.title}</h5><div class="space-y-2">${linksList}</div></div>`;
