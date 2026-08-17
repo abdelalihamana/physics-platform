@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>منصة المجتهد للعلوم الفيزيائية</title>
     
+    <!-- تحسينات الأداء والسرعة (Preload & Preconnect) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://www.gstatic.com">
+    <link rel="preload" as="image" href="bg-pattern.webp">
+
+    <!-- تحسينات محركات البحث (SEO) -->
+    <meta name="description" content="منصة المجتهد للعلوم الفيزيائية - منصة تعليمية تفاعلية لتقديم الدروس والتمارين لطلاب التعليم المتوسط والثانوي بطريقة حديثة ومبتكرة.">
+
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -23,13 +32,12 @@
     </script>
 
     <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://www.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- Phosphor Icons -->
-<script src="https://unpkg.com/@phosphor-icons/web" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">    
+    <!-- Phosphor Icons (تم استخدام defer لتسريع التحميل) -->
+    <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
     <style>
         body { 
             font-family: 'Tajawal', sans-serif; 
@@ -39,7 +47,7 @@
         }
         
         .dark body {
-           background: linear-gradient(rgba(248, 250, 252, 0.94), rgba(226, 232, 240, 0.97)), url('bg-pattern.webp');
+           background: linear-gradient(rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.98)), url('bg-pattern.webp');
             background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed;
         }
 
@@ -108,14 +116,14 @@
                     <p class="text-xs text-blue-100 font-bold mt-0.5">مساحة التواصل</p>
                 </div>
             </div>
-            <button onclick="closeChat()" class="bg-black/10 hover:bg-black/20 rounded-full w-8 h-8 flex items-center justify-center transition text-lg relative z-10"><i class="ph-bold ph-x"></i></button>
+            <button onclick="closeChat()" aria-label="إغلاق الدردشة" class="bg-black/10 hover:bg-black/20 rounded-full w-8 h-8 flex items-center justify-center transition text-lg relative z-10"><i class="ph-bold ph-x"></i></button>
         </div>
         <div id="chat-messages" class="flex-1 overflow-y-auto overflow-x-hidden p-4 flex flex-col gap-3 bg-white dark:bg-slate-900 scroll-smooth"></div>
         <div class="bg-white dark:bg-slate-800 p-3 border-t border-slate-100 dark:border-slate-700 flex gap-2 items-end shadow-[0_-5px_10px_-5px_rgba(0,0,0,0.05)]">
             <div class="flex-1 bg-slate-100 dark:bg-slate-700 rounded-2xl border-2 border-slate-200 dark:border-slate-600 p-1 flex flex-col focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-slate-800 transition-all shadow-inner">
-                <textarea id="chat-input" rows="1" class="w-full bg-transparent px-3 py-2 outline-none resize-none font-bold text-slate-700 dark:text-slate-200 text-sm placeholder-slate-400 dark:placeholder-slate-500 leading-relaxed" placeholder="رسالة أو رابط..."></textarea>
+                <textarea id="chat-input" aria-label="كتابة رسالة" rows="1" class="w-full bg-transparent px-3 py-2 outline-none resize-none font-bold text-slate-700 dark:text-slate-200 text-sm placeholder-slate-400 dark:placeholder-slate-500 leading-relaxed" placeholder="رسالة أو رابط..."></textarea>
             </div>
-            <button id="send-msg-btn" onclick="sendChatMessage()" class="w-12 h-12 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl font-black text-xl btn-modern flex items-center justify-center shadow-md shadow-blue-500/30"><i class="ph-bold ph-paper-plane-tilt"></i></button>
+            <button id="send-msg-btn" onclick="sendChatMessage()" aria-label="إرسال الرسالة" class="w-12 h-12 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl font-black text-xl btn-modern flex items-center justify-center shadow-md shadow-blue-500/30"><i class="ph-bold ph-paper-plane-tilt"></i></button>
         </div>
     </div>
 
@@ -140,24 +148,24 @@
         <div class="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] max-w-md w-full shadow-2xl border border-white/50 dark:border-slate-700 transform transition-transform duration-300 scale-95" id="settings-content">
             <div class="flex justify-between items-center mb-6 border-b border-slate-100 dark:border-slate-700 pb-4">
                 <h3 class="text-2xl font-black text-slate-800 dark:text-white flex items-center gap-3"><i class="ph-fill ph-gear-six text-blue-500"></i> الإعدادات</h3>
-                <button onclick="closeSettings()" class="text-slate-400 hover:text-red-500 font-bold text-3xl transition hover:rotate-90"><i class="ph-bold ph-x"></i></button>
+                <button onclick="closeSettings()" aria-label="إغلاق الإعدادات" class="text-slate-400 hover:text-red-500 font-bold text-3xl transition hover:rotate-90"><i class="ph-bold ph-x"></i></button>
             </div>
             
             <div class="space-y-5 max-h-[65vh] overflow-y-auto pr-2">
                <div>
                     <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2 flex items-center gap-2"><i class="ph-fill ph-user"></i> اسم المستخدم</label>
-                    <input type="text" id="settings-username" autocomplete="username" disabled class="w-full px-5 py-3.5 rounded-xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-400 dark:text-slate-500 font-black outline-none cursor-not-allowed shadow-inner text-lg">
+                    <input type="text" id="settings-username" aria-label="اسم المستخدم" autocomplete="username" disabled class="w-full px-5 py-3.5 rounded-xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-400 dark:text-slate-500 font-black outline-none cursor-not-allowed shadow-inner text-lg">
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2 flex items-center gap-2"><i class="ph-fill ph-lock-key"></i> كلمة المرور الجديدة</label>
-                    <input type="text" id="settings-new-password" autocomplete="new-password" class="w-full px-5 py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-blue-500 outline-none font-black transition shadow-sm text-lg text-slate-800 dark:text-white">
+                    <input type="text" id="settings-new-password" aria-label="كلمة المرور الجديدة" autocomplete="new-password" class="w-full px-5 py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-blue-500 outline-none font-black transition shadow-sm text-lg text-slate-800 dark:text-white">
                 </div>
                 <div id="settings-phone-container">
                     <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2 flex items-center gap-2"><i class="ph-fill ph-device-mobile"></i> هاتف ولي الأمر</label>
-                    <input type="tel" id="settings-new-phone" autocomplete="tel" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full px-5 py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-blue-500 outline-none font-black transition shadow-sm text-left tracking-[0.2em] text-lg text-slate-800 dark:text-white" dir="auto" placeholder="05/06/07...">
+                    <input type="tel" id="settings-new-phone" aria-label="رقم الهاتف" autocomplete="tel" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full px-5 py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-blue-500 outline-none font-black transition shadow-sm text-left tracking-[0.2em] text-lg text-slate-800 dark:text-white" dir="auto" placeholder="05/06/07...">
                 </div>
 
-                <button onclick="saveSettingsData()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-4 rounded-xl transition btn-modern mt-2 shadow-lg shadow-blue-500/30 text-xl flex items-center justify-center gap-2"><i class="ph-bold ph-floppy-disk"></i> حفظ التغييرات</button>
+                <button onclick="saveSettingsData()" aria-label="حفظ التغييرات" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-4 rounded-xl transition btn-modern mt-2 shadow-lg shadow-blue-500/30 text-xl flex items-center justify-center gap-2"><i class="ph-bold ph-floppy-disk"></i> حفظ التغييرات</button>
             </div>
         </div>
     </div>
@@ -167,8 +175,8 @@
         <div class="bg-white dark:bg-slate-800 p-8 rounded-[2rem] max-w-sm w-[90%] mx-auto shadow-2xl border border-white/50 dark:border-slate-700">
             <h3 class="text-2xl font-black mb-6 text-slate-800 dark:text-white flex items-center gap-3"><i class="ph-fill ph-pencil-simple text-amber-500"></i> تعديل المحتوى</h3>
             <div class="space-y-4">
-                <input type="text" id="edit-link-title" class="w-full text-base font-bold p-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl outline-none focus:border-amber-500 transition bg-slate-50 dark:bg-slate-900 dark:text-white" placeholder="عنوان المحتوى...">
-                <input type="text" id="edit-link-url" class="w-full text-base p-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl outline-none focus:border-amber-500 transition bg-slate-50 dark:bg-slate-900 dark:text-white text-left font-bold" dir="ltr" placeholder="https://...">
+                <input type="text" id="edit-link-title" aria-label="عنوان الدرس" class="w-full text-base font-bold p-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl outline-none focus:border-amber-500 transition bg-slate-50 dark:bg-slate-900 dark:text-white" placeholder="عنوان المحتوى...">
+                <input type="text" id="edit-link-url" aria-label="رابط الدرس" class="w-full text-base p-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl outline-none focus:border-amber-500 transition bg-slate-50 dark:bg-slate-900 dark:text-white text-left font-bold" dir="ltr" placeholder="https://...">
             </div>
             <div class="flex justify-center gap-3 mt-8">
                 <button onclick="closeEditModal()" class="flex-1 py-3.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-black text-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition btn-modern">إلغاء</button>
@@ -226,7 +234,7 @@
         <div id="auth-screen" class="screen active max-w-md mx-auto mt-8 md:mt-12 bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl p-8 md:p-12 rounded-[3rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] border border-white/60 dark:border-slate-700/60 relative overflow-hidden interactive-card">
             
             <div class="absolute top-4 left-4 z-20">
-                <button onclick="toggleDarkMode()" class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-amber-400 flex items-center justify-center text-2xl shadow-sm hover:scale-110 transition"><i class="ph-fill ph-moon"></i></button>
+                <button onclick="toggleDarkMode()" aria-label="تبديل الوضع الليلي" class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-amber-400 flex items-center justify-center text-2xl shadow-sm hover:scale-110 transition"><i class="ph-fill ph-moon"></i></button>
             </div>
 
             <div class="text-center mb-10 relative z-10 pt-4">
@@ -240,22 +248,22 @@
             <div class="space-y-5 relative z-10">
                 <div class="relative group">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-fill ph-user"></i></div>
-                    <input type="text" id="username" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 dark:focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400" placeholder="اسم المستخدم">
+                    <input type="text" id="username" aria-label="اسم المستخدم" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 dark:focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400" placeholder="اسم المستخدم">
                 </div>
                 
                 <div class="relative group hidden" id="parent-name-container">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-fill ph-users-three"></i></div>
-                    <input type="text" id="parent-name" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400" placeholder="اسم ولي الأمر (ثلاثي)">
+                    <input type="text" id="parent-name" aria-label="اسم ولي الأمر" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400" placeholder="اسم ولي الأمر (ثلاثي)">
                 </div>
                 
                 <div class="relative group hidden" id="phone-number-container">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-fill ph-device-mobile"></i></div>
-                    <input type="tel" id="phone-number" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400 text-left tracking-[0.2em]" dir="auto" placeholder="05 / 06 / 07...">
+                    <input type="tel" id="phone-number" aria-label="رقم الهاتف" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400 text-left tracking-[0.2em]" dir="auto" placeholder="05 / 06 / 07...">
                 </div>
 
                 <div class="relative group">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors hidden text-2xl" id="level-icon"><i class="ph-fill ph-graduation-cap"></i></div>
-                    <select id="user-level" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all hidden font-black text-blue-700 dark:text-blue-400 text-lg appearance-none cursor-pointer">
+                    <select id="user-level" aria-label="المستوى الدراسي" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all hidden font-black text-blue-700 dark:text-blue-400 text-lg appearance-none cursor-pointer">
                         <option value="" disabled selected>اختر مستواك الدراسي بدقة...</option>
                         <option value="m_y1">السنة الأولى متوسط</option>
                         <option value="m_y2">السنة الثانية متوسط</option>
@@ -269,7 +277,7 @@
 
                 <div class="relative group">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-fill ph-lock-key"></i></div>
-                    <input type="password" id="password" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400" placeholder="كلمة المرور">
+                    <input type="password" id="password" aria-label="كلمة المرور" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400" placeholder="كلمة المرور">
                 </div>
                 
                 <button id="auth-action-btn" onclick="handleAuth()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black py-5 rounded-2xl btn-modern text-2xl mt-6 shadow-xl shadow-blue-600/30 tracking-wide flex justify-center items-center gap-2">
@@ -299,7 +307,7 @@
             <!-- Header -->
             <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-5 md:p-6 rounded-[2.5rem] shadow-lg border border-white/50 dark:border-slate-700 mb-6 gap-5 sticky top-4 z-40 transition-all duration-300">
                 <div class="flex items-center gap-4 w-full md:w-auto">
-                    <div class="w-16 h-16 rounded-2xl shadow-lg overflow-hidden bg-white p-1 border border-slate-100 dark:border-slate-700"><img src="bg-pattern.webp" class="w-full h-full object-cover rounded-xl"></div>
+                    <div class="w-16 h-16 rounded-2xl shadow-lg overflow-hidden bg-white p-1 border border-slate-100 dark:border-slate-700"><img src="bg-pattern.webp" class="w-full h-full object-cover rounded-xl" alt="Logo"></div>
                     <div>
                         <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 leading-tight">منصة المجتهد</h1>
                         <div class="flex items-center gap-2 mt-1">
@@ -311,7 +319,7 @@
                     
                     <!-- إحصائيات الإدارة العائمة (تظهر على اليمين - للداخل) -->
                     <div class="relative group z-50">
-                        <button class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-blue-600 dark:text-blue-400 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" title="إحصائيات التلاميذ">
+                        <button class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-blue-600 dark:text-blue-400 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" aria-label="إحصائيات التلاميذ" title="إحصائيات التلاميذ">
                             <i class="ph-fill ph-chart-bar"></i>
                         </button>
                         <div class="absolute top-full left-0 mt-3 w-[280px] md:w-[300px] bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl border border-slate-100 dark:border-slate-700 p-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-3 cursor-default">
@@ -323,9 +331,9 @@
                         </div>
                     </div>
 
-                    <button onclick="toggleDarkMode()" class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-amber-400 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" title="تغيير المظهر"><i class="ph-fill ph-moon"></i></button>
-                    <button onclick="openSettings()" class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" title="الإعدادات"><i class="ph-fill ph-gear-six"></i></button>
-                    <button onclick="logout()" class="icon-btn px-6 h-12 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-lg font-black shadow-sm border border-red-100 dark:border-red-800 flex items-center gap-2">خروج <i class="ph-bold ph-sign-out"></i></button>
+                    <button onclick="toggleDarkMode()" aria-label="تبديل الوضع الليلي" class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-amber-400 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" title="تغيير المظهر"><i class="ph-fill ph-moon"></i></button>
+                    <button onclick="openSettings()" aria-label="فتح الإعدادات" class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" title="الإعدادات"><i class="ph-fill ph-gear-six"></i></button>
+                    <button onclick="logout()" aria-label="تسجيل الخروج" class="icon-btn px-6 h-12 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-lg font-black shadow-sm border border-red-100 dark:border-red-800 flex items-center gap-2">خروج <i class="ph-bold ph-sign-out"></i></button>
                 </div>
             </header>
 
@@ -347,24 +355,24 @@
                         متابعة التلاميذ
                     </h3>
                     <div class="flex flex-wrap gap-2">
-                        <button onclick="bulkAction('approve')" class="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-xl text-sm font-black hover:bg-emerald-100 transition border border-emerald-200 dark:border-emerald-800 flex items-center gap-2"><i class="ph-bold ph-check"></i> تفعيل المحدد</button>
-                        <button onclick="bulkAction('deactivate')" class="bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 px-4 py-2 rounded-xl text-sm font-black hover:bg-amber-100 transition border border-amber-200 dark:border-amber-800 flex items-center gap-2"><i class="ph-bold ph-x"></i> إلغاء التفعيل</button>
-                        <button onclick="bulkAction('delete')" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-4 py-2 rounded-xl text-sm font-black hover:bg-red-100 transition border border-red-200 dark:border-red-800 flex items-center gap-2"><i class="ph-bold ph-trash"></i> حذف المحدد</button>
+                        <button onclick="bulkAction('approve')" aria-label="تفعيل المحدد" class="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-xl text-sm font-black hover:bg-emerald-100 transition border border-emerald-200 dark:border-emerald-800 flex items-center gap-2"><i class="ph-bold ph-check"></i> تفعيل المحدد</button>
+                        <button onclick="bulkAction('deactivate')" aria-label="إلغاء التفعيل" class="bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 px-4 py-2 rounded-xl text-sm font-black hover:bg-amber-100 transition border border-amber-200 dark:border-amber-800 flex items-center gap-2"><i class="ph-bold ph-x"></i> إلغاء التفعيل</button>
+                        <button onclick="bulkAction('delete')" aria-label="حذف المحدد" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-4 py-2 rounded-xl text-sm font-black hover:bg-red-100 transition border border-red-200 dark:border-red-800 flex items-center gap-2"><i class="ph-bold ph-trash"></i> حذف المحدد</button>
                     </div>
                 </div>
 
                 <!-- أزرار فلترة الجدول -->
                 <div class="flex gap-2 mb-4 bg-slate-100 dark:bg-slate-900 p-1.5 rounded-xl w-fit border border-slate-200 dark:border-slate-700">
-                    <button onclick="filterStudentsTable('all')" id="filter-stu-all" class="px-5 py-2 rounded-lg font-black text-sm bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-white transition-all">الكل</button>
-                    <button onclick="filterStudentsTable('middle')" id="filter-stu-middle" class="px-5 py-2 rounded-lg font-black text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-all">المتوسط</button>
-                    <button onclick="filterStudentsTable('high')" id="filter-stu-high" class="px-5 py-2 rounded-lg font-black text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-all">الثانوي</button>
+                    <button onclick="filterStudentsTable('all')" id="filter-stu-all" aria-label="الكل" class="px-5 py-2 rounded-lg font-black text-sm bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-white transition-all">الكل</button>
+                    <button onclick="filterStudentsTable('middle')" id="filter-stu-middle" aria-label="المتوسط" class="px-5 py-2 rounded-lg font-black text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-all">المتوسط</button>
+                    <button onclick="filterStudentsTable('high')" id="filter-stu-high" aria-label="الثانوي" class="px-5 py-2 rounded-lg font-black text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-all">الثانوي</button>
                 </div>
 
                 <div class="overflow-y-auto overflow-x-auto rounded-3xl border border-slate-100 dark:border-slate-700 shadow-inner bg-slate-50/50 dark:bg-slate-900/50 flex-1">
                     <table class="w-full text-right border-collapse whitespace-nowrap min-w-[900px]">
                         <thead class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-sm font-black border-b border-slate-200 dark:border-slate-700 sticky top-0 z-10 shadow-sm">
                             <tr>
-                                <th class="p-5 w-12 text-center rounded-tr-3xl"><input type="checkbox" id="select-all-cb" onclick="toggleSelectAll()" class="custom-cb"></th>
+                                <th class="p-5 w-12 text-center rounded-tr-3xl"><input type="checkbox" id="select-all-cb" aria-label="تحديد الكل" onclick="toggleSelectAll()" class="custom-cb"></th>
                                 <th class="p-5">التلميذ / ولي الأمر</th>
                                 <th class="p-5 text-center">المستوى</th>
                                 <th class="p-5 text-center">نقاط (XP)</th>
@@ -438,25 +446,25 @@
                         <i class="ph-bold ph-arrow-right"></i> العودة للإدارة
                     </button>
 
-                    <button id="student-dark-btn" onclick="toggleDarkMode()" class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-amber-400 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" title="الوضع الليلي"><i class="ph-fill ph-moon"></i></button>
+                    <button id="student-dark-btn" onclick="toggleDarkMode()" aria-label="تبديل الوضع الليلي" class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-amber-400 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" title="الوضع الليلي"><i class="ph-fill ph-moon"></i></button>
 
                     <!-- زر الإعدادات للتلميذ -->
-                    <button id="student-settings-btn" onclick="openSettings()" class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" title="إعدادات الحساب"><i class="ph-fill ph-gear-six"></i></button>
+                    <button id="student-settings-btn" onclick="openSettings()" aria-label="فتح الإعدادات" class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" title="إعدادات الحساب"><i class="ph-fill ph-gear-six"></i></button>
 
                     <!-- زر الدردشة -->
-                    <button id="student-chat-btn" onclick="openChat('admin')" class="relative bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-2xl font-black text-lg hover:from-blue-700 hover:to-indigo-700 transition btn-modern shadow-md shadow-blue-500/30 flex items-center gap-2">
+                    <button id="student-chat-btn" onclick="openChat('admin')" aria-label="فتح الدردشة" class="relative bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-2xl font-black text-lg hover:from-blue-700 hover:to-indigo-700 transition btn-modern shadow-md shadow-blue-500/30 flex items-center gap-2">
                         <span class="hidden sm:inline">الدردشة</span> <i class="ph-fill ph-chat-circle-dots text-2xl"></i>
                         <span id="student-chat-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-[12px] font-black w-6 h-6 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-sm hidden animate-bounce">0</span>
                     </button>
 
-                    <button id="student-logout-btn" onclick="logout()" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-5 py-3 rounded-2xl font-black hover:bg-red-100 dark:hover:bg-red-900/50 transition btn-modern border border-red-100 dark:border-red-800 shadow-sm flex items-center gap-2 text-lg">خروج <i class="ph-bold ph-sign-out"></i></button>
+                    <button id="student-logout-btn" onclick="logout()" aria-label="تسجيل الخروج" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-5 py-3 rounded-2xl font-black hover:bg-red-100 dark:hover:bg-red-900/50 transition btn-modern border border-red-100 dark:border-red-800 shadow-sm flex items-center gap-2 text-lg">خروج <i class="ph-bold ph-sign-out"></i></button>
                 </div>
             </header>
 
             <div class="flex flex-col md:flex-row gap-6 mb-8 items-center">
                 <div class="w-full md:w-1/2 relative group">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-bold ph-magnifying-glass"></i></div>
-                    <input type="text" id="lesson-search" onkeyup="executeStudentSearch()" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400 shadow-sm" placeholder="ابحث عن درس، تمرين، أو وحدة...">
+                    <input type="text" id="lesson-search" aria-label="البحث عن الدروس والتمارين" onkeyup="executeStudentSearch()" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400 shadow-sm" placeholder="ابحث عن درس، تمرين، أو وحدة...">
                 </div>
 
                 <div class="w-full md:w-1/2 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-5 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 flex items-center justify-between interactive-card">
@@ -480,8 +488,9 @@
         </div>
     </div>
 
-    <!-- Confetti Library -->
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
+    <!-- Confetti Library (تم استخدام defer لتسريع التحميل) -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
+    
     <!-- Firebase SDK Setup -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -1103,7 +1112,7 @@
                                         </div>
                                         <div class="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
                                             ${isRead ? `<span class="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 text-xs font-black px-3 py-1.5 rounded-lg flex items-center gap-1"><i class="ph-bold ph-check"></i> مكتمل</span>` : ''}
-                                            <button onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}')" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl font-black shadow-sm transition flex items-center gap-2 text-sm whitespace-nowrap">مشاهدة <i class="ph-bold ph-arrow-left"></i></button>
+                                            <button onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}')" aria-label="مشاهدة المحتوى" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl font-black shadow-sm transition flex items-center gap-2 text-sm whitespace-nowrap">مشاهدة <i class="ph-bold ph-arrow-left"></i></button>
                                         </div>
                                     </div>`;
                                 }
@@ -1251,7 +1260,7 @@
 
                 tbody.innerHTML += `
                     <tr class="hover:bg-blue-50/40 dark:hover:bg-blue-900/20 transition duration-200 group">
-                        <td class="p-4 text-center border-b border-slate-100 dark:border-slate-700"><input type="checkbox" class="student-cb custom-cb" value="${d.id}"></td>
+                        <td class="p-4 text-center border-b border-slate-100 dark:border-slate-700"><input type="checkbox" aria-label="تحديد التلميذ" class="student-cb custom-cb" value="${d.id}"></td>
                         <td class="p-4 border-b border-slate-100 dark:border-slate-700">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400 text-2xl flex-shrink-0 shadow-inner border border-blue-200/50 dark:border-blue-800/50"><i class="ph-fill ph-user"></i></div>
@@ -1271,7 +1280,7 @@
                         <td class="p-4 text-left border-b border-slate-100 dark:border-slate-700">
                             <div class="flex gap-2 justify-end">
                                 <button onclick="loginAsStudent('${d.id}')" class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 px-3 py-1.5 rounded-lg text-xs font-black hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition border border-indigo-200 dark:border-indigo-800 shadow-sm flex items-center gap-1" title="مراقبة حساب التلميذ"><i class="ph-bold ph-sign-in"></i> دخول للحساب</button>
-                                <button onclick="openChat('${d.id}')" class="relative icon-btn w-9 h-9 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-lg shadow-sm border border-blue-200 dark:border-blue-800" title="مراسلة"><i class="ph-bold ph-chat-circle-dots"></i>${chatBadge}</button>
+                                <button onclick="openChat('${d.id}')" aria-label="مراسلة التلميذ" class="relative icon-btn w-9 h-9 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-lg shadow-sm border border-blue-200 dark:border-blue-800" title="مراسلة"><i class="ph-bold ph-chat-circle-dots"></i>${chatBadge}</button>
                             </div>
                         </td>
                     </tr>`;
@@ -1525,10 +1534,13 @@
 
                         cats.forEach(cat => {
                             let links = branch.categories[cat] || []; let conf = catConfig[cat];
+                            
+                            // تحويل الروابط (a) إلى أزرار (button) لتحسين (Accessibility / Best Practices)
                             let linksList = links.length ? links.map((lnk, lIdx) => {
                                 let linkId = `${branch.id}_${cat}_${lIdx}`; let isRead = clickedLinks.includes(linkId);
-                                return `<a href="#" onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}'); return false;" class="lesson-item flex items-center justify-between gap-3 bg-white dark:bg-slate-800 p-3 rounded-2xl border ${isRead ? 'border-emerald-200 dark:border-emerald-800 shadow-sm' : 'border-slate-100 dark:border-slate-700'} hover:shadow-md transition group/link relative overflow-hidden"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl group-hover/link:bg-blue-600 group-hover/link:text-white transition shadow-inner"><i class="ph-bold ph-link"></i></div><span class="${conf.text} font-bold text-sm truncate max-w-[140px] sm:max-w-[180px] group-hover/link:underline decoration-2 underline-offset-4">${lnk.title}</span></div>${isRead ? `<span class="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 text-[10px] font-black px-2 py-1 rounded-md flex items-center gap-1"><i class="ph-bold ph-check"></i> مقروء</span>` : ''}</a>`;
+                                return `<button onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}')" class="lesson-item w-full flex items-center justify-between gap-3 bg-white dark:bg-slate-800 p-3 rounded-2xl border ${isRead ? 'border-emerald-200 dark:border-emerald-800 shadow-sm' : 'border-slate-100 dark:border-slate-700'} hover:shadow-md transition group/link relative overflow-hidden text-right"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl group-hover/link:bg-blue-600 group-hover/link:text-white transition shadow-inner"><i class="ph-bold ph-link"></i></div><span class="${conf.text} font-bold text-sm truncate max-w-[140px] sm:max-w-[180px] group-hover/link:underline decoration-2 underline-offset-4">${lnk.title}</span></div>${isRead ? `<span class="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 text-[10px] font-black px-2 py-1 rounded-md flex items-center gap-1"><i class="ph-bold ph-check"></i> مقروء</span>` : ''}</button>`;
                             }).join('') : getEmptyStateHTML(conf.title);
+                            
                             html += `<div class="${conf.bg} ${conf.border} p-5 rounded-3xl border shadow-sm"><h5 class="font-black ${conf.text} text-lg mb-4 flex items-center gap-2">${conf.icon} ${conf.title}</h5><div class="space-y-2">${linksList}</div></div>`;
                         });
                         html += `</div></div></div>`; 
@@ -1572,8 +1584,8 @@
                                 
                                 cats.forEach(cat => {
                                     let links = branch.categories[cat] || []; let conf = catConfig[cat];
-                                    let linksList = links.length ? links.map((lnk, lIdx) => `<div class="flex justify-between items-center bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm text-sm mb-2 group interactive-card"><a href="${lnk.url}" target="_blank" class="${conf.text} font-bold truncate w-2/3 hover:underline flex items-center gap-2"><i class="ph-bold ph-link text-lg opacity-70"></i> ${lnk.title}</a><div class="flex gap-1"><button onclick="adminEditLinkModal(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" class="text-slate-400 hover:text-amber-500 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg transition"><i class="ph-bold ph-pencil"></i></button><button onclick="adminDeleteLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" class="text-slate-400 hover:text-red-500 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg transition"><i class="ph-bold ph-trash"></i></button></div></div>`).join('') : getEmptyStateHTML('محتوى');
-                                    html += `<div class="${conf.bg} ${conf.border} p-5 rounded-2xl border flex flex-col h-full"><h5 class="font-black ${conf.text} text-base mb-3 flex items-center gap-2">${conf.icon} ${conf.title}</h5><div class="mb-2 max-h-60 overflow-y-auto pr-1 scroll-smooth flex-1">${linksList}</div><div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 space-y-2 mt-auto"><input type="text" id="title_${branch.id}_${cat}" class="w-full text-xs font-bold p-3 border border-slate-200 dark:border-slate-600 rounded-lg outline-none focus:border-blue-400 bg-white dark:bg-slate-900 text-slate-700 dark:text-white transition-all" placeholder="عنوان المحتوى..."><input type="text" id="url_${branch.id}_${cat}" class="w-full text-xs p-3 border border-slate-200 dark:border-slate-600 rounded-lg outline-none focus:border-blue-400 bg-white dark:bg-slate-900 text-slate-600 dark:text-white text-left font-bold transition-all" dir="ltr" placeholder="https://..."><button onclick="adminAddLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', '${branch.id}')" class="w-full bg-slate-800 dark:bg-blue-600 hover:bg-slate-700 dark:hover:bg-blue-700 text-white text-xs font-black py-2.5 rounded-lg transition-all flex items-center justify-center gap-1"><i class="ph-bold ph-plus"></i> إضافة</button></div></div>`;
+                                    let linksList = links.length ? links.map((lnk, lIdx) => `<div class="flex justify-between items-center bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm text-sm mb-2 group interactive-card"><a href="${lnk.url}" target="_blank" class="${conf.text} font-bold truncate w-2/3 hover:underline flex items-center gap-2"><i class="ph-bold ph-link text-lg opacity-70"></i> ${lnk.title}</a><div class="flex gap-1"><button onclick="adminEditLinkModal(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" aria-label="تعديل الرابط" class="text-slate-400 hover:text-amber-500 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg transition"><i class="ph-bold ph-pencil"></i></button><button onclick="adminDeleteLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" aria-label="حذف الرابط" class="text-slate-400 hover:text-red-500 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg transition"><i class="ph-bold ph-trash"></i></button></div></div>`).join('') : getEmptyStateHTML('محتوى');
+                                    html += `<div class="${conf.bg} ${conf.border} p-5 rounded-2xl border flex flex-col h-full"><h5 class="font-black ${conf.text} text-base mb-3 flex items-center gap-2">${conf.icon} ${conf.title}</h5><div class="mb-2 max-h-60 overflow-y-auto pr-1 scroll-smooth flex-1">${linksList}</div><div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 space-y-2 mt-auto"><input type="text" id="title_${branch.id}_${cat}" aria-label="عنوان المحتوى" class="w-full text-xs font-bold p-3 border border-slate-200 dark:border-slate-600 rounded-lg outline-none focus:border-blue-400 bg-white dark:bg-slate-900 text-slate-700 dark:text-white transition-all" placeholder="عنوان المحتوى..."><input type="text" id="url_${branch.id}_${cat}" aria-label="رابط المحتوى" class="w-full text-xs p-3 border border-slate-200 dark:border-slate-600 rounded-lg outline-none focus:border-blue-400 bg-white dark:bg-slate-900 text-slate-600 dark:text-white text-left font-bold transition-all" dir="ltr" placeholder="https://..."><button onclick="adminAddLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', '${branch.id}')" aria-label="إضافة" class="w-full bg-slate-800 dark:bg-blue-600 hover:bg-slate-700 dark:hover:bg-blue-700 text-white text-xs font-black py-2.5 rounded-lg transition-all flex items-center justify-center gap-1"><i class="ph-bold ph-plus"></i> إضافة</button></div></div>`;
                                 });
                                 html += `</div></div>`; 
                             });
