@@ -1,10 +1,10 @@
 {
-  "name": "منصة الفيزياء السحابية",
-  "short_name": "الفيزياء",
+  "name": "منصة المجتهد للعلوم الفيزيائية",
+  "short_name": "منصة المجتهد",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "background_color": "#0f172a",
+  "theme_color": "#06b6d4",
   "icons": [
     {
       "src": "iconn.png",
@@ -17,7 +17,7 @@
       "type": "image/png"
     }
   ],
-  "description": "المنصة التي تحتاجها لتعلم الظواهر الفيزيائية وإجراء التجارب العلمية بسهولة.",
+  "description": "كل ما تحتاجه من دروس ، ملخصات ، تمارين ، فروض ، اختبارات وتجارب ومحاكاة في مادة العلوم الفيزيائية",
   "orientation": "any",
   "screenshots": [
     {
@@ -36,5 +36,7 @@
   "lang": "ar",
   "categories": [
     "education"
-  ]
+  ],
+  "id": "19950108",
+  "iarc_rating_id": "منصة المجتهد للعلوم الفيزيائية"
 }
