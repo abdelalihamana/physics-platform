@@ -487,6 +487,9 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, deleteDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // ملاحظة أمنية: مفتاح API الخاص بـ Firebase مصمم ليكون عاماً وموجوداً في الواجهة الأمامية.
+        // لحماية هذا المفتاح، تأكد من إضافة "قيود" (Restrictions) له من لوحة تحكم Google Cloud للسماح لموقعك فقط.
+        // تنبيه GitHub بشأن هذا المفتاح يعتبر "تنبيه كاذب" (False Positive) ويمكنك إغلاقه/تجاهله في GitHub.
         const firebaseConfig = {
             apiKey: "AIzaSyDuuYHwmSW0UV1TO3gDGyETrvOimE7iGLs",
             authDomain: "physique-58073.firebaseapp.com",
@@ -719,8 +722,14 @@
         ];
 
         const initAuth = async () => {
-            try { await signInAnonymously(auth); } 
-            catch (error) { console.error("Auth Error:", error); }
+            try { 
+                await signInAnonymously(auth); 
+            } catch (error) { 
+                console.error("Auth Error:", error);
+                if (error.code === 'auth/network-request-failed') {
+                    showToast("تنبيه: يبدو أن اتصال الإنترنت ضعيف أو مقطوع.", "error");
+                }
+            }
         };
         initAuth();
 
@@ -853,7 +862,15 @@
                         }
                     }
                 }
-            } catch (err) { console.error(err); showToast("خطأ في الاتصال بالإنترنت", "error"); }
+            } catch (err) { 
+                console.error(err); 
+                // معالجة أخطاء الشبكة بشكل مخصص لتجنب انهيار التطبيق
+                if (err.code === 'auth/network-request-failed' || err.message.includes('Failed to fetch')) {
+                    showToast("لا يوجد اتصال بالإنترنت! يرجى التحقق من الشبكة والمحاولة مجدداً.", "error");
+                } else {
+                    showToast("حدث خطأ في الاتصال، يرجى المحاولة لاحقاً.", "error");
+                }
+            }
             btn.disabled = false; btn.innerHTML = originalHTML;
         };
 
@@ -1040,14 +1057,28 @@
             'mock_exams': { title: 'مواضيع مقترحة', icon: '<i class="ph-fill ph-file-text"></i>', bg: 'bg-amber-50/50 dark:bg-amber-900/10', text: 'text-amber-700 dark:text-amber-400', border: 'border-amber-100 dark:border-amber-900/30' }
         };
 
+        // دالة مساعدة لتنظيف المدخلات وحماية الموقع من ثغرات XSS
+        const escapeHtml = (unsafeText) => {
+            if (typeof unsafeText !== 'string') return '';
+            return unsafeText
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        };
+
         window.executeStudentSearch = () => {
-            const query = document.getElementById('lesson-search').value.toLowerCase().trim();
+            const searchInput = document.getElementById('lesson-search').value.trim();
+            const query = searchInput.toLowerCase(); // نستخدم النص الأصلي للبحث الفعلي
+            const safeQuery = escapeHtml(searchInput); // نستخدم النص المنظف للعرض على الشاشة فقط
             const container = document.getElementById('student-program-view');
             
             if (query === '') { renderProgramUI(window.currentSections, 'student-program-view', false); return; }
 
+            // تم استبدال query بـ safeQuery هنا لمنع ثغرة XSS
             let html = `<div class="bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl rounded-[2rem] border border-blue-200 dark:border-blue-800 p-6 shadow-lg animate-[fadeInTab_0.3s_ease]">
-                            <h3 class="text-xl font-black text-blue-600 dark:text-blue-400 mb-6 flex items-center gap-2"><i class="ph-bold ph-magnifying-glass"></i> نتائج البحث عن: "${query}"</h3>
+                            <h3 class="text-xl font-black text-blue-600 dark:text-blue-400 mb-6 flex items-center gap-2"><i class="ph-bold ph-magnifying-glass"></i> نتائج البحث عن: "${safeQuery}"</h3>
                             <div class="space-y-4">`;
             let found = false; let userLevel = window.currentUserRecord.level; let clickedLinks = window.currentUserRecord.clickedLinks || [];
 
