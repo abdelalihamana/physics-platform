@@ -1,4 +1,5 @@
-{"name": "منصة الفيزياء السحابية",
+{
+  "name": "منصة الفيزياء السحابية",
   "short_name": "الفيزياء",
   "start_url": "/",
   "display": "standalone",
@@ -15,7 +16,7 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ], 
+  ],
   "description": "المنصة التي تحتاجها لتعلم الظواهر الفيزيائية وإجراء التجارب العلمية بسهولة.",
   "orientation": "any",
   "screenshots": [
@@ -31,5 +32,9 @@
       "type": "image/png",
       "form_factor": "wide"
     }
+  ],
+  "lang": "ar",
+  "categories": [
+    "education"
   ]
 }
