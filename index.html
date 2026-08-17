@@ -23,21 +23,23 @@
     </script>
 
     <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://www.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     
     <!-- Phosphor Icons -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-
+<script src="https://unpkg.com/@phosphor-icons/web" defer></script>
     <style>
         body { 
             font-family: 'Tajawal', sans-serif; 
-            background: linear-gradient(rgba(248, 250, 252, 0.94), rgba(226, 232, 240, 0.97)), url('icon.png');
+            background: linear-gradient(rgba(248, 250, 252, 0.94), rgba(226, 232, 240, 0.97)), url('bg-pattern.webp');
             background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed;
             min-height: 100vh; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased;
         }
         
         .dark body {
-            background: linear-gradient(rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.98)), url('icon.png');
+           background: linear-gradient(rgba(248, 250, 252, 0.94), rgba(226, 232, 240, 0.97)), url('bg-pattern.webp');
             background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed;
         }
 
@@ -479,8 +481,7 @@
     </div>
 
     <!-- Confetti Library -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
     <!-- Firebase SDK Setup -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
