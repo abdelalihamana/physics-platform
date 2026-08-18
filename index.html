@@ -283,6 +283,10 @@
                     <input type="password" id="password" aria-label="كلمة المرور" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400" placeholder="كلمة المرور">
                 </div>
                 
+                <div class="text-right mt-2" id="forgot-password-container">
+                    <button onclick="requestPasswordReset()" class="text-sm font-bold text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 transition underline decoration-1 underline-offset-2">نسيت كلمة المرور؟</button>
+                </div>
+
                 <button id="auth-action-btn" onclick="handleAuth()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black py-5 rounded-2xl btn-modern text-2xl mt-6 shadow-xl shadow-blue-600/30 tracking-wide flex justify-center items-center gap-2">
                     <i class="ph-bold ph-sign-in"></i> تسجيل الدخول
                 </button>
@@ -332,6 +336,22 @@
                                 <span id="hover-total-students" class="bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400 px-3 py-1 rounded-lg text-sm shadow-inner">0</span>
                             </h4>
                             <div id="header-stats-container" class="grid grid-cols-2 gap-3 max-h-[300px] overflow-y-auto pr-1"></div>
+                        </div>
+                    </div>
+
+                    <!-- إشعارات الأستاذ -->
+                    <div class="relative group z-50">
+                        <button class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-blue-600 dark:text-blue-400 text-2xl shadow-sm border border-slate-200 dark:border-slate-600 relative" aria-label="الإشعارات والرسائل" title="الإشعارات والرسائل">
+                            <i class="ph-fill ph-bell"></i>
+                            <span id="admin-global-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full shadow-md border border-white dark:border-slate-800 hidden animate-bounce">0</span>
+                        </button>
+                        <div class="absolute top-full left-0 mt-3 w-[280px] md:w-[320px] bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl border border-slate-100 dark:border-slate-700 p-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-3 cursor-default max-h-[400px] overflow-y-auto z-[60]">
+                            <h4 class="font-black text-slate-800 dark:text-white border-b border-slate-100 dark:border-slate-700 pb-3 mb-4 flex items-center gap-2">
+                                <i class="ph-fill ph-bell-ringing text-amber-500"></i> الإشعارات والرسائل
+                            </h4>
+                            <div id="admin-notifications-container" class="flex flex-col gap-2">
+                                <div class="text-center text-slate-500 dark:text-slate-400 text-sm font-bold p-4">لا توجد إشعارات جديدة</div>
+                            </div>
                         </div>
                     </div>
 
@@ -793,13 +813,57 @@
             
             const levelSelect = document.getElementById('user-level'); const levelIcon = document.getElementById('level-icon');
             const parentNameCont = document.getElementById('parent-name-container'); const phoneNumCont = document.getElementById('phone-number-container');
+            const forgotPassCont = document.getElementById('forgot-password-container');
             
             if(window.isRegistering) {
                 levelSelect.classList.remove('hidden'); levelIcon.classList.remove('hidden');
                 parentNameCont.classList.remove('hidden'); phoneNumCont.classList.remove('hidden');
+                forgotPassCont.classList.add('hidden');
             } else {
                 levelSelect.classList.add('hidden'); levelIcon.classList.add('hidden');
                 parentNameCont.classList.add('hidden'); phoneNumCont.classList.add('hidden');
+                forgotPassCont.classList.remove('hidden');
+            }
+        };
+
+        window.requestPasswordReset = async () => {
+            const username = document.getElementById('username').value.trim();
+            if (!username) return showToast("يرجى إدخال اسم المستخدم أولاً لطلب كلمة المرور", "error");
+
+            if(await confirmAction(`هل أنت متأكد من إرسال طلب استرجاع كلمة المرور للحساب "${username}" للأستاذ؟`)) {
+                try {
+                    const userRef = doc(usersCol, username);
+                    const userSnap = await getDoc(userRef);
+
+                    if (!userSnap.exists()) {
+                        showToast("حساب المستخدم غير موجود.", "error");
+                        return;
+                    }
+
+                    const userData = userSnap.data();
+                    if (userData.role === 'admin') {
+                        showToast("لا يمكن استخدام هذه الميزة لحساب الإدارة.", "error");
+                        return;
+                    }
+
+                    const levelDisplay = levelNames[userData.level] || "مستوى غير محدد";
+                    
+                    // Sending the request as a chat message to the admin
+                    const chatRoomId = username; 
+                    const messagesRef = collection(db, chatsPath, chatRoomId, 'messages');
+                    const chatDocRef = doc(db, chatsPath, chatRoomId);
+                    
+                    const resetMessage = `🔴 إشعار استرجاع كلمة مرور 🔴\n\nالتلميذ: ${username}\nالمستوى: ${levelDisplay}\nالهاتف: ${userData.phoneNumber || 'غير متوفر'}\n\n(يرجى من الأستاذ التواصل مع التلميذ وتزويده بكلمة المرور الجديدة بعد تغييرها من الإعدادات)`;
+
+                    await setDoc(doc(messagesRef, Date.now().toString()), { sender: 'student', text: resetMessage, timestamp: Date.now(), isSystemMessage: true });
+                    await setDoc(chatDocRef, { unreadAdmin: increment(1) }, { merge: true });
+
+                    showToast("تم إرسال طلب استرجاع كلمة المرور للأستاذ بنجاح. سيتم التواصل معك.", "success");
+
+                } catch (err) {
+                    console.error(err);
+                    showToast("حدث خطأ أثناء إرسال الطلب، يرجى المحاولة لاحقاً.", "error");
+                }
             }
         };
 
@@ -1325,7 +1389,43 @@
 
             if(unsubscribeChatMeta) unsubscribeChatMeta();
             unsubscribeChatMeta = onSnapshot(collection(db, chatsPath), (snapshot) => {
-                window.adminChatsData = {}; snapshot.forEach(d => { window.adminChatsData[d.id] = d.data(); }); renderAdminTable();
+                window.adminChatsData = {}; 
+                let totalUnread = 0;
+                let notifHtml = '';
+
+                snapshot.forEach(d => { 
+                    let data = d.data();
+                    window.adminChatsData[d.id] = data; 
+                    if(data.unreadAdmin > 0) {
+                        totalUnread += data.unreadAdmin;
+                        notifHtml += `
+                            <button onclick="openChat('${d.id}')" class="flex items-center justify-between p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl hover:bg-amber-100 dark:hover:bg-amber-900/40 transition border border-amber-100 dark:border-amber-800/50 group text-right w-full">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-amber-200 dark:bg-amber-800 text-amber-700 dark:text-amber-300 flex items-center justify-center text-xl shadow-inner"><i class="ph-fill ph-user"></i></div>
+                                    <div>
+                                        <div class="font-black text-slate-800 dark:text-white text-sm group-hover:text-amber-600 transition">${d.id}</div>
+                                        <div class="text-xs text-slate-500 dark:text-slate-400 font-bold mt-0.5">لديك ${data.unreadAdmin} رسالة/إشعار</div>
+                                    </div>
+                                </div>
+                                <i class="ph-bold ph-chat-circle-dots text-amber-500 text-xl group-hover:scale-110 transition"></i>
+                            </button>
+                        `;
+                    }
+                }); 
+                renderAdminTable();
+                
+                const globalBadge = document.getElementById('admin-global-badge');
+                const notifContainer = document.getElementById('admin-notifications-container');
+                if (globalBadge) {
+                    if (totalUnread > 0) {
+                        globalBadge.innerText = totalUnread > 99 ? '99+' : totalUnread;
+                        globalBadge.classList.remove('hidden');
+                        if(notifContainer) notifContainer.innerHTML = notifHtml;
+                    } else {
+                        globalBadge.classList.add('hidden');
+                        if(notifContainer) notifContainer.innerHTML = '<div class="text-center text-slate-500 dark:text-slate-400 text-sm font-bold p-4">لا توجد إشعارات جديدة</div>';
+                    }
+                }
             });
         };
 
@@ -1397,6 +1497,13 @@
                     let bubbleClass = isMine ? 'chat-mine dark:bg-blue-900/30 dark:border-blue-800' : 'chat-other dark:bg-slate-800 dark:border-slate-700';
                     let alignment = isMine ? 'self-end' : 'self-start';
                     let textColor = isAdminMsg && !isMine ? 'text-red-600 dark:text-red-400 font-bold' : 'text-slate-700 dark:text-slate-200';
+                    
+                    if (m.isSystemMessage) {
+                        bubbleClass = 'bg-amber-100 dark:bg-amber-900/40 border-amber-300 dark:border-amber-700 border-2 w-full max-w-[95%] text-center mx-auto shadow-md';
+                        alignment = 'self-center';
+                        textColor = 'text-amber-900 dark:text-amber-400 font-black';
+                    }
+
                     chatHtml += `<div class="chat-bubble ${bubbleClass} ${alignment} shadow-sm transition hover:shadow-md"><p class="text-[14px] whitespace-pre-wrap break-words ${textColor}" dir="auto">${linkify(m.text)}</p></div>`;
                 });
                 
