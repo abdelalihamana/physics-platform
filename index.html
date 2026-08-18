@@ -19,7 +19,6 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="theme-color" content="#f8fafc">
     <link rel="manifest" href="manifest.json">
-    <!-- تم تصحيح أيقونة الهاتف لتكون الشعار بدلاً من الخلفية -->
     <link rel="apple-touch-icon" href="icon.png">
 
     <!-- Tailwind CSS with Dark Mode config -->
@@ -33,12 +32,12 @@
     </script>
 
     <!-- Google Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://www.gstatic.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://www.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Phosphor Icons (تم استخدام defer لتسريع التحميل) -->
+    <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
     <style>
         body { 
@@ -240,7 +239,6 @@
             </div>
 
             <div class="text-center mb-10 relative z-10 pt-4">
-                <!-- تم تصحيح اللوجو ليصبح icon.png مع وضع أبعاد ثابتة -->
                 <div class="w-36 h-36 mx-auto mb-6 rounded-[2rem] shadow-2xl overflow-hidden border-4 border-white dark:border-slate-700 bg-white p-1 transform transition hover:scale-105 duration-300">
                     <img src="icon.png" alt="شعار المنصة" width="144" height="144" class="w-full h-full object-cover rounded-[1.7rem]">
                 </div>
@@ -314,7 +312,6 @@
             <!-- Header -->
             <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-5 md:p-6 rounded-[2.5rem] shadow-lg border border-white/50 dark:border-slate-700 mb-6 gap-5 sticky top-4 z-40 transition-all duration-300">
                 <div class="flex items-center gap-4 w-full md:w-auto">
-                    <!-- تم تصحيح اللوجو هنا أيضاً مع وضع الأبعاد -->
                     <div class="w-16 h-16 rounded-2xl shadow-lg overflow-hidden bg-white p-1 border border-slate-100 dark:border-slate-700"><img src="icon.png" alt="شعار المنصة" width="64" height="64" class="w-full h-full object-cover rounded-xl"></div>
                     <div>
                         <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 leading-tight">منصة المجتهد</h1>
@@ -325,7 +322,7 @@
                 </div>
                 <div class="flex items-center gap-3 w-full md:w-auto justify-end flex-wrap relative">
                     
-                    <!-- إحصائيات الإدارة العائمة (تظهر على اليمين - للداخل) -->
+                    <!-- إحصائيات الإدارة العائمة -->
                     <div class="relative group z-50">
                         <button class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-blue-600 dark:text-blue-400 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" aria-label="إحصائيات التلاميذ" title="إحصائيات التلاميذ">
                             <i class="ph-fill ph-chart-bar"></i>
@@ -476,6 +473,22 @@
                         </details>
                     </div>
 
+                    <!-- إشعارات التلميذ للمحتوى الجديد -->
+                    <div class="relative group z-50" onmouseenter="markStudentNotificationsAsRead()" onclick="markStudentNotificationsAsRead()">
+                        <button id="student-notif-btn" class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-blue-600 dark:text-blue-400 text-2xl shadow-sm border border-slate-200 dark:border-slate-600 relative" aria-label="إشعارات المحتوى" title="جديد المنصة">
+                            <i class="ph-fill ph-bell"></i>
+                            <span id="student-global-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full shadow-md border border-white dark:border-slate-800 hidden animate-bounce">0</span>
+                        </button>
+                        <div class="absolute top-full right-0 mt-3 w-[280px] md:w-[320px] bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl border border-slate-100 dark:border-slate-700 p-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-3 cursor-default max-h-[400px] overflow-y-auto z-[60]">
+                            <h4 class="font-black text-slate-800 dark:text-white border-b border-slate-100 dark:border-slate-700 pb-3 mb-4 flex items-center gap-2">
+                                <i class="ph-fill ph-bell-ringing text-amber-500"></i> جديد المنصة
+                            </h4>
+                            <div id="student-notifications-container" class="flex flex-col gap-2">
+                                <div class="text-center text-slate-500 dark:text-slate-400 text-sm font-bold p-4 opacity-70"><i class="ph-fill ph-bell-slash text-4xl mb-2"></i><br>لا توجد إشعارات جديدة</div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- زر العودة للإدارة الجديد -->
                     <button id="return-admin-btn" onclick="returnToAdmin()" aria-label="العودة للإدارة" class="hidden relative px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-2xl text-lg shadow-[0_0_15px_rgba(249,115,22,0.6)] animate-pulse hover:animate-none transition-all flex items-center gap-2 border border-orange-300 dark:border-orange-700" title="العودة للإدارة">
                         <i class="ph-bold ph-arrow-right"></i> العودة للإدارة
@@ -532,8 +545,6 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, deleteDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // ملاحظة أمنية: مفتاح API الخاص بـ Firebase مصمم ليكون عاماً وموجوداً في الواجهة الأمامية.
-        // لحماية هذا المفتاح، تأكد من إضافة "قيود" (Restrictions) له من لوحة تحكم Google Cloud للسماح لموقعك فقط.
         const firebaseConfig = {
             apiKey: "AIzaSyDuuYHwmSW0UV1TO3gDGyETrvOimE7iGLs",
             authDomain: "physique-58073.firebaseapp.com",
@@ -565,6 +576,7 @@
         
         window.activeChatUser = null; 
         window.currentSections = [];
+        window.currentUpdates = []; 
         window.currentEditParams = null; 
         
         // Admin & Student States
@@ -683,7 +695,6 @@
             document.getElementById(screenId).classList.add('active');
         };
 
-        // المنهج الافتراضي المتكامل للطورين
         const defaultProgramData = [
             { 
                 id: "part_middle", 
@@ -726,7 +737,6 @@
                             { id: "m4_b2", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [], exams: [] } },
                             { id: "m4_b3", title: "الظواهر الميكانيكية", categories: { lessons: [], exercises: [], exams: [] } },
                             { id: "m4_b4", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [], exams: [] } },
-                            // وحدة الشهادات ذات التصنيفين: مواضيع سابقة ومقترحة
                             { id: "m4_b5", title: "شهادتك 🎓", categories: { 'past_exams': [], 'mock_exams': [] } } 
                         ] 
                     }
@@ -784,9 +794,8 @@
                 try {
                     const progDoc = await getDoc(doc(programCol, 'main'));
                     if (!progDoc.exists()) {
-                        await setDoc(doc(programCol, 'main'), { sections: defaultProgramData });
+                        await setDoc(doc(programCol, 'main'), { sections: defaultProgramData, latestUpdates: [] });
                     } else {
-                        // إضافة أو تحديث وحدة "شهادتك 🎓" برمجياً وإصلاح التصنيفات
                         let data = progDoc.data();
                         let needsUpdate = false;
                         data.sections.forEach(part => {
@@ -860,7 +869,6 @@
 
                     const levelDisplay = levelNames[userData.level] || "مستوى غير محدد";
                     
-                    // Sending the request as a chat message to the admin
                     const chatRoomId = username; 
                     const messagesRef = collection(db, chatsPath, chatRoomId, 'messages');
                     const chatDocRef = doc(db, chatsPath, chatRoomId);
@@ -951,7 +959,6 @@
                 }
             } catch (err) { 
                 console.error(err); 
-                // معالجة أخطاء الشبكة بشكل مخصص لتجنب انهيار التطبيق
                 if (err.code === 'auth/network-request-failed' || err.message.includes('Failed to fetch')) {
                     showToast("لا يوجد اتصال بالإنترنت! يرجى التحقق من الشبكة والمحاولة مجدداً.", "error");
                 } else {
@@ -977,12 +984,12 @@
             document.getElementById('display-username').innerText = window.currentUserRecord.username;
             document.getElementById('student-level-badge').innerText = levelNames[window.currentUserRecord.level];
             
-            // تفعيل وضع المراقبة (إخفاء أزرار الدردشة والإعدادات والخروج والوضع الليلي)
             document.getElementById('return-admin-btn').classList.remove('hidden');
             document.getElementById('student-settings-btn').classList.add('hidden'); 
             document.getElementById('student-chat-btn').classList.add('hidden'); 
             document.getElementById('student-dark-btn').classList.add('hidden'); 
             document.getElementById('student-logout-btn').classList.add('hidden'); 
+            document.getElementById('student-notif-btn').classList.add('hidden'); // إخفاء الإشعارات في وضع المراقبة
 
             if(unsubscribeUsers) unsubscribeUsers();
             if(unsubscribeChatMeta) unsubscribeChatMeta();
@@ -997,12 +1004,12 @@
             window.currentUserRecord = { ...window.originalAdminRecord };
             window.originalAdminRecord = null;
             
-            // إلغاء وضع المراقبة وإرجاع الأزرار لطبيعتها
             document.getElementById('return-admin-btn').classList.add('hidden');
             document.getElementById('student-settings-btn').classList.remove('hidden');
             document.getElementById('student-chat-btn').classList.remove('hidden');
             document.getElementById('student-dark-btn').classList.remove('hidden');
             document.getElementById('student-logout-btn').classList.remove('hidden');
+            document.getElementById('student-notif-btn').classList.remove('hidden');
 
             if(unsubscribeUsers) unsubscribeUsers();
             if(unsubscribeChatMeta) unsubscribeChatMeta();
@@ -1017,12 +1024,12 @@
                 window.currentUserRecord = null; window.originalAdminRecord = null;
                 document.getElementById('password').value = '';
                 
-                // إعادة الأزرار لحالتها الأصلية احتياطياً
                 document.getElementById('return-admin-btn').classList.add('hidden');
                 document.getElementById('student-settings-btn').classList.remove('hidden');
                 document.getElementById('student-chat-btn').classList.remove('hidden');
                 document.getElementById('student-dark-btn').classList.remove('hidden');
                 document.getElementById('student-logout-btn').classList.remove('hidden');
+                document.getElementById('student-notif-btn').classList.remove('hidden');
 
                 if(unsubscribeProgram) unsubscribeProgram();
                 if(unsubscribeUsers) unsubscribeUsers();
@@ -1083,6 +1090,72 @@
             } catch(e) { showToast("حدث خطأ أثناء الحفظ", "error"); }
         };
 
+        // Student Notifications Helper Functions
+        window.markStudentNotificationsAsRead = () => {
+            if (!window.currentUpdates || !window.currentUserRecord || window.currentUserRecord.role === 'admin') return;
+            let myUpdates = window.currentUpdates.filter(u => u.level === window.currentUserRecord.level);
+            let seenUpdates = myUpdates.map(u => u.id);
+            localStorage.setItem(`seen_updates_${window.currentUserRecord.username}`, JSON.stringify(seenUpdates));
+
+            const badge = document.getElementById('student-global-badge');
+            if (badge) badge.classList.add('hidden');
+
+            document.querySelectorAll('#student-notifications-container .bg-blue-50').forEach(el => {
+                el.classList.remove('bg-blue-50', 'dark:bg-blue-900/20', 'border-blue-200', 'dark:border-blue-800');
+                el.classList.add('bg-slate-50', 'dark:bg-slate-800/50', 'border-slate-100', 'dark:border-slate-700');
+            });
+            document.querySelectorAll('#student-notifications-container .text-blue-600').forEach(el => {
+                el.classList.remove('text-blue-600', 'dark:text-blue-400');
+                el.classList.add('text-slate-400', 'dark:text-slate-500');
+            });
+        };
+
+        window.renderStudentNotifications = (myUpdates, seenUpdates) => {
+            let unreadCount = 0;
+            let notifHtml = '';
+            
+            let sortedUpdates = [...myUpdates].sort((a, b) => b.timestamp - a.timestamp);
+
+            sortedUpdates.forEach(update => {
+                let isNew = !seenUpdates.includes(update.id);
+                if (isNew) unreadCount++;
+
+                let bgClass = isNew ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-700';
+                let iconColor = isNew ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500';
+
+                notifHtml += `
+                    <div class="flex items-start gap-3 p-3 rounded-xl border ${bgClass} transition shadow-sm">
+                        <div class="w-8 h-8 rounded-full bg-white dark:bg-slate-700 flex items-center justify-center flex-shrink-0 shadow-sm ${iconColor}">
+                            <i class="ph-bold ph-bell-ringing"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="font-black text-sm text-slate-800 dark:text-white leading-tight mb-1">${update.title}</div>
+                            <div class="text-[11px] font-bold text-slate-500 dark:text-slate-400">في وحدة: ${update.branch}</div>
+                        </div>
+                    </div>`;
+            });
+
+            const badge = document.getElementById('student-global-badge');
+            const container = document.getElementById('student-notifications-container');
+
+            if (badge) {
+                if (unreadCount > 0) {
+                    badge.innerText = unreadCount > 9 ? '9+' : unreadCount;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            }
+
+            if (container) {
+                if (sortedUpdates.length > 0) {
+                    container.innerHTML = notifHtml;
+                } else {
+                    container.innerHTML = '<div class="text-center text-slate-500 dark:text-slate-400 text-sm font-bold p-4 opacity-70"><i class="ph-fill ph-bell-slash text-4xl mb-2"></i><br>لا توجد إشعارات جديدة</div>';
+                }
+            }
+        };
+
         const calculateProgressXP = (levelId, data, sections) => {
             if(!sections || !levelId) return { xp: 0, percent: 0 };
             let xp = 0; let totalLinks = 0; let clickedLinks = data.clickedLinks || [];
@@ -1113,7 +1186,6 @@
         window.trackLinkClick = async (branchId, cat, lIdx, url) => {
             window.open(url, '_blank');
             if (window.currentUserRecord && window.currentUserRecord.role !== 'admin') {
-                // منع احتساب النقاط إذا كان الأستاذ في وضع المراقبة
                 if (window.originalAdminRecord) {
                     showToast("أنت في وضع المراقبة، لن يتم تسجيل هذا الدرس كمقروء ولن تحسب النقاط للتلميذ.", "error");
                     return;
@@ -1135,7 +1207,6 @@
             }
         };
 
-        // التكوين الخاص بالتصنيفات
         const catConfig = {
             'lessons': { title: 'الدروس', icon: '<i class="ph-fill ph-books"></i>', bg: 'bg-blue-50/50 dark:bg-blue-900/10', text: 'text-blue-700 dark:text-blue-400', border: 'border-blue-100 dark:border-blue-900/30' },
             'exercises': { title: 'التمارين', icon: '<i class="ph-fill ph-pencil-simple"></i>', bg: 'bg-orange-50/50 dark:bg-orange-900/10', text: 'text-orange-700 dark:text-orange-400', border: 'border-orange-100 dark:border-orange-900/30' },
@@ -1144,7 +1215,6 @@
             'mock_exams': { title: 'مواضيع مقترحة', icon: '<i class="ph-fill ph-file-text"></i>', bg: 'bg-amber-50/50 dark:bg-amber-900/10', text: 'text-amber-700 dark:text-amber-400', border: 'border-amber-100 dark:border-amber-900/30' }
         };
 
-        // دالة مساعدة لتنظيف المدخلات وحماية الموقع من ثغرات XSS
         const escapeHtml = (unsafeText) => {
             if (typeof unsafeText !== 'string') return '';
             return unsafeText
@@ -1157,8 +1227,8 @@
 
         window.executeStudentSearch = () => {
             const searchInput = document.getElementById('lesson-search').value.trim();
-            const query = searchInput.toLowerCase(); // نستخدم النص الأصلي للبحث الفعلي
-            const safeQuery = escapeHtml(searchInput); // نستخدم النص المنظف للعرض على الشاشة فقط لضمان الأمان
+            const query = searchInput.toLowerCase(); 
+            const safeQuery = escapeHtml(searchInput); 
             const container = document.getElementById('student-program-view');
             
             if (query === '') { renderProgramUI(window.currentSections, 'student-program-view', false); return; }
@@ -1201,7 +1271,6 @@
             html += `</div></div>`; container.innerHTML = html;
         };
 
-        // Admin Tabs & Filters
         window.switchAdminPart = (partId) => {
             window.adminActivePart = partId;
             document.querySelectorAll(`.admin-part-content`).forEach(el => el.classList.remove('active'));
@@ -1227,7 +1296,7 @@
         
         window.filterMainStudents = (mainType) => {
             window.adminMainFilter = mainType;
-            window.adminSubFilter = 'all'; // إعادة تعيين بوابة السنة عند تغيير الطور
+            window.adminSubFilter = 'all'; 
             
             ['all', 'middle', 'high'].forEach(t => {
                 let btn = document.getElementById(`filter-main-${t}`);
@@ -1271,7 +1340,6 @@
             renderAdminTable();
         };
 
-        // Admin Actions
         window.toggleSelectAll = () => { const state = document.getElementById('select-all-cb').checked; document.querySelectorAll('.student-cb').forEach(cb => cb.checked = state); };
         
         window.toggleUserStatus = async (uid, isApproved, phone) => {
@@ -1355,23 +1423,20 @@
                 let isMiddle = data.level && data.level.startsWith('m_');
                 let isHigh = data.level && data.level.startsWith('h_');
                 
-                // الفلترة حسب الطور (متوسط / ثانوي)
                 if(window.adminMainFilter === 'middle' && !isMiddle) return;
                 if(window.adminMainFilter === 'high' && !isHigh) return;
                 
-                // الفلترة حسب بوابة السنة المختارة
                 if(window.adminSubFilter !== 'all' && data.level !== window.adminSubFilter) return;
 
-                // الفلترة حسب شريط البحث (اسم التلميذ أو الولي)
                 if (searchQuery) {
                     const studentName = d.id.toLowerCase();
                     const parentName = (data.parentName || '').toLowerCase();
                     if (!studentName.includes(searchQuery) && !parentName.includes(searchQuery)) {
-                        return; // تخطي التلميذ إذا لم يطابق كلمات البحث
+                        return; 
                     }
                 }
 
-                studentCount++; // حساب عدد التلاميذ الذين يظهرون في الجدول فقط
+                studentCount++; 
 
                 let levelDisplay = data.level ? (levelNames[data.level] || data.level) : "غير محدد";
                 let prog = calculateProgressXP(data.level, data, window.currentSections);
@@ -1442,7 +1507,13 @@
 
         const startAdminListeners = () => {
             unsubscribeProgram = onSnapshot(doc(programCol, 'main'), (docSnap) => {
-                if(docSnap.exists()) { window.currentSections = docSnap.data().sections; renderProgramUI(window.currentSections, 'admin-program-view', true); renderAdminTable(); }
+                if(docSnap.exists()) { 
+                    let data = docSnap.data();
+                    window.currentSections = data.sections; 
+                    window.currentUpdates = data.latestUpdates || []; 
+                    renderProgramUI(window.currentSections, 'admin-program-view', true); 
+                    renderAdminTable(); 
+                }
             });
 
             if(unsubscribeUsers) unsubscribeUsers();
@@ -1501,11 +1572,38 @@
         };
 
         const startStudentListeners = () => {
+            let isInitialProgramLoad = true;
+
             unsubscribeProgram = onSnapshot(doc(programCol, 'main'), (docSnap) => {
                 if(docSnap.exists()) { 
-                    window.currentSections = docSnap.data().sections; 
-                    if(document.getElementById('lesson-search').value.trim() === '') { renderProgramUI(window.currentSections, 'student-program-view', false); }
-                    updateProgressUI(window.currentSections); renderLeaderboard(); 
+                    let data = docSnap.data();
+                    window.currentSections = data.sections; 
+                    window.currentUpdates = data.latestUpdates || [];
+
+                    if(document.getElementById('lesson-search').value.trim() === '') { 
+                        renderProgramUI(window.currentSections, 'student-program-view', false); 
+                    }
+                    updateProgressUI(window.currentSections); 
+                    renderLeaderboard(); 
+
+                    if (window.currentUserRecord && window.currentUserRecord.role === 'student') {
+                        let myUpdates = window.currentUpdates.filter(u => u.level === window.currentUserRecord.level);
+                        let seenUpdates = JSON.parse(localStorage.getItem(`seen_updates_${window.currentUserRecord.username}`)) || [];
+
+                        // Show Toast Notification only for truly new updates (added in the last 15 seconds) and not initial load
+                        if (!isInitialProgramLoad) {
+                            myUpdates.forEach(u => {
+                                if (!seenUpdates.includes(u.id) && (Date.now() - u.timestamp < 15000)) {
+                                    showToast(`محتوى جديد متاح: ${u.title}`, 'success');
+                                }
+                            });
+                        }
+                        
+                        // Always render the bell dropdown notifications
+                        renderStudentNotifications(myUpdates, seenUpdates);
+                    }
+                    
+                    isInitialProgramLoad = false;
                 }
             });
             
@@ -1604,7 +1702,6 @@
             btn.disabled = false; btn.innerHTML = origHtml;
         };
 
-        // Admin Links functions
         window.adminAddLink = async (pIdx, yIdx, bIdx, cat, branchId) => {
             let title = document.getElementById(`title_${branchId}_${cat}`).value.trim(); 
             let url = document.getElementById(`url_${branchId}_${cat}`).value.trim();
@@ -1620,8 +1717,25 @@
             }
             
             sections[pIdx].years[yIdx].branches[bIdx].categories[cat].push({title, url});
-            await updateDoc(docRef, { sections }); 
-            showToast("تمت الإضافة بنجاح للمنهج 📚");
+
+            // تسجيل الإضافة في قائمة التحديثات للإشعارات
+            let levelId = sections[pIdx].years[yIdx].id;
+            let branchTitle = sections[pIdx].years[yIdx].branches[bIdx].title;
+            let updates = window.currentUpdates || [];
+            
+            updates.push({
+                id: Date.now().toString(),
+                title: title,
+                level: levelId,
+                branch: branchTitle,
+                timestamp: Date.now()
+            });
+
+            // الاحتفاظ بآخر 50 تحديث فقط لتجنب امتلاء قاعدة البيانات
+            if (updates.length > 50) updates = updates.slice(updates.length - 50);
+
+            await updateDoc(docRef, { sections: sections, latestUpdates: updates }); 
+            showToast("تمت الإضافة بنجاح وتنبيه التلاميذ 📚");
         };
 
         window.adminDeleteLink = async (pIdx, yIdx, bIdx, cat, lIdx) => {
@@ -1712,7 +1826,6 @@
                         cats.forEach(cat => {
                             let links = branch.categories[cat] || []; let conf = catConfig[cat];
                             
-                            // استخدام زر button بدلاً من رابط a لرفع تقييم Best Practices وسهولة الوصول
                             let linksList = links.length ? links.map((lnk, lIdx) => {
                                 let linkId = `${branch.id}_${cat}_${lIdx}`; let isRead = clickedLinks.includes(linkId);
                                 return `<button onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}')" aria-label="مشاهدة المحتوى" class="lesson-item w-full flex items-center justify-between gap-3 bg-white dark:bg-slate-800 p-3 rounded-2xl border ${isRead ? 'border-emerald-200 dark:border-emerald-800 shadow-sm' : 'border-slate-100 dark:border-slate-700'} hover:shadow-md transition group/link relative overflow-hidden text-right"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl group-hover/link:bg-blue-600 group-hover/link:text-white transition shadow-inner"><i class="ph-bold ph-link"></i></div><span class="${conf.text} font-bold text-sm truncate max-w-[140px] sm:max-w-[180px] group-hover/link:underline decoration-2 underline-offset-4">${lnk.title}</span></div>${isRead ? `<span class="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 text-[10px] font-black px-2 py-1 rounded-md flex items-center gap-1"><i class="ph-bold ph-check"></i> مقروء</span>` : ''}</button>`;
