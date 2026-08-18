@@ -385,6 +385,12 @@
                     </div>
                 </div>
 
+                <!-- شريط البحث عن التلاميذ -->
+                <div class="mb-5 relative group w-full md:w-2/3 lg:w-1/2">
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500 transition-colors text-xl"><i class="ph-bold ph-magnifying-glass"></i></div>
+                    <input type="text" id="admin-student-search" aria-label="البحث عن تلميذ" onkeyup="executeAdminStudentSearch()" class="w-full pl-5 pr-14 py-3.5 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-900 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-sm placeholder-slate-400 shadow-sm" placeholder="ابحث عن تلميذ باسم المستخدم أو اسم الولي...">
+                </div>
+
                 <!-- أزرار فلترة الجدول الرئيسية والبوابات الفرعية -->
                 <div class="flex flex-col gap-3 mb-4">
                     <div class="flex gap-2 bg-slate-100 dark:bg-slate-900 p-1.5 rounded-xl w-fit border border-slate-200 dark:border-slate-700">
@@ -1215,6 +1221,10 @@
         window.switchAdminBranch = (yearId, branchId) => { window.adminActiveBranch[yearId] = branchId; renderProgramUI(window.currentSections, 'admin-program-view', true); };
         window.switchStudentTab = (branchId) => { window.studentActiveBranchTab = branchId; document.getElementById('lesson-search').value = ''; renderProgramUI(window.currentSections, 'student-program-view', false); };
         
+        window.executeAdminStudentSearch = () => {
+            renderAdminTable();
+        };
+        
         window.filterMainStudents = (mainType) => {
             window.adminMainFilter = mainType;
             window.adminSubFilter = 'all'; // إعادة تعيين بوابة السنة عند تغيير الطور
@@ -1334,6 +1344,9 @@
         const renderAdminTable = () => {
             const tbody = document.getElementById('students-table-body');
             tbody.innerHTML = ''; let studentCount = 0; let levelStats = {}; 
+            
+            const searchInput = document.getElementById('admin-student-search');
+            const searchQuery = searchInput ? searchInput.value.trim().toLowerCase() : '';
 
             window.adminUsersList.forEach(d => {
                 const data = d.data;
@@ -1348,6 +1361,15 @@
                 
                 // الفلترة حسب بوابة السنة المختارة
                 if(window.adminSubFilter !== 'all' && data.level !== window.adminSubFilter) return;
+
+                // الفلترة حسب شريط البحث (اسم التلميذ أو الولي)
+                if (searchQuery) {
+                    const studentName = d.id.toLowerCase();
+                    const parentName = (data.parentName || '').toLowerCase();
+                    if (!studentName.includes(searchQuery) && !parentName.includes(searchQuery)) {
+                        return; // تخطي التلميذ إذا لم يطابق كلمات البحث
+                    }
+                }
 
                 studentCount++; // حساب عدد التلاميذ الذين يظهرون في الجدول فقط
 
