@@ -385,11 +385,16 @@
                     </div>
                 </div>
 
-                <!-- أزرار فلترة الجدول -->
-                <div class="flex gap-2 mb-4 bg-slate-100 dark:bg-slate-900 p-1.5 rounded-xl w-fit border border-slate-200 dark:border-slate-700">
-                    <button onclick="filterStudentsTable('all')" id="filter-stu-all" aria-label="الكل" class="px-5 py-2 rounded-lg font-black text-sm bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-white transition-all">الكل</button>
-                    <button onclick="filterStudentsTable('middle')" id="filter-stu-middle" aria-label="المتوسط" class="px-5 py-2 rounded-lg font-black text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-all">المتوسط</button>
-                    <button onclick="filterStudentsTable('high')" id="filter-stu-high" aria-label="الثانوي" class="px-5 py-2 rounded-lg font-black text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-all">الثانوي</button>
+                <!-- أزرار فلترة الجدول الرئيسية والبوابات الفرعية -->
+                <div class="flex flex-col gap-3 mb-4">
+                    <div class="flex gap-2 bg-slate-100 dark:bg-slate-900 p-1.5 rounded-xl w-fit border border-slate-200 dark:border-slate-700">
+                        <button onclick="filterMainStudents('all')" id="filter-main-all" aria-label="الكل" class="px-5 py-2 rounded-lg font-black text-sm bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-white transition-all">الكل</button>
+                        <button onclick="filterMainStudents('middle')" id="filter-main-middle" aria-label="المتوسط" class="px-5 py-2 rounded-lg font-black text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-all">المتوسط</button>
+                        <button onclick="filterMainStudents('high')" id="filter-main-high" aria-label="الثانوي" class="px-5 py-2 rounded-lg font-black text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-all">الثانوي</button>
+                    </div>
+                    <!-- بوابات السنوات (Sub-filters) -->
+                    <div id="sub-filter-container" class="hidden flex-wrap gap-2 p-2 rounded-xl border border-indigo-100 dark:border-indigo-800 bg-indigo-50/50 dark:bg-indigo-900/20 w-fit animate-[fadeInTab_0.3s_ease]">
+                    </div>
                 </div>
 
                 <div class="overflow-y-auto overflow-x-auto rounded-3xl border border-slate-100 dark:border-slate-700 shadow-inner bg-slate-50/50 dark:bg-slate-900/50 flex-1">
@@ -561,7 +566,8 @@
         window.adminActivePart = 'part_middle';
         window.adminActiveYear = {}; 
         window.adminActiveBranch = {}; 
-        window.adminStudentsFilter = 'all'; 
+        window.adminMainFilter = 'all'; 
+        window.adminSubFilter = 'all'; 
         window.studentActiveBranchTab = null;
         
         window.adminUsersList = [];
@@ -1208,13 +1214,50 @@
         };
         window.switchAdminBranch = (yearId, branchId) => { window.adminActiveBranch[yearId] = branchId; renderProgramUI(window.currentSections, 'admin-program-view', true); };
         window.switchStudentTab = (branchId) => { window.studentActiveBranchTab = branchId; document.getElementById('lesson-search').value = ''; renderProgramUI(window.currentSections, 'student-program-view', false); };
-        window.filterStudentsTable = (filterType) => {
-            window.adminStudentsFilter = filterType;
+        
+        window.filterMainStudents = (mainType) => {
+            window.adminMainFilter = mainType;
+            window.adminSubFilter = 'all'; // إعادة تعيين بوابة السنة عند تغيير الطور
+            
             ['all', 'middle', 'high'].forEach(t => {
-                let btn = document.getElementById(`filter-stu-${t}`);
-                if(t === filterType) { btn.classList.add('bg-white', 'dark:bg-slate-700', 'text-blue-600', 'dark:text-white', 'shadow-sm'); btn.classList.remove('text-slate-500', 'dark:text-slate-400'); } 
-                else { btn.classList.remove('bg-white', 'dark:bg-slate-700', 'text-blue-600', 'dark:text-white', 'shadow-sm'); btn.classList.add('text-slate-500', 'dark:text-slate-400'); }
+                let btn = document.getElementById(`filter-main-${t}`);
+                if(btn) {
+                    if(t === mainType) { btn.classList.add('bg-white', 'dark:bg-slate-700', 'text-blue-600', 'dark:text-white', 'shadow-sm'); btn.classList.remove('text-slate-500', 'dark:text-slate-400'); } 
+                    else { btn.classList.remove('bg-white', 'dark:bg-slate-700', 'text-blue-600', 'dark:text-white', 'shadow-sm'); btn.classList.add('text-slate-500', 'dark:text-slate-400'); }
+                }
             });
+
+            const subContainer = document.getElementById('sub-filter-container');
+            if (mainType === 'all') {
+                subContainer.classList.add('hidden'); subContainer.classList.remove('flex');
+            } else {
+                subContainer.classList.remove('hidden'); subContainer.classList.add('flex');
+                let html = `<button onclick="filterSubStudents('all')" id="filter-sub-all" class="px-4 py-1.5 rounded-lg font-black text-xs bg-indigo-600 text-white shadow-sm transition-all flex items-center gap-1"><i class="ph-fill ph-circles-four"></i> كل السنوات</button>`;
+                
+                if (mainType === 'middle') {
+                    const years = [{id: 'm_y1', t: 'الأولى متوسط'}, {id: 'm_y2', t: 'الثانية متوسط'}, {id: 'm_y3', t: 'الثالثة متوسط'}, {id: 'm_y4', t: 'الرابعة متوسط'}];
+                    years.forEach(y => { html += `<button onclick="filterSubStudents('${y.id}')" id="filter-sub-${y.id}" class="px-4 py-1.5 rounded-lg font-black text-xs bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all flex items-center gap-1"><i class="ph-fill ph-door"></i> ${y.t}</button>`; });
+                } else if (mainType === 'high') {
+                    const years = [{id: 'h_y1', t: 'أولى ثانوي'}, {id: 'h_y2', t: 'الثانية ثانوي'}, {id: 'h_y3', t: 'الثالثة ثانوي'}];
+                    years.forEach(y => { html += `<button onclick="filterSubStudents('${y.id}')" id="filter-sub-${y.id}" class="px-4 py-1.5 rounded-lg font-black text-xs bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all flex items-center gap-1"><i class="ph-fill ph-door"></i> ${y.t}</button>`; });
+                }
+                subContainer.innerHTML = html;
+            }
+            renderAdminTable();
+        };
+
+        window.filterSubStudents = (subType) => {
+            window.adminSubFilter = subType;
+            const subContainer = document.getElementById('sub-filter-container');
+            if(subContainer) {
+                Array.from(subContainer.children).forEach(btn => {
+                    if (btn.id === `filter-sub-${subType}`) {
+                        btn.className = "px-4 py-1.5 rounded-lg font-black text-xs bg-indigo-600 text-white shadow-sm transition-all flex items-center gap-1";
+                    } else {
+                        btn.className = "px-4 py-1.5 rounded-lg font-black text-xs bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all flex items-center gap-1";
+                    }
+                });
+            }
             renderAdminTable();
         };
 
@@ -1295,13 +1338,19 @@
             window.adminUsersList.forEach(d => {
                 const data = d.data;
                 if(data.level) levelStats[data.level] = (levelStats[data.level] || 0) + 1;
-                studentCount++;
 
                 let isMiddle = data.level && data.level.startsWith('m_');
                 let isHigh = data.level && data.level.startsWith('h_');
-                if(window.adminStudentsFilter === 'middle' && !isMiddle) return;
-                if(window.adminStudentsFilter === 'high' && !isHigh) return;
                 
+                // الفلترة حسب الطور (متوسط / ثانوي)
+                if(window.adminMainFilter === 'middle' && !isMiddle) return;
+                if(window.adminMainFilter === 'high' && !isHigh) return;
+                
+                // الفلترة حسب بوابة السنة المختارة
+                if(window.adminSubFilter !== 'all' && data.level !== window.adminSubFilter) return;
+
+                studentCount++; // حساب عدد التلاميذ الذين يظهرون في الجدول فقط
+
                 let levelDisplay = data.level ? (levelNames[data.level] || data.level) : "غير محدد";
                 let prog = calculateProgressXP(data.level, data, window.currentSections);
                 
