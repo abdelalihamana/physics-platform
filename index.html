@@ -698,7 +698,7 @@
             document.getElementById(screenId).classList.add('active');
         };
 
-        // المنهج الافتراضي المتكامل للطورين مع الفصول وإزالة الفروض والاختبارات
+        // المنهج الافتراضي المتكامل للطورين مع الفصول وإزالة الفروض والاختبارات من الوحدات العادية
         const defaultProgramData = [
             { 
                 id: "part_middle", 
@@ -712,9 +712,9 @@
                             { id: "m1_b1", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [] } },
                             { id: "m1_b2", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [] } },
                             { id: "m1_b3", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [] } },
-                            { id: "m1_s1", title: "فصل 1", categories: { lessons: [], exercises: [] } },
-                            { id: "m1_s2", title: "فصل 2", categories: { lessons: [], exercises: [] } },
-                            { id: "m1_s3", title: "فصل 3", categories: { lessons: [], exercises: [] } }
+                            { id: "m1_s1", title: "فصل 1", categories: { terms: [], exams: [] } },
+                            { id: "m1_s2", title: "فصل 2", categories: { terms: [], exams: [] } },
+                            { id: "m1_s3", title: "فصل 3", categories: { terms: [], exams: [] } }
                         ] 
                     },
                     { 
@@ -724,9 +724,9 @@
                             { id: "m2_b1", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [] } },
                             { id: "m2_b2", title: "الظواهر الميكانيكية", categories: { lessons: [], exercises: [] } },
                             { id: "m2_b3", title: "الظواهر الكهرومغناطيسية", categories: { lessons: [], exercises: [] } },
-                            { id: "m2_s1", title: "فصل 1", categories: { lessons: [], exercises: [] } },
-                            { id: "m2_s2", title: "فصل 2", categories: { lessons: [], exercises: [] } },
-                            { id: "m2_s3", title: "فصل 3", categories: { lessons: [], exercises: [] } }
+                            { id: "m2_s1", title: "فصل 1", categories: { terms: [], exams: [] } },
+                            { id: "m2_s2", title: "فصل 2", categories: { terms: [], exams: [] } },
+                            { id: "m2_s3", title: "فصل 3", categories: { terms: [], exams: [] } }
                         ] 
                     },
                     { 
@@ -737,9 +737,9 @@
                             { id: "m3_b2", title: "الطاقة", categories: { lessons: [], exercises: [] } },
                             { id: "m3_b3", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [] } },
                             { id: "m3_b4", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [] } },
-                            { id: "m3_s1", title: "فصل 1", categories: { lessons: [], exercises: [] } },
-                            { id: "m3_s2", title: "فصل 2", categories: { lessons: [], exercises: [] } },
-                            { id: "m3_s3", title: "فصل 3", categories: { lessons: [], exercises: [] } }
+                            { id: "m3_s1", title: "فصل 1", categories: { terms: [], exams: [] } },
+                            { id: "m3_s2", title: "فصل 2", categories: { terms: [], exams: [] } },
+                            { id: "m3_s3", title: "فصل 3", categories: { terms: [], exams: [] } }
                         ] 
                     },
                     { 
@@ -751,9 +751,9 @@
                             { id: "m4_b3", title: "الظواهر الميكانيكية", categories: { lessons: [], exercises: [] } },
                             { id: "m4_b4", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [] } },
                             { id: "m4_b5", title: "شهادتك 🎓", categories: { 'past_exams': [], 'mock_exams': [] } },
-                            { id: "m4_s1", title: "فصل 1", categories: { lessons: [], exercises: [] } },
-                            { id: "m4_s2", title: "فصل 2", categories: { lessons: [], exercises: [] } },
-                            { id: "m4_s3", title: "فصل 3", categories: { lessons: [], exercises: [] } }
+                            { id: "m4_s1", title: "فصل 1", categories: { terms: [], exams: [] } },
+                            { id: "m4_s2", title: "فصل 2", categories: { terms: [], exams: [] } },
+                            { id: "m4_s3", title: "فصل 3", categories: { terms: [], exams: [] } }
                         ] 
                     }
                 ] 
@@ -769,9 +769,9 @@
                         branches: [
                             { id: "h1_b1", title: "بنية وهندسة أفراد بعض الأنواع الكيميائية", categories: { lessons: [], exercises: [] } },
                             { id: "h1_b2", title: "القوة والحركات المستقيمة", categories: { lessons: [], exercises: [] } },
-                            { id: "h1_s1", title: "فصل 1", categories: { lessons: [], exercises: [] } },
-                            { id: "h1_s2", title: "فصل 2", categories: { lessons: [], exercises: [] } },
-                            { id: "h1_s3", title: "فصل 3", categories: { lessons: [], exercises: [] } }
+                            { id: "h1_s1", title: "فصل 1", categories: { terms: [], exams: [] } },
+                            { id: "h1_s2", title: "فصل 2", categories: { terms: [], exams: [] } },
+                            { id: "h1_s3", title: "فصل 3", categories: { terms: [], exams: [] } }
                         ] 
                     },
                     { 
@@ -780,9 +780,9 @@
                         branches: [
                             { id: "h2_b1", title: "المقاربة الكيفية لطاقة جملة وانحفاظها", categories: { lessons: [], exercises: [] } },
                             { id: "h2_b2", title: "العمل والطاقة الحركية", categories: { lessons: [], exercises: [] } },
-                            { id: "h2_s1", title: "فصل 1", categories: { lessons: [], exercises: [] } },
-                            { id: "h2_s2", title: "فصل 2", categories: { lessons: [], exercises: [] } },
-                            { id: "h2_s3", title: "فصل 3", categories: { lessons: [], exercises: [] } }
+                            { id: "h2_s1", title: "فصل 1", categories: { terms: [], exams: [] } },
+                            { id: "h2_s2", title: "فصل 2", categories: { terms: [], exams: [] } },
+                            { id: "h2_s3", title: "فصل 3", categories: { terms: [], exams: [] } }
                         ] 
                     },
                     { 
@@ -792,9 +792,9 @@
                             { id: "h3_b1", title: "تطور جملة كيميائية نحو حالة التوازن", categories: { lessons: [], exercises: [] } },
                             { id: "h3_b2", title: "التحولات النووية", categories: { lessons: [], exercises: [] } },
                             { id: "h3_b3", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [] } },
-                            { id: "h3_s1", title: "فصل 1", categories: { lessons: [], exercises: [] } },
-                            { id: "h3_s2", title: "فصل 2", categories: { lessons: [], exercises: [] } },
-                            { id: "h3_s3", title: "فصل 3", categories: { lessons: [], exercises: [] } }
+                            { id: "h3_s1", title: "فصل 1", categories: { terms: [], exams: [] } },
+                            { id: "h3_s2", title: "فصل 2", categories: { terms: [], exams: [] } },
+                            { id: "h3_s3", title: "فصل 3", categories: { terms: [], exams: [] } }
                         ] 
                     }
                 ] 
@@ -833,22 +833,23 @@
                                     let existingSem = year.branches.find(b => b.id === semId);
                                     
                                     if (!existingSem) {
-                                        year.branches.push({ id: semId, title: semTitle, categories: { lessons: [], exercises: [] } });
+                                        year.branches.push({ id: semId, title: semTitle, categories: { terms: [], exams: [] } });
                                         needsUpdate = true;
                                     } else {
-                                        if (existingSem.categories['exams']) { delete existingSem.categories['exams']; needsUpdate = true; }
+                                        if (existingSem.categories['lessons']) {
+                                            existingSem.categories['terms'] = existingSem.categories['lessons'];
+                                            delete existingSem.categories['lessons'];
+                                            needsUpdate = true;
+                                        }
+                                        if (existingSem.categories['exercises']) {
+                                            existingSem.categories['exams'] = existingSem.categories['exercises'];
+                                            delete existingSem.categories['exercises'];
+                                            needsUpdate = true;
+                                        }
                                     }
                                 });
 
-                                // 2. حذف تصنيف exams من الوحدات العادية
-                                year.branches.forEach(branch => {
-                                    if (branch.id !== 'm4_b5' && branch.categories && branch.categories['exams']) {
-                                        delete branch.categories['exams'];
-                                        needsUpdate = true;
-                                    }
-                                });
-
-                                // 3. التحقق من شهادة الرابعة متوسط
+                                // 2. التحقق من شهادة الرابعة متوسط
                                 if (year.id === 'm_y4') {
                                     let existingB5 = year.branches.find(b => b.id === 'm4_b5');
                                     if (!existingB5) {
@@ -864,6 +865,14 @@
                                         if (existingB5.categories['exams']) { delete existingB5.categories['exams']; needsUpdate = true; }
                                     }
                                 }
+
+                                // 3. حذف تصنيف exams القديم من الوحدات العادية
+                                year.branches.forEach(branch => {
+                                    if (branch.id !== 'm4_b5' && !branch.id.includes('_s') && branch.categories && branch.categories['exams']) {
+                                        delete branch.categories['exams'];
+                                        needsUpdate = true;
+                                    }
+                                });
                             });
                         });
 
@@ -1211,7 +1220,15 @@
             sections.forEach(p => p.years.forEach(y => {
                 if(y.id === levelId) {
                     y.branches.forEach(b => {
-                        let cats = b.id === 'm4_b5' ? ['past_exams', 'mock_exams'] : ['lessons', 'exercises'];
+                        let cats;
+                        if (b.id === 'm4_b5') {
+                            cats = ['past_exams', 'mock_exams'];
+                        } else if (b.id.includes('_s')) {
+                            cats = ['terms', 'exams'];
+                        } else {
+                            cats = ['lessons', 'exercises'];
+                        }
+                        
                         cats.forEach(cat => {
                             let links = b.categories[cat] || [];
                             totalLinks += links.length;
@@ -1259,6 +1276,8 @@
         const catConfig = {
             'lessons': { title: 'الدروس', icon: '<i class="ph-fill ph-books"></i>', bg: 'bg-blue-50/50 dark:bg-blue-900/10', text: 'text-blue-700 dark:text-blue-400', border: 'border-blue-100 dark:border-blue-900/30' },
             'exercises': { title: 'التمارين', icon: '<i class="ph-fill ph-pencil-simple"></i>', bg: 'bg-orange-50/50 dark:bg-orange-900/10', text: 'text-orange-700 dark:text-orange-400', border: 'border-orange-100 dark:border-orange-900/30' },
+            'terms': { title: 'الفروض', icon: '<i class="ph-fill ph-file-text"></i>', bg: 'bg-emerald-50/50 dark:bg-emerald-900/10', text: 'text-emerald-700 dark:text-emerald-400', border: 'border-emerald-100 dark:border-emerald-900/30' },
+            'exams': { title: 'الاختبارات', icon: '<i class="ph-fill ph-exam"></i>', bg: 'bg-purple-50/50 dark:bg-purple-900/10', text: 'text-purple-700 dark:text-purple-400', border: 'border-purple-100 dark:border-purple-900/30' },
             'past_exams': { title: 'مواضيع سابقة', icon: '<i class="ph-fill ph-certificate"></i>', bg: 'bg-emerald-50/50 dark:bg-emerald-900/10', text: 'text-emerald-700 dark:text-emerald-400', border: 'border-emerald-100 dark:border-emerald-900/30' },
             'mock_exams': { title: 'مواضيع مقترحة', icon: '<i class="ph-fill ph-file-text"></i>', bg: 'bg-amber-50/50 dark:bg-amber-900/10', text: 'text-amber-700 dark:text-amber-400', border: 'border-amber-100 dark:border-amber-900/30' }
         };
@@ -1289,7 +1308,15 @@
             window.currentSections.forEach(p => p.years.forEach(y => {
                 if(y.id === userLevel) {
                     y.branches.forEach(branch => {
-                        let cats = branch.id === 'm4_b5' ? ['past_exams', 'mock_exams'] : ['lessons', 'exercises'];
+                        let cats;
+                        if (branch.id === 'm4_b5') {
+                            cats = ['past_exams', 'mock_exams'];
+                        } else if (branch.id.includes('_s')) {
+                            cats = ['terms', 'exams'];
+                        } else {
+                            cats = ['lessons', 'exercises'];
+                        }
+                        
                         cats.forEach(cat => {
                             let links = branch.categories[cat] || []; let conf = catConfig[cat];
                             links.forEach((lnk, lIdx) => {
@@ -1830,7 +1857,15 @@
                     userYearData.branches.forEach(branch => {
                         if (window.studentActiveBranchTab !== branch.id) return; 
                         let branchLinksTotal = 0; let branchLinksClicked = 0;
-                        let cats = branch.id === 'm4_b5' ? ['past_exams', 'mock_exams'] : ['lessons', 'exercises'];
+                        let cats;
+                        
+                        if (branch.id === 'm4_b5') {
+                            cats = ['past_exams', 'mock_exams'];
+                        } else if (branch.id.includes('_s')) {
+                            cats = ['terms', 'exams'];
+                        } else {
+                            cats = ['lessons', 'exercises'];
+                        }
                         
                         cats.forEach(cat => {
                             let links = branch.categories[cat] || []; branchLinksTotal += links.length;
@@ -1840,7 +1875,7 @@
                         let isComp = branchLinksTotal > 0 && unitProg === 100;
                         let cardCls = isComp ? 'border-emerald-400 dark:border-emerald-600 bg-emerald-50/30 dark:bg-emerald-900/10' : 'border-slate-200 dark:border-slate-700 bg-white/90 dark:bg-slate-800/90';
                         
-                        let gridCols = 'grid-cols-1 md:grid-cols-2';
+                        let gridCols = (branch.id === 'm4_b5' || branch.id.includes('_s')) ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 md:grid-cols-2';
 
                         html += `
                         <div class="student-branch-wrapper rounded-[2rem] shadow-sm border-2 overflow-hidden interactive-card backdrop-blur-xl ${cardCls} animate-[fadeInTab_0.3s_ease]">
@@ -1909,8 +1944,16 @@
                             year.branches.forEach((branch, bIdx) => {
                                 if (window.adminActiveBranch[year.id] !== branch.id) return;
                                 
-                                let cats = branch.id === 'm4_b5' ? ['past_exams', 'mock_exams'] : ['lessons', 'exercises'];
-                                let gridCols = 'grid-cols-1 md:grid-cols-2';
+                                let cats;
+                                if (branch.id === 'm4_b5') {
+                                    cats = ['past_exams', 'mock_exams'];
+                                } else if (branch.id.includes('_s')) {
+                                    cats = ['terms', 'exams'];
+                                } else {
+                                    cats = ['lessons', 'exercises'];
+                                }
+
+                                let gridCols = (branch.id === 'm4_b5' || branch.id.includes('_s')) ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 md:grid-cols-2';
 
                                 html += `<div class="border-2 rounded-[2rem] p-5 md:p-6 bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 shadow-sm animate-[fadeInTab_0.3s_ease]">
                                     <h4 class="font-black text-slate-800 dark:text-white text-xl flex items-center gap-2 mb-5 border-b border-slate-100 dark:border-slate-700 pb-3"><span class="text-${pColor}-500 text-3xl">${getBranchIcon(branch.title)}</span> ${branch.title}</h4>
@@ -1918,7 +1961,7 @@
                                 
                                 cats.forEach(cat => {
                                     let links = branch.categories[cat] || []; let conf = catConfig[cat];
-                                    let linksList = links.length ? links.map((lnk, lIdx) => `<div class="flex justify-between items-center bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm text-sm mb-2 group interactive-card"><a href="${lnk.url}" target="_blank" class="${conf.text} font-bold truncate w-2/3 hover:underline flex items-center gap-2"><i class="ph-bold ph-link text-lg opacity-70"></i> ${lnk.title}</a><div class="flex gap-1"><button onclick="adminEditLinkModal(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" aria-label="تعديل الرابط" class="text-slate-400 hover:text-amber-500 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg transition"><i class="ph-bold ph-pencil"></i></button><button onclick="adminDeleteLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" aria-label="حذف الرابط" class="text-slate-400 hover:text-red-500 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg transition"><i class="ph-bold ph-trash"></i></button></div></div>`).join('') : getEmptyStateHTML('محتوى');
+                                    let linksList = links.length ? links.map((lnk, lIdx) => `<div class="flex justify-between items-center bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm text-sm mb-2 group interactive-card"><a href="${lnk.url}" target="_blank" class="${conf.text} font-bold truncate w-2/3 hover:underline flex items-center gap-2"><i class="ph-bold ph-link text-lg opacity-70"></i> ${lnk.title}</a><div class="flex gap-1"><button onclick="adminEditLinkModal(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" aria-label="تعديل الرابط" class="text-slate-400 hover:text-amber-500 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg transition"><i class="ph-bold ph-pencil"></i></button><button onclick="adminDeleteLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" aria-label="حذف الرابط" class="text-slate-400 hover:text-red-500 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg transition"><i class="ph-bold ph-trash"></i></button></div></div>`).join('') : getEmptyStateHTML(conf.title);
                                     html += `<div class="${conf.bg} ${conf.border} p-5 rounded-2xl border flex flex-col h-full"><h5 class="font-black ${conf.text} text-base mb-3 flex items-center gap-2">${conf.icon} ${conf.title}</h5><div class="mb-2 max-h-60 overflow-y-auto pr-1 scroll-smooth flex-1">${linksList}</div><div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 space-y-2 mt-auto"><input type="text" id="title_${branch.id}_${cat}" aria-label="عنوان المحتوى" class="w-full text-xs font-bold p-3 border border-slate-200 dark:border-slate-600 rounded-lg outline-none focus:border-blue-400 bg-white dark:bg-slate-900 text-slate-700 dark:text-white transition-all" placeholder="عنوان المحتوى..."><input type="text" id="url_${branch.id}_${cat}" aria-label="رابط المحتوى" class="w-full text-xs p-3 border border-slate-200 dark:border-slate-600 rounded-lg outline-none focus:border-blue-400 bg-white dark:bg-slate-900 text-slate-600 dark:text-white text-left font-bold transition-all" dir="ltr" placeholder="https://..."><button onclick="adminAddLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', '${branch.id}')" aria-label="إضافة" class="w-full bg-slate-800 dark:bg-blue-600 hover:bg-slate-700 dark:hover:bg-blue-700 text-white text-xs font-black py-2.5 rounded-lg transition-all flex items-center justify-center gap-1"><i class="ph-bold ph-plus"></i> إضافة</button></div></div>`;
                                 });
                                 html += `</div></div>`; 
