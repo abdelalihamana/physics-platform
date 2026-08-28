@@ -1851,25 +1851,19 @@
                 let userYearData = null; sections.forEach(p => p.years.forEach(y => { if (y.id === userLevel) userYearData = y; }));
                 if (userYearData && userYearData.branches && userYearData.branches.length > 0) {
                     if (!window.studentActiveBranchTab) window.studentActiveBranchTab = userYearData.branches[0].id;
-                    html += `<div class="flex overflow-x-auto gap-3 mb-6 pb-2 scroll-smooth">`;
+                    /* هنا التعديل: استبدال التمرير بـ flex-wrap */
+                    html += `<div class="flex flex-wrap gap-2 md:gap-3 mb-6 justify-center sm:justify-start">`;
                     userYearData.branches.forEach(branch => {
                         let isActive = window.studentActiveBranchTab === branch.id;
                         let btnCls = isActive ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30 border-blue-600 dark:border-blue-500' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-blue-50 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700';
-                        html += `<button onclick="switchStudentTab('${branch.id}')" class="whitespace-nowrap px-6 py-3 rounded-2xl font-black text-sm transition-all border flex items-center gap-2 ${btnCls}">${getBranchIcon(branch.title)} ${branch.title}</button>`;
+                        /* جعل الأزرار تتمدد لملء الفراغ في الهاتف */
+                        html += `<button onclick="switchStudentTab('${branch.id}')" class="whitespace-nowrap flex-grow sm:flex-grow-0 px-4 py-2.5 md:px-6 md:py-3 rounded-2xl font-black text-xs md:text-sm transition-all border flex items-center justify-center gap-2 ${btnCls}">${getBranchIcon(branch.title)} ${branch.title}</button>`;
                     });
                     html += `</div><div class="flex flex-col gap-6">`;
                     userYearData.branches.forEach(branch => {
                         if (window.studentActiveBranchTab !== branch.id) return; 
                         let branchLinksTotal = 0; let branchLinksClicked = 0;
-                        let cats;
-                        
-                        if (branch.id === 'm4_b5') {
-                            cats = ['past_exams', 'mock_exams'];
-                        } else if (branch.id.includes('_s')) {
-                            cats = ['terms', 'exams'];
-                        } else {
-                            cats = ['lessons', 'exercises'];
-                        }
+                        let cats = branch.id === 'm4_b5' ? ['past_exams', 'mock_exams'] : ['lessons', 'exercises', 'exams'];
                         
                         cats.forEach(cat => {
                             let links = branch.categories[cat] || []; branchLinksTotal += links.length;
@@ -1879,7 +1873,7 @@
                         let isComp = branchLinksTotal > 0 && unitProg === 100;
                         let cardCls = isComp ? 'border-emerald-400 dark:border-emerald-600 bg-emerald-50/30 dark:bg-emerald-900/10' : 'border-slate-200 dark:border-slate-700 bg-white/90 dark:bg-slate-800/90';
                         
-                        let gridCols = (branch.id === 'm4_b5' || branch.id.includes('_s')) ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 md:grid-cols-2';
+                        let gridCols = branch.id === 'm4_b5' ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 md:grid-cols-3';
 
                         html += `
                         <div class="student-branch-wrapper rounded-[2rem] shadow-sm border-2 overflow-hidden interactive-card backdrop-blur-xl ${cardCls} animate-[fadeInTab_0.3s_ease]">
@@ -1924,12 +1918,13 @@
                 sections.forEach((part, pIdx) => {
                     let pColor = part.color === 'blue' ? 'blue' : 'indigo';
                     html += `<div id="content-${part.id}" class="admin-part-content tab-content ${window.adminActivePart === part.id ? 'active' : ''}">`;
-                    html += `<div class="flex overflow-x-auto gap-2 mb-6 pb-2 scroll-smooth border-b border-slate-200 dark:border-slate-700">`;
+                    /* التعديل للإدارة: استبدال التمرير بـ flex-wrap للسنوات */
+                    html += `<div class="flex flex-wrap gap-2 mb-6 border-b border-slate-200 dark:border-slate-700 pb-2 justify-center sm:justify-start">`;
                     part.years.forEach((year, yIdx) => {
                         if(window.adminActiveYear[part.id] === undefined && yIdx === 0) window.adminActiveYear[part.id] = year.id;
                         let isActive = window.adminActiveYear[part.id] === year.id;
                         let btnCls = isActive ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400';
-                        html += `<button id="btn-${part.id}-${year.id}" onclick="switchAdminYear('${part.id}', '${year.id}')" class="admin-year-btn-${part.id} whitespace-nowrap px-4 py-3 font-black text-sm transition-all border-b-4 ${btnCls}">${year.title}</button>`;
+                        html += `<button id="btn-${part.id}-${year.id}" onclick="switchAdminYear('${part.id}', '${year.id}')" class="admin-year-btn-${part.id} whitespace-nowrap flex-grow sm:flex-grow-0 text-center px-4 py-3 font-black text-sm transition-all border-b-4 ${btnCls}">${year.title}</button>`;
                     });
                     html += `</div>`;
 
@@ -1938,26 +1933,19 @@
                         html += `<div id="content-${part.id}-${year.id}" class="admin-year-content-${part.id} animate-[fadeInTab_0.3s_ease] ${isYearActive ? '' : 'hidden'}">`;
                         if (year.branches && year.branches.length > 0) {
                             if (!window.adminActiveBranch[year.id]) window.adminActiveBranch[year.id] = year.branches[0].id;
-                            html += `<div class="flex overflow-x-auto gap-2 mb-6 pb-2 scroll-smooth">`;
+                            /* التعديل للإدارة: استبدال التمرير بـ flex-wrap للوحدات/الفصول */
+                            html += `<div class="flex flex-wrap gap-2 mb-6 justify-center sm:justify-start">`;
                             year.branches.forEach(branch => {
                                 let isActive = window.adminActiveBranch[year.id] === branch.id;
                                 let btnCls = isActive ? 'bg-indigo-600 text-white shadow-md' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-indigo-50 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700 border';
-                                html += `<button onclick="switchAdminBranch('${year.id}', '${branch.id}')" class="whitespace-nowrap px-5 py-2.5 rounded-xl font-black text-xs transition-all flex items-center gap-2 ${btnCls}">${getBranchIcon(branch.title)} ${branch.title}</button>`;
+                                html += `<button onclick="switchAdminBranch('${year.id}', '${branch.id}')" class="whitespace-nowrap flex-grow sm:flex-grow-0 px-4 py-2.5 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-2 ${btnCls}">${getBranchIcon(branch.title)} ${branch.title}</button>`;
                             });
                             html += `</div>`;
                             year.branches.forEach((branch, bIdx) => {
                                 if (window.adminActiveBranch[year.id] !== branch.id) return;
                                 
-                                let cats;
-                                if (branch.id === 'm4_b5') {
-                                    cats = ['past_exams', 'mock_exams'];
-                                } else if (branch.id.includes('_s')) {
-                                    cats = ['terms', 'exams'];
-                                } else {
-                                    cats = ['lessons', 'exercises'];
-                                }
-
-                                let gridCols = (branch.id === 'm4_b5' || branch.id.includes('_s')) ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 md:grid-cols-2';
+                                let cats = branch.id === 'm4_b5' ? ['past_exams', 'mock_exams'] : ['lessons', 'exercises', 'exams'];
+                                let gridCols = branch.id === 'm4_b5' ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 md:grid-cols-3';
 
                                 html += `<div class="border-2 rounded-[2rem] p-5 md:p-6 bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 shadow-sm animate-[fadeInTab_0.3s_ease]">
                                     <h4 class="font-black text-slate-800 dark:text-white text-xl flex items-center gap-2 mb-5 border-b border-slate-100 dark:border-slate-700 pb-3"><span class="text-${pColor}-500 text-3xl">${getBranchIcon(branch.title)}</span> ${branch.title}</h4>
@@ -1965,7 +1953,7 @@
                                 
                                 cats.forEach(cat => {
                                     let links = branch.categories[cat] || []; let conf = catConfig[cat];
-                                    let linksList = links.length ? links.map((lnk, lIdx) => `<div class="flex justify-between items-center bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm text-sm mb-2 group interactive-card"><a href="${lnk.url}" target="_blank" class="${conf.text} font-bold truncate w-2/3 hover:underline flex items-center gap-2"><i class="ph-bold ph-link text-lg opacity-70"></i> ${lnk.title}</a><div class="flex gap-1"><button onclick="adminEditLinkModal(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" aria-label="تعديل الرابط" class="text-slate-400 hover:text-amber-500 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg transition"><i class="ph-bold ph-pencil"></i></button><button onclick="adminDeleteLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" aria-label="حذف الرابط" class="text-slate-400 hover:text-red-500 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg transition"><i class="ph-bold ph-trash"></i></button></div></div>`).join('') : getEmptyStateHTML(conf.title);
+                                    let linksList = links.length ? links.map((lnk, lIdx) => `<div class="flex justify-between items-center bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm text-sm mb-2 group interactive-card"><a href="${lnk.url}" target="_blank" class="${conf.text} font-bold truncate w-2/3 hover:underline flex items-center gap-2"><i class="ph-bold ph-link text-lg opacity-70"></i> ${lnk.title}</a><div class="flex gap-1"><button onclick="adminEditLinkModal(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" aria-label="تعديل الرابط" class="text-slate-400 hover:text-amber-500 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg transition"><i class="ph-bold ph-pencil"></i></button><button onclick="adminDeleteLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" aria-label="حذف الرابط" class="text-slate-400 hover:text-red-500 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg transition"><i class="ph-bold ph-trash"></i></button></div></div>`).join('') : getEmptyStateHTML('محتوى');
                                     html += `<div class="${conf.bg} ${conf.border} p-5 rounded-2xl border flex flex-col h-full"><h5 class="font-black ${conf.text} text-base mb-3 flex items-center gap-2">${conf.icon} ${conf.title}</h5><div class="mb-2 max-h-60 overflow-y-auto pr-1 scroll-smooth flex-1">${linksList}</div><div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 space-y-2 mt-auto"><input type="text" id="title_${branch.id}_${cat}" aria-label="عنوان المحتوى" class="w-full text-xs font-bold p-3 border border-slate-200 dark:border-slate-600 rounded-lg outline-none focus:border-blue-400 bg-white dark:bg-slate-900 text-slate-700 dark:text-white transition-all" placeholder="عنوان المحتوى..."><input type="text" id="url_${branch.id}_${cat}" aria-label="رابط المحتوى" class="w-full text-xs p-3 border border-slate-200 dark:border-slate-600 rounded-lg outline-none focus:border-blue-400 bg-white dark:bg-slate-900 text-slate-600 dark:text-white text-left font-bold transition-all" dir="ltr" placeholder="https://..."><button onclick="adminAddLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', '${branch.id}')" aria-label="إضافة" class="w-full bg-slate-800 dark:bg-blue-600 hover:bg-slate-700 dark:hover:bg-blue-700 text-white text-xs font-black py-2.5 rounded-lg transition-all flex items-center justify-center gap-1"><i class="ph-bold ph-plus"></i> إضافة</button></div></div>`;
                                 });
                                 html += `</div></div>`; 
