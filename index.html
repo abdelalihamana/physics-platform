@@ -646,7 +646,7 @@
             if(title.includes('ضوء') || title.includes('بصريات') || title.includes('الضوئية')) return '<i class="ph-fill ph-lightbulb"></i>';
             if(title.includes('طاقة') || title.includes('عمل')) return '<i class="ph-fill ph-battery-full"></i>';
             if(title.includes('مغناطيس') || title.includes('كهرومغناطيسية')) return '<i class="ph-fill ph-magnet"></i>';
-            if(title.includes('الفصل')) return '<i class="ph-fill ph-folder-open"></i>'; // أيقونة الفصول
+            if(title.includes('فصل')) return '<i class="ph-fill ph-folder-open"></i>'; // أيقونة الفصول
             return '<i class="ph-fill ph-book-bookmark"></i>'; 
         };
 
@@ -826,16 +826,20 @@
                         
                         data.sections.forEach(part => {
                             part.years.forEach(year => {
-                                // 1. تحديث أو إضافة الفصول الثلاثة
+                                // 1. تحديث أو إضافة الفصول الثلاثة وتعديل أسمائها
                                 ['s1', 's2', 's3'].forEach((sem, idx) => {
                                     let semId = `${year.id}_${sem}`;
-                                    let semTitle = `الفصل ${idx + 1}`;
+                                    let semTitle = `الفصل ${idx + 1}`; // تم التعديل هنا
                                     let existingSem = year.branches.find(b => b.id === semId);
                                     
                                     if (!existingSem) {
                                         year.branches.push({ id: semId, title: semTitle, categories: { terms: [], exams: [] } });
                                         needsUpdate = true;
                                     } else {
+                                        if (existingSem.title !== semTitle) { // التحديث التلقائي للأسماء القديمة
+                                            existingSem.title = semTitle;
+                                            needsUpdate = true;
+                                        }
                                         if (existingSem.categories['lessons']) {
                                             existingSem.categories['terms'] = existingSem.categories['lessons'];
                                             delete existingSem.categories['lessons'];
