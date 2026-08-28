@@ -22,9 +22,10 @@
     <link rel="apple-touch-icon" href="icon.png">
 
     <!-- Tailwind CSS with Dark Mode config -->
-    <!-- تمت إزالة cdn.tailwindcss.com من هنا لحل المشكلة -->
     <link href="./output.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
+        tailwind.config = { darkMode: 'class' };
         if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         } else {
@@ -606,7 +607,6 @@
             "طريق الألف ميل يبدأ بخطوة واحدة، وأنت الآن في المسار الصحيح. 🚶‍♂️"
         ];
 
-        // دالة تحويل التبويبات الرئيسية للإدارة
         window.switchAdminMainTab = (tab) => {
             window.adminMainTab = tab;
             const btnAccounts = document.getElementById('main-tab-accounts');
@@ -1047,7 +1047,6 @@
             document.getElementById('display-username').innerText = window.currentUserRecord.username;
             document.getElementById('student-level-badge').innerText = levelNames[window.currentUserRecord.level];
             
-            // تفعيل وضع المراقبة (إخفاء أزرار الدردشة والإعدادات والخروج والوضع الليلي)
             document.getElementById('return-admin-btn').classList.remove('hidden');
             document.getElementById('student-settings-btn').classList.add('hidden'); 
             document.getElementById('student-chat-btn').classList.add('hidden'); 
@@ -1068,7 +1067,6 @@
             window.currentUserRecord = { ...window.originalAdminRecord };
             window.originalAdminRecord = null;
             
-            // إلغاء وضع المراقبة وإرجاع الأزرار لطبيعتها
             document.getElementById('return-admin-btn').classList.add('hidden');
             document.getElementById('student-settings-btn').classList.remove('hidden');
             document.getElementById('student-chat-btn').classList.remove('hidden');
@@ -1089,7 +1087,6 @@
                 window.currentUserRecord = null; window.originalAdminRecord = null;
                 document.getElementById('password').value = '';
                 
-                // إعادة الأزرار لحالتها الأصلية احتياطياً
                 document.getElementById('return-admin-btn').classList.add('hidden');
                 document.getElementById('student-settings-btn').classList.remove('hidden');
                 document.getElementById('student-chat-btn').classList.remove('hidden');
@@ -1701,11 +1698,6 @@
             });
         };
 
-        const linkify = (text) => {
-            const urlRegex = /(https?:\/\/[^\s]+)/g;
-            return text.replace(urlRegex, function(url) { return '<a href="' + url + '" target="_blank" class="text-blue-500 dark:text-blue-400 font-bold underline decoration-2 underline-offset-2 hover:text-blue-700 dark:hover:text-blue-300 transition inline-flex items-center gap-1"><i class="ph-bold ph-link"></i> رابط</a>'; });
-        };
-
         window.openChat = async (targetUser) => {
             window.activeChatUser = targetUser; 
             let displayTarget = window.currentUserRecord.role === 'admin' ? targetUser : "الأستاذ";
@@ -1849,7 +1841,7 @@
                             units.forEach(branch => {
                                 let isActive = window.studentActiveBranchTab === branch.id;
                                 let btnCls = isActive ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30 border-blue-600 dark:border-blue-500' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-blue-50 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700';
-                                html += `<button onclick="switchStudentTab('${branch.id}')" class="whitespace-nowrap flex-grow sm:flex-grow-0 px-4 py-2.5 md:px-6 md:py-3 rounded-2xl font-black text-xs md:text-sm transition-all border flex items-center justify-center gap-2 ${btnCls}">${getBranchIcon(branch.title)} ${branch.title}</button>`;
+                                html += `<button onclick="switchStudentTab('${branch.id}')" class="whitespace-nowrap px-6 py-3 rounded-2xl font-black text-sm transition-all border flex items-center gap-2 ${btnCls}">${getBranchIcon(branch.title)} ${branch.title}</button>`;
                             });
                             html += `</div>`;
                         }
@@ -1859,7 +1851,7 @@
                             evals.forEach(branch => {
                                 let isActive = window.studentActiveBranchTab === branch.id;
                                 let btnCls = isActive ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30 border-blue-600 dark:border-blue-500' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-blue-50 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700';
-                                html += `<button onclick="switchStudentTab('${branch.id}')" class="whitespace-nowrap flex-grow sm:flex-grow-0 px-4 py-2.5 md:px-6 md:py-3 rounded-2xl font-black text-xs md:text-sm transition-all border flex items-center justify-center gap-2 ${btnCls}">${getBranchIcon(branch.title)} ${branch.title}</button>`;
+                                html += `<button onclick="switchStudentTab('${branch.id}')" class="whitespace-nowrap px-6 py-3 rounded-2xl font-black text-sm transition-all border flex items-center gap-2 ${btnCls}">${getBranchIcon(branch.title)} ${branch.title}</button>`;
                             });
                             html += `</div>`;
                         }
@@ -1868,7 +1860,7 @@
                         userYearData.branches.forEach(branch => {
                             let isActive = window.studentActiveBranchTab === branch.id;
                             let btnCls = isActive ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30 border-blue-600 dark:border-blue-500' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-blue-50 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700';
-                            html += `<button onclick="switchStudentTab('${branch.id}')" class="whitespace-nowrap flex-grow sm:flex-grow-0 px-4 py-2.5 md:px-6 md:py-3 rounded-2xl font-black text-xs md:text-sm transition-all border flex items-center justify-center gap-2 ${btnCls}">${getBranchIcon(branch.title)} ${branch.title}</button>`;
+                            html += `<button onclick="switchStudentTab('${branch.id}')" class="whitespace-nowrap px-6 py-3 rounded-2xl font-black text-sm transition-all border flex items-center gap-2 ${btnCls}">${getBranchIcon(branch.title)} ${branch.title}</button>`;
                         });
                         html += `</div>`;
                     }
@@ -1964,10 +1956,15 @@
                                     <div class="grid ${gridCols} gap-5">`;
                                 
                                 cats.forEach(cat => {
-                                    let links = branch.categories[cat] || []; let conf = catConfig[cat];
-                                    let linksList = links.length ? links.map((lnk, lIdx) => `<div class="flex justify-between items-center bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm text-sm mb-2 group interactive-card"><a href="${lnk.url}" target="_blank" class="${conf.text} font-bold truncate w-2/3 hover:underline flex items-center gap-2"><i class="ph-bold ph-link text-lg opacity-70"></i> ${lnk.title}</a><div class="flex gap-1"><button onclick="adminEditLinkModal(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" aria-label="تعديل الرابط" class="text-slate-400 hover:text-amber-500 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg transition"><i class="ph-bold ph-pencil"></i></button><button onclick="adminDeleteLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" aria-label="حذف الرابط" class="text-slate-400 hover:text-red-500 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg transition"><i class="ph-bold ph-trash"></i></button></div></div>`).join('') : getEmptyStateHTML('محتوى');
-                                    html += `<div class="${conf.bg} ${conf.border} p-5 rounded-2xl border flex flex-col h-full"><h5 class="font-black ${conf.text} text-base mb-3 flex items-center gap-2">${conf.icon} ${conf.title}</h5><div class="mb-2 max-h-60 overflow-y-auto pr-1 scroll-smooth flex-1">${linksList}</div><div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 space-y-2 mt-auto"><input type="text" id="title_${branch.id}_${cat}" aria-label="عنوان المحتوى" class="w-full text-xs font-bold p-3 border border-slate-200 dark:border-slate-600 rounded-lg outline-none focus:border-blue-400 bg-white dark:bg-slate-900 text-slate-700 dark:text-white transition-all" placeholder="عنوان المحتوى..."><input type="text" id="url_${branch.id}_${cat}" aria-label="رابط المحتوى" class="w-full text-xs p-3 border border-slate-200 dark:border-slate-600 rounded-lg outline-none focus:border-blue-400 bg-white dark:bg-slate-900 text-slate-600 dark:text-white text-left font-bold transition-all" dir="ltr" placeholder="https://..."><button onclick="adminAddLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', '${branch.id}')" aria-label="إضافة" class="w-full bg-slate-800 dark:bg-blue-600 hover:bg-slate-700 dark:hover:bg-blue-700 text-white text-xs font-black py-2.5 rounded-lg transition-all flex items-center justify-center gap-1"><i class="ph-bold ph-plus"></i> إضافة</button></div></div>`;
-                                });
+                                let links = branch.categories[cat] || []; let conf = catConfig[cat];
+                                
+                                let linksList = links.length ? links.map((lnk, lIdx) => {
+                                    let linkId = `${branch.id}_${cat}_${lIdx}`; let isRead = clickedLinks.includes(linkId);
+                                    return `<button onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}')" aria-label="مشاهدة المحتوى" class="lesson-item w-full flex items-center justify-between gap-3 bg-white dark:bg-slate-800 p-3 rounded-2xl border ${isRead ? 'border-emerald-200 dark:border-emerald-800 shadow-sm' : 'border-slate-100 dark:border-slate-700'} hover:shadow-md transition group/link relative overflow-hidden text-right"><div class="flex items-center gap-3 flex-1"><div class="w-10 h-10 flex-shrink-0 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl group-hover/link:bg-blue-600 group-hover/link:text-white transition shadow-inner"><i class="ph-bold ph-link"></i></div><span class="${conf.text} font-bold text-sm flex-1 leading-relaxed text-right group-hover/link:underline decoration-2 underline-offset-4" style="word-break: break-word; white-space: normal;">${lnk.title}</span></div>${isRead ? `<span class="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 text-[10px] font-black px-2 py-1 rounded-md flex items-center flex-shrink-0 gap-1"><i class="ph-bold ph-check"></i> مقروء</span>` : ''}</button>`;
+                                }).join('') : getEmptyStateHTML(conf.title);
+                                
+                                html += `<div class="${conf.bg} ${conf.border} p-5 rounded-3xl border shadow-sm"><h5 class="font-black ${conf.text} text-lg mb-4 flex items-center gap-2">${conf.icon} ${conf.title}</h5><div class="space-y-2">${linksList}</div></div>`;
+                            });
                                 html += `</div></div>`; 
                             });
                         }
