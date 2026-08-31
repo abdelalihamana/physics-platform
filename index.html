@@ -22,8 +22,8 @@
     <link rel="apple-touch-icon" href="icon.png">
 
     <!-- Tailwind CSS with Dark Mode config -->
-    <link href="output.css" rel="stylesheet">
-    
+    <link href="./output.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { darkMode: 'class' };
         if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -39,6 +39,68 @@
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
     
+    <style>
+        body { 
+            font-family: 'Tajawal', sans-serif; 
+            background: linear-gradient(rgba(248, 250, 252, 0.94), rgba(226, 232, 240, 0.97)), url('bg-pattern.webp');
+            background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed;
+            min-height: 100vh; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased;
+        }
+        
+        .dark body {
+           background: linear-gradient(rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.98)), url('bg-pattern.webp');
+            background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed;
+        }
+
+        .screen { display: none; }
+        .screen.active { display: block; animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes slideUpFade { from { opacity: 0; transform: translateY(40px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        
+        .interactive-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .interactive-card:hover { transform: translateY(-4px); box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.1), 0 15px 15px -5px rgba(0, 0, 0, 0.04); }
+        .dark .interactive-card:hover { box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.3); }
+        
+        .btn-modern { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .btn-modern:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -3px rgba(0, 0, 0, 0.1); filter: brightness(1.05); }
+        .btn-modern:active { transform: translateY(1px); filter: brightness(0.95); box-shadow: none;}
+
+        .icon-btn { transition: all 0.2s; display: flex; align-items: center; justify-content: center; border-radius: 1rem; cursor: pointer; }
+        .icon-btn:hover { transform: scale(1.1); }
+        .icon-btn:active { transform: scale(0.95); }
+
+        details > summary { list-style: none; cursor: pointer; user-select: none; transition: background-color 0.3s ease; }
+        details > summary::-webkit-details-marker { display: none; }
+        
+        ::-webkit-scrollbar { width: 10px; display: block; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; border: 1px solid #e2e8f0; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; border: 2px solid #f1f5f9; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        .dark ::-webkit-scrollbar-track { background: #1e293b; border-color: #334155; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; border-color: #1e293b; }
+        
+        .chat-bubble { max-width: 85%; padding: 12px 18px; border-radius: 1.5rem; margin-bottom: 8px; position: relative; word-wrap: break-word; overflow-wrap: anywhere; line-height: 1.6; font-size: 1rem; animation: popIn 0.3s ease;}
+        @keyframes popIn { from { opacity: 0; transform: scale(0.9) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        
+        #welcome-quote-screen { transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        .welcome-visible { opacity: 1 !important; transform: scale(1) !important; pointer-events: auto !important;}
+        .welcome-hidden { opacity: 0 !important; transform: scale(1.05) !important; pointer-events: none !important;}
+
+        .leaderboard-row { transition: all 0.3s ease; }
+        .leaderboard-row:hover { transform: scale(1.02); z-index: 10; position: relative; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        
+        .rank-1 { background: linear-gradient(to left, #fffbeb, #ffffff); border-right: 4px solid #fbbf24; }
+        .rank-2 { background: linear-gradient(to left, #f1f5f9, #ffffff); border-right: 4px solid #94a3b8; }
+        .rank-3 { background: linear-gradient(to left, #fff7ed, #ffffff); border-right: 4px solid #fb923c; }
+        .dark .rank-1 { background: linear-gradient(to left, rgba(251, 191, 36, 0.1), #1e293b); }
+        .dark .rank-2 { background: linear-gradient(to left, rgba(148, 163, 184, 0.1), #1e293b); }
+        .dark .rank-3 { background: linear-gradient(to left, rgba(251, 146, 60, 0.1), #1e293b); }
+
+        .tab-content { display: none; animation: fadeInTab 0.3s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeInTab { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .custom-cb { width: 1.25rem; height: 1.25rem; cursor: pointer; accent-color: #2563eb; }
+    </style>
 </head>
 <body class="text-slate-800 dark:text-slate-200 antialiased p-3 md:p-6 pb-24 selection:bg-blue-200 selection:text-blue-900 dark:selection:bg-blue-900 dark:selection:text-blue-200 relative overflow-x-hidden overflow-y-scroll transition-colors duration-300">
 
@@ -97,7 +159,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2 flex items-center gap-2"><i class="ph-fill ph-lock-key"></i> كلمة المرور الجديدة</label>
-                    <input type="text" id="settings-new-password" aria-label="كلمة المرور الجديدة" autocomplete="new-password" class="w-full px-5 py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-blue-500 outline-none font-black transition shadow-sm text-lg text-slate-800 dark:text-white" placeholder="اتركه فارغاً إذا لم ترد تغييره">
+                    <input type="text" id="settings-new-password" aria-label="كلمة المرور الجديدة" autocomplete="new-password" class="w-full px-5 py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-blue-500 outline-none font-black transition shadow-sm text-lg text-slate-800 dark:text-white">
                 </div>
                 <div id="settings-phone-container">
                     <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2 flex items-center gap-2"><i class="ph-fill ph-device-mobile"></i> هاتف ولي الأمر</label>
@@ -480,7 +542,7 @@
     <!-- Firebase SDK Setup -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, deleteDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -735,64 +797,95 @@
             }
         ];
 
+        const initAuth = async () => {
+            try { 
+                await signInAnonymously(auth); 
+            } catch (error) { 
+                console.error("Auth Error:", error);
+                if (error.code === 'auth/network-request-failed') {
+                    showToast("تنبيه: يبدو أن اتصال الإنترنت ضعيف أو مقطوع.", "error");
+                }
+            }
+        };
+        initAuth();
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 isAuthReady = true;
                 try {
-                    // تحديث المنهاج من قاعدة البيانات
                     const progDoc = await getDoc(doc(programCol, 'main'));
                     if (!progDoc.exists()) {
                         await setDoc(doc(programCol, 'main'), { sections: defaultProgramData, latestUpdates: [] });
                     } else {
                         let data = progDoc.data();
                         let needsUpdate = false;
+                        
                         data.sections.forEach(part => {
                             part.years.forEach(year => {
+                                // Add/Fix Terms/Semesters
                                 ['s1', 's2', 's3'].forEach((sem, idx) => {
-                                    let semId = `${year.id}_${sem}`; let semTitle = `الفصل ${idx + 1}`;
+                                    let semId = `${year.id}_${sem}`;
+                                    let semTitle = `الفصل ${idx + 1}`;
                                     let existingSem = year.branches.find(b => b.id === semId);
-                                    if (!existingSem) { year.branches.push({ id: semId, title: semTitle, categories: { terms: [], exams: [] } }); needsUpdate = true; }
+                                    
+                                    if (!existingSem) {
+                                        year.branches.push({ id: semId, title: semTitle, categories: { terms: [], exams: [] } });
+                                        needsUpdate = true;
+                                    } else {
+                                        if (existingSem.title !== semTitle) {
+                                            existingSem.title = semTitle;
+                                            needsUpdate = true;
+                                        }
+                                        if (existingSem.categories['lessons']) {
+                                            if (!existingSem.categories['terms']) existingSem.categories['terms'] = [];
+                                            existingSem.categories['terms'].push(...existingSem.categories['lessons']);
+                                            delete existingSem.categories['lessons'];
+                                            needsUpdate = true;
+                                        }
+                                        if (existingSem.categories['exercises']) {
+                                            if (!existingSem.categories['exams']) existingSem.categories['exams'] = [];
+                                            existingSem.categories['exams'].push(...existingSem.categories['exercises']);
+                                            delete existingSem.categories['exercises'];
+                                            needsUpdate = true;
+                                        }
+                                    }
                                 });
+
+                                // Fix m4_b5 for m_y4
                                 if (year.id === 'm_y4') {
                                     let existingB5 = year.branches.find(b => b.id === 'm4_b5');
-                                    if (!existingB5) { year.branches.push({ id: "m4_b5", title: "شهادتك 🎓", categories: { 'past_exams': [], 'mock_exams': [] } }); needsUpdate = true; }
+                                    if (!existingB5) {
+                                        year.branches.push({ id: "m4_b5", title: "شهادتك 🎓", categories: { 'past_exams': [], 'mock_exams': [] } });
+                                        needsUpdate = true;
+                                    } else {
+                                        if (!existingB5.categories) { existingB5.categories = {}; needsUpdate = true; }
+                                        if (!existingB5.categories['past_exams']) { existingB5.categories['past_exams'] = existingB5.categories['lessons'] || []; needsUpdate = true; }
+                                        if (!existingB5.categories['mock_exams']) { existingB5.categories['mock_exams'] = existingB5.categories['exercises'] || []; needsUpdate = true; }
+                                        
+                                        if (existingB5.categories['lessons']) { delete existingB5.categories['lessons']; needsUpdate = true; }
+                                        if (existingB5.categories['exercises']) { delete existingB5.categories['exercises']; needsUpdate = true; }
+                                        if (existingB5.categories['exams'] && !existingB5.id.includes('_s')) { delete existingB5.categories['exams']; needsUpdate = true; }
+                                    }
                                 }
+                                
+                                // Clean 'exams' from standard learning units
+                                year.branches.forEach(branch => {
+                                    if (branch.id !== 'm4_b5' && !branch.id.includes('_s') && branch.categories && branch.categories['exams']) {
+                                        delete branch.categories['exams'];
+                                        needsUpdate = true;
+                                    }
+                                });
                             });
                         });
-                        if (needsUpdate) await updateDoc(doc(programCol, 'main'), { sections: data.sections });
-                    }
-
-                    const adminDoc = await getDoc(doc(usersCol, 'admin'));
-                    if (!adminDoc.exists()) await setDoc(doc(usersCol, 'admin'), { role: 'admin', approved: true, clickedLinks: [] });
-
-                    // ميزة الاحتفاظ بتسجيل الدخول عند تحديث الصفحة
-                    if (user.email && !window.currentUserRecord && !window.isRegistering) {
-                        const username = user.email.split('@')[0];
-                        const userRef = doc(usersCol, username);
-                        const userSnap = await getDoc(userRef);
                         
-                        if (userSnap.exists()) {
-                            window.currentUserRecord = { username, ...userSnap.data() };
-                            
-                            if (window.currentUserRecord.role === 'admin') {
-                                switchScreen('admin-screen');
-                                startAdminListeners();
-                            } else if (!window.currentUserRecord.approved) {
-                                switchScreen('pending-screen');
-                                await signOut(auth); // إخراجه لأن حسابه غير مفعل
-                            } else {
-                                document.getElementById('display-username').innerText = username;
-                                document.getElementById('student-level-badge').innerText = levelNames[window.currentUserRecord.level] || "تلميذ";
-                                switchScreen('app-screen');
-                                startStudentListeners();
-                            }
+                        if (needsUpdate) {
+                            await updateDoc(doc(programCol, 'main'), { sections: data.sections });
                         }
                     }
 
+                    const adminDoc = await getDoc(doc(usersCol, 'admin'));
+                    if (!adminDoc.exists()) await setDoc(doc(usersCol, 'admin'), { password: 'adminpassword', role: 'admin', approved: true, clickedLinks: [] });
                 } catch(e) { console.error(e); }
-            } else {
-                // إذا لم يكن هناك مستخدم مسجل الدخول، أعده للشاشة الرئيسية
-                switchScreen('auth-screen');
             }
         });
 
@@ -819,7 +912,7 @@
 
         window.requestPasswordReset = async () => {
             const username = document.getElementById('username').value.trim();
-            if (!username) return showToast("يرجى إدخال اسم المستخدم أولاً لطلب استرجاع كلمة المرور", "error");
+            if (!username) return showToast("يرجى إدخال اسم المستخدم أولاً لطلب كلمة المرور", "error");
 
             if(await confirmAction(`هل أنت متأكد من إرسال طلب استرجاع كلمة المرور للحساب "${username}" للأستاذ؟`)) {
                 try {
@@ -858,7 +951,9 @@
         };
 
         window.handleAuth = async () => {
-            const username = document.getElementById('username').value.trim().toLowerCase();
+            if (!isAuthReady) return showToast("يتم الاتصال بالسحابة... يرجى الانتظار", "error");
+            
+            const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value.trim();
             const level = document.getElementById('user-level').value;
             const parentName = document.getElementById('parent-name').value.trim();
@@ -868,85 +963,71 @@
             if (window.isRegistering) {
                 if (!level || !parentName || !phoneNumber) return showToast("يرجى تعبئة جميع الحقول بدقة", "error");
                 const phoneRegex = /^(05|06|07)\d{8}$/;
-                if(!phoneRegex.test(phoneNumber)) return showToast("رقم الهاتف غير صحيح!", "error");
+                if(!phoneRegex.test(phoneNumber)) return showToast("رقم الهاتف غير صحيح! يجب أن يتكون من 10 أرقام ويبدأ بـ 05، 06، أو 07", "error");
             }
 
             const btn = document.getElementById('auth-action-btn');
             const originalHTML = btn.innerHTML;
             btn.disabled = true; btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-2xl"></i> جاري التحقق...';
 
-            const pseudoEmail = `${username}@almojtahid.com`;
-            const userRef = doc(usersCol, username);
-
             try {
+                const userRef = doc(usersCol, username);
+                const userSnap = await getDoc(userRef);
+
                 if (window.isRegistering) {
-                    const userSnap = await getDoc(userRef);
-                    if (userSnap.exists()) {
-                        showToast("اسم المستخدم مستخدم مسبقاً، اختر اسماً آخر", "error");
-                    } else {
-                        await createUserWithEmailAndPassword(auth, pseudoEmail, password);
-                        
-                        // حفظ البيانات في Firestore (مع الاحتفاظ بنسخة من كلمة المرور لضرورة استخدام الأستاذ)
+                    if (userSnap.exists()) { showToast("اسم المستخدم مستخدم مسبقاً، اختر اسماً آخر", "error"); } 
+                    else {
                         await setDoc(userRef, { 
-                            role: 'student', 
-                            approved: false, 
-                            clickedLinks: [],
-                            level: level, 
-                            parentName: parentName, 
-                            phoneNumber: phoneNumber,
-                            password: password // الاحتفاظ بنسخة مقروءة للأستاذ بناءً على طلبك
+                            password: password, role: 'student', approved: false, clickedLinks: [],
+                            level: level, parentName: parentName, phoneNumber: phoneNumber
                         });
-                        
                         document.getElementById('registration-success-modal').classList.remove('hidden');
                         document.getElementById('registration-success-modal').classList.add('flex');
                         document.getElementById('username').value = ''; document.getElementById('password').value = '';
-                        await signOut(auth); 
+                        document.getElementById('parent-name').value = ''; document.getElementById('phone-number').value = '';
                     }
                 } else {
-                    // تسجيل الدخول
-                    await signInWithEmailAndPassword(auth, pseudoEmail, password);
-                    const userSnap = await getDoc(userRef);
-                    
-                    if (!userSnap.exists()) {
-                        showToast("حدث خطأ: الحساب موجود لكن البيانات مفقودة.", "error");
-                        await signOut(auth);
-                        return;
-                    }
-
-                    window.currentUserRecord = { username, ...userSnap.data() };
-                    
-                    // تأكيد تحديث كلمة المرور في القاعدة إذا كانت مفقودة (للأمان الإضافي للطلاب القدامى)
-                    if (!window.currentUserRecord.password && window.currentUserRecord.role !== 'admin') {
-                         await updateDoc(userRef, { password: password });
-                         window.currentUserRecord.password = password;
-                    }
-                    
-                    if (window.currentUserRecord.role === 'admin') {
-                        switchScreen('admin-screen');
-                        startAdminListeners();
-                    } else if (!window.currentUserRecord.approved) {
-                        switchScreen('pending-screen');
-                        await signOut(auth);
-                    } else {
-                        document.getElementById('display-username').innerText = username;
-                        document.getElementById('student-level-badge').innerText = levelNames[window.currentUserRecord.level];
-                        switchScreen('app-screen');
-                        startStudentListeners();
+                    if (!userSnap.exists() || userSnap.data().password !== password) { showToast("بيانات الدخول غير صحيحة", "error"); } 
+                    else {
+                        window.currentUserRecord = { username, ...userSnap.data() };
+                        if (window.currentUserRecord.role === 'admin') {
+                            switchScreen('admin-screen');
+                            startAdminListeners();
+                        } else if (!window.currentUserRecord.approved) {
+                            switchScreen('pending-screen');
+                        } else {
+                            document.getElementById('display-username').innerText = username;
+                            document.getElementById('student-level-badge').innerText = levelNames[window.currentUserRecord.level];
+                            
+                            const lastQuoteDate = localStorage.getItem('last_quote_date');
+                            const today = new Date().toDateString();
+                            if (lastQuoteDate !== today) {
+                                let availableQuotes = JSON.parse(localStorage.getItem('available_quotes')) || [];
+                                if (availableQuotes.length === 0) availableQuotes = [...Array(motivationalQuotes.length).keys()];
+                                let randomIndex = Math.floor(Math.random() * availableQuotes.length);
+                                let quoteIndex = availableQuotes[randomIndex];
+                                availableQuotes.splice(randomIndex, 1);
+                                localStorage.setItem('available_quotes', JSON.stringify(availableQuotes));
+                                localStorage.setItem('last_quote_date', today);
+                                
+                                document.getElementById('welcome-quote-text').innerText = motivationalQuotes[quoteIndex];
+                                const screen = document.getElementById('welcome-quote-screen');
+                                screen.classList.remove('welcome-hidden');
+                                setTimeout(() => { screen.classList.add('welcome-visible'); }, 10);
+                            }
+                            switchScreen('app-screen');
+                            startStudentListeners();
+                        }
                     }
                 }
             } catch (err) { 
-                console.error(err);
-                if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
-                    showToast("بيانات الدخول غير صحيحة", "error");
-                } else if (err.code === 'auth/email-already-in-use') {
-                    showToast("اسم المستخدم مستخدم مسبقاً.", "error");
-                } else if (err.code === 'auth/network-request-failed') {
-                    showToast("لا يوجد اتصال بالإنترنت! يرجى التحقق من الشبكة.", "error");
+                console.error(err); 
+                if (err.code === 'auth/network-request-failed' || err.message.includes('Failed to fetch')) {
+                    showToast("لا يوجد اتصال بالإنترنت! يرجى التحقق من الشبكة والمحاولة مجدداً.", "error");
                 } else {
                     showToast("حدث خطأ في الاتصال، يرجى المحاولة لاحقاً.", "error");
                 }
             }
-            
             btn.disabled = false; btn.innerHTML = originalHTML;
         };
 
@@ -1003,10 +1084,6 @@
 
         window.logout = async () => {
             if(await confirmAction("هل أنت متأكد أنك تريد تسجيل الخروج من حسابك؟")) {
-                try {
-                    await signOut(auth);
-                } catch(e) { console.error("Logout error", e); }
-                
                 window.currentUserRecord = null; window.originalAdminRecord = null;
                 document.getElementById('password').value = '';
                 
@@ -1028,8 +1105,7 @@
 
         window.openSettings = () => {
             document.getElementById('settings-username').value = window.currentUserRecord.username;
-            // إفراغ حقل كلمة المرور لحماية الخصوصية
-            document.getElementById('settings-new-password').value = '';
+            document.getElementById('settings-new-password').value = window.currentUserRecord.password;
             
             const phoneContainer = document.getElementById('settings-phone-container');
             const phoneInput = document.getElementById('settings-new-phone');
@@ -1057,34 +1133,19 @@
             const phoneInput = document.getElementById('settings-new-phone');
             let updates = {};
             
-            // تغيير كلمة المرور عبر نظام Firebase Auth الآمن وحفظ نسخة مقروءة
-            if(newPass) {
-                try {
-                    if(auth.currentUser) {
-                        await updatePassword(auth.currentUser, newPass);
-                    }
-                    updates.password = newPass; // تحديث النسخة المقروءة في القاعدة
-                } catch(e) {
-                    console.error("Password update error", e);
-                    if (e.code === 'auth/requires-recent-login') {
-                        return showToast("يرجى تسجيل الخروج والدخول مجدداً لتغيير كلمة المرور", "error");
-                    }
-                    return showToast("حدث خطأ أثناء تغيير كلمة المرور في نظام الحماية", "error");
-                }
-            }
+            if(!newPass) return showToast("كلمة المرور لا يمكن أن تكون فارغة", "error");
+            updates.password = newPass;
 
             if(window.currentUserRecord.role !== 'admin') {
                 const newPhone = phoneInput.value.trim();
                 const phoneRegex = /^(05|06|07)\d{8}$/;
                 if(newPhone && !phoneRegex.test(newPhone)) return showToast("رقم الهاتف غير صحيح! يجب أن يبدأ بـ 05، 06، أو 07", "error");
-                if(newPhone) updates.phoneNumber = newPhone;
+                updates.phoneNumber = newPhone;
             }
 
             try {
-                if (Object.keys(updates).length > 0) {
-                    await updateDoc(doc(usersCol, window.currentUserRecord.username), updates);
-                }
-                if(updates.password) window.currentUserRecord.password = updates.password;
+                await updateDoc(doc(usersCol, window.currentUserRecord.username), updates);
+                window.currentUserRecord.password = updates.password;
                 if(updates.phoneNumber) window.currentUserRecord.phoneNumber = updates.phoneNumber;
                 
                 showToast("تم تحديث الإعدادات بنجاح 💾");
@@ -1460,9 +1521,6 @@
                     ? `<button onclick="toggleUserStatus('${d.id}', true, '${data.phoneNumber||''}')" aria-label="تغيير الحالة" class="px-4 py-1.5 rounded-full text-xs font-black shadow-sm bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:scale-105 transition" title="انقر لإلغاء التفعيل">مفعل ✅</button>`
                     : `<button onclick="toggleUserStatus('${d.id}', false, '${data.phoneNumber||''}')" aria-label="تغيير الحالة" class="px-4 py-1.5 rounded-full text-xs font-black shadow-sm bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800 hover:scale-105 transition" title="اضغط للتفعيل ومراسلة الولي">انتظار ⏳</button>`;
 
-                // استرجاع ظهور كلمة المرور بناءً على طلبك كاستثناء للأستاذ
-                let passDisplay = data.password ? data.password : "مفقودة ⚠";
-
                 tbody.innerHTML += `
                     <tr class="hover:bg-blue-50/40 dark:hover:bg-blue-900/20 transition duration-200 group">
                         <td class="p-4 text-center border-b border-slate-100 dark:border-slate-700"><input type="checkbox" aria-label="تحديد التلميذ" class="student-cb custom-cb" value="${d.id}"></td>
@@ -1471,7 +1529,7 @@
                                 <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400 text-2xl flex-shrink-0 shadow-inner border border-blue-200/50 dark:border-blue-800/50"><i class="ph-fill ph-user"></i></div>
                                 <div>
                                     <div class="font-black text-slate-800 dark:text-white text-lg group-hover:text-blue-600 transition">${d.id}</div>
-                                    <div class="text-xs text-slate-500 dark:text-slate-400 font-bold mt-1 flex items-center gap-1.5"><i class="ph-fill ph-key opacity-70"></i> <span class="text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded border border-blue-200/50 dark:border-blue-800/50">${passDisplay}</span></div>
+                                    <div class="text-xs text-slate-500 dark:text-slate-400 font-bold mt-1 flex items-center gap-1.5"><i class="ph-fill ph-key opacity-70"></i> <span class="text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded border border-blue-200/50 dark:border-blue-800/50">${data.password}</span></div>
                                 </div>
                             </div>
                             <div class="mt-3 bg-slate-50 dark:bg-slate-900/50 p-2.5 rounded-lg border border-slate-100 dark:border-slate-700">${parentInfo}</div>
@@ -1671,7 +1729,7 @@
                         textColor = 'text-amber-900 dark:text-amber-400 font-black';
                     }
 
-                    chatHtml += `<div class="chat-bubble ${bubbleClass} ${alignment} shadow-sm transition hover:shadow-md"><p class="text-[14px] whitespace-pre-wrap break-words ${textColor}" dir="auto">${escapeHtml(m.text)}</p></div>`;
+                    chatHtml += `<div class="chat-bubble ${bubbleClass} ${alignment} shadow-sm transition hover:shadow-md"><p class="text-[14px] whitespace-pre-wrap break-words ${textColor}" dir="auto">${linkify(m.text)}</p></div>`;
                 });
                 
                 const msgBox = document.getElementById('chat-messages');
