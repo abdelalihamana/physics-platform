@@ -457,3 +457,22 @@ window.addEventListener('userLoggedOut', () => {
     if (typeof window.closeChat === 'function') window.closeChat();
     window.switchScreen('auth-screen');
 });
+
+// 11. مستمع مخصص لنجاح تسجيل الدخول ونقل المستخدم للشاشة المناسبة
+window.addEventListener('authSuccess', (e) => {
+    const userRecord = e.detail;
+    if (userRecord.role === 'admin') {
+        window.switchScreen('admin-screen');
+        // استدعاء مستمعات الأستاذ (تتطلب وجود الدالة في نفس الملف)
+        if (typeof startAdminListeners === 'function') startAdminListeners();
+    } else if (!userRecord.approved) {
+        window.switchScreen('pending-screen');
+    } else {
+        document.getElementById('display-username').innerText = userRecord.username;
+        // خريطة المستويات
+        const levelNames = { "m_y1": "الأولى متوسط", "m_y2": "الثانية متوسط", "m_y3": "الثالثة متوسط", "m_y4": "الرابعة متوسط", "h_y1": "أولى ثانوي", "h_y2": "الثانية ثانوي", "h_y3": "الثالثة ثانوي" };
+        document.getElementById('student-level-badge').innerText = levelNames[userRecord.level] || "تلميذ";
+        window.switchScreen('app-screen');
+        if (typeof startStudentListeners === 'function') startStudentListeners();
+    }
+});
