@@ -34,6 +34,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
+    <link rel="manifest" href="/manifest.json">
 </head>
 <body class="text-slate-800 dark:text-slate-200 antialiased p-3 md:p-6 pb-24 selection:bg-blue-200 selection:text-blue-900 dark:selection:bg-blue-900 dark:selection:text-blue-200 relative overflow-x-hidden overflow-y-scroll transition-colors duration-300">
 
@@ -523,7 +524,6 @@
         window.adminMainFilter = 'all'; 
         window.adminSubFilter = 'all'; 
         window.studentActiveBranchTab = null;
-        window.adminDetailedBranch = null; // New state to track detailed view for admin
         
         window.adminUsersList = [];
         window.adminChatsData = {};
@@ -1283,34 +1283,16 @@
             document.getElementById(`tab-btn-${partId}`).classList.add('bg-white', 'text-blue-600', 'shadow-md', 'dark:bg-slate-700', 'dark:text-white');
             document.getElementById(`tab-btn-${partId}`).classList.remove('text-slate-500', 'dark:text-slate-400');
         };
-        
         window.switchAdminYear = (partId, yearId) => {
             window.adminActiveYear[partId] = yearId;
             document.querySelectorAll(`.admin-year-content-${partId}`).forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll(`.admin-year-btn-${partId}`).forEach(el => { el.classList.remove('border-blue-500', 'text-blue-600', 'dark:text-blue-400', 'bg-blue-50/50', 'dark:bg-blue-900/20'); el.classList.add('border-transparent', 'text-slate-500', 'dark:text-slate-400'); });
+            document.querySelectorAll(`.admin-year-btn-${partId}`).forEach(el => { el.classList.remove('border-blue-500', 'text-blue-600', 'dark:text-blue-400'); el.classList.add('border-transparent', 'text-slate-500', 'dark:text-slate-400'); });
             document.getElementById(`content-${partId}-${yearId}`).classList.remove('hidden');
-            document.getElementById(`btn-${partId}-${yearId}`).classList.add('border-blue-500', 'text-blue-600', 'dark:text-blue-400', 'bg-blue-50/50', 'dark:bg-blue-900/20');
+            document.getElementById(`btn-${partId}-${yearId}`).classList.add('border-blue-500', 'text-blue-600', 'dark:text-blue-400');
             document.getElementById(`btn-${partId}-${yearId}`).classList.remove('border-transparent', 'text-slate-500', 'dark:text-slate-400');
         };
-
-        // دالة التفاصيل للأستاذ (Master-Detail)
-        window.openAdminBranchDetail = (pIdx, yIdx, bIdx) => {
-            window.adminDetailedBranch = { pIdx, yIdx, bIdx, branch: window.currentSections[pIdx].years[yIdx].branches[bIdx] };
-            renderProgramUI(window.currentSections, 'admin-program-view', true);
-        };
-        
-        // دالة العودة للأستاذ (Master-Detail)
-        window.closeAdminBranchDetail = () => {
-            window.adminDetailedBranch = null;
-            renderProgramUI(window.currentSections, 'admin-program-view', true);
-        };
-
-        // دالة التنقل للتلميذ (Master-Detail)
-        window.switchStudentTab = (branchId) => { 
-            window.studentActiveBranchTab = branchId; 
-            document.getElementById('lesson-search').value = ''; 
-            renderProgramUI(window.currentSections, 'student-program-view', false); 
-        };
+        window.switchAdminBranch = (yearId, branchId) => { window.adminActiveBranch[yearId] = branchId; renderProgramUI(window.currentSections, 'admin-program-view', true); };
+        window.switchStudentTab = (branchId) => { window.studentActiveBranchTab = branchId; document.getElementById('lesson-search').value = ''; renderProgramUI(window.currentSections, 'student-program-view', false); };
         
         window.executeAdminStudentSearch = () => {
             renderAdminTable();
@@ -1783,246 +1765,169 @@
 
         const getEmptyStateHTML = (title) => `<div class="flex flex-col items-center justify-center p-6 text-center bg-white/50 dark:bg-slate-800/30 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700"><i class="ph-fill ph-folder-open text-5xl text-slate-300 dark:text-slate-600 mb-2"></i><h3 class="text-sm font-black text-slate-500 dark:text-slate-400">لا يوجد ${title} حالياً</h3></div>`;
 
-        // ----------------------------------------------------------------------
-        // الدالة المعدلة لعرض واجهة البرنامج بنظام التفاصيل (Master-Detail)
-        // ----------------------------------------------------------------------
         const renderProgramUI = (sections, containerId, isAdmin) => {
-            if(!sections) return; 
-            window.currentSections = sections; 
-            let html = '';
-            
+            if(!sections) return; window.currentSections = sections; let html = '';
             let clickedLinks = (!isAdmin && window.currentUserRecord) ? (window.currentUserRecord.clickedLinks || []) : [];
             let userLevel = (!isAdmin && window.currentUserRecord) ? window.currentUserRecord.level : null;
 
             if (!isAdmin && userLevel) {
-                // ==========================================
-                // واجهة التلميذ
-                // ==========================================
-                let userYearData = null; 
-                sections.forEach(p => p.years.forEach(y => { if (y.id === userLevel) userYearData = y; }));
-                
+                let userYearData = null; sections.forEach(p => p.years.forEach(y => { if (y.id === userLevel) userYearData = y; }));
                 if (userYearData && userYearData.branches && userYearData.branches.length > 0) {
+                    if (!window.studentActiveBranchTab) window.studentActiveBranchTab = userYearData.branches[0].id;
                     
-                    if (!window.studentActiveBranchTab) {
-                        // 1. عرض قائمة الوحدات كبطاقات (Master View)
-                        html += `<div class="mb-6">
-                                    <h3 class="text-xl font-black text-slate-800 dark:text-white flex items-center gap-2">
-                                        <i class="ph-fill ph-stack"></i> الوحدات والمقاطع التعلمية
-                                    </h3>
-                                    <p class="text-slate-500 dark:text-slate-400 text-sm font-bold mt-1">اختر الوحدة لفتح الدروس والتمارين</p>
-                                 </div>`;
-                        
-                        html += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 animate-[fadeInTab_0.3s_ease]">`;
-                        
-                        userYearData.branches.forEach(branch => {
-                            let branchLinksTotal = 0; let branchLinksClicked = 0;
-                            let cats = branch.id === 'm4_b5' ? ['past_exams', 'mock_exams'] : (branch.id.includes('_s') ? ['terms', 'exams'] : ['lessons', 'exercises']);
-                            
-                            cats.forEach(cat => {
-                                let links = branch.categories[cat] || []; 
-                                branchLinksTotal += links.length;
-                                links.forEach((_, lIdx) => { 
-                                    if(clickedLinks.includes(`${branch.id}_${cat}_${lIdx}`)) branchLinksClicked++; 
-                                });
-                            });
-                            
-                            let unitProg = branchLinksTotal === 0 ? 0 : Math.round((branchLinksClicked / branchLinksTotal) * 100);
-                            let isComp = branchLinksTotal > 0 && unitProg === 100;
-                            let bgCls = isComp ? 'bg-emerald-50/80 dark:bg-emerald-900/20 border-emerald-300 dark:border-emerald-800' : 'bg-white/90 dark:bg-slate-800/90 border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500';
+                    if (userLevel === 'm_y4') {
+                        let units = userYearData.branches.filter(b => !b.id.includes('_s') && b.id !== 'm4_b5');
+                        let evals = userYearData.branches.filter(b => b.id.includes('_s') || b.id === 'm4_b5');
 
-                            html += `
-                            <div onclick="switchStudentTab('${branch.id}')" class="cursor-pointer interactive-card p-6 rounded-[2rem] border-2 ${bgCls} shadow-sm flex flex-col items-center justify-center text-center gap-4 group transition-all backdrop-blur-xl">
-                                <div class="w-20 h-20 rounded-[1.5rem] bg-blue-50 dark:bg-slate-700 text-blue-600 dark:text-amber-400 flex items-center justify-center text-4xl group-hover:scale-110 transition-transform shadow-inner border border-white/50 dark:border-slate-600 relative">
-                                    ${getBranchIcon(branch.title)}
-                                    ${isComp ? `<div class="absolute -top-2 -right-2 bg-emerald-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shadow-md border-2 border-white dark:border-slate-800"><i class="ph-bold ph-check"></i></div>` : ''}
-                                </div>
-                                <div class="w-full">
-                                    <h3 class="font-black text-slate-800 dark:text-white text-lg mb-2">${branch.title}</h3>
-                                    <div class="flex items-center justify-between mb-1">
-                                        <span class="text-[10px] font-bold text-slate-400">الإنجاز</span>
-                                        <span class="text-[11px] font-black ${isComp ? 'text-emerald-600 dark:text-emerald-400' : 'text-blue-600 dark:text-blue-400'}">${unitProg}%</span>
+                        if (units.length > 0) {
+                            html += `<div class="flex flex-wrap gap-3 mb-3 w-full">`;
+                            units.forEach(branch => {
+                                let isActive = window.studentActiveBranchTab === branch.id;
+                                let btnCls = isActive ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30 border-blue-600 dark:border-blue-500' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-blue-50 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700';
+                                html += `<button onclick="switchStudentTab('${branch.id}')" class="whitespace-nowrap px-6 py-3 rounded-2xl font-black text-sm transition-all border flex items-center gap-2 ${btnCls}">${getBranchIcon(branch.title)} ${branch.title}</button>`;
+                            });
+                            html += `</div>`;
+                        }
+                        
+                        if (evals.length > 0) {
+                            html += `<div class="flex flex-wrap gap-3 mb-6 pb-4 w-full border-b border-slate-100 dark:border-slate-700">`;
+                            evals.forEach(branch => {
+                                let isActive = window.studentActiveBranchTab === branch.id;
+                                let btnCls = isActive ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30 border-blue-600 dark:border-blue-500' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-blue-50 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700';
+                                html += `<button onclick="switchStudentTab('${branch.id}')" class="whitespace-nowrap px-6 py-3 rounded-2xl font-black text-sm transition-all border flex items-center gap-2 ${btnCls}">${getBranchIcon(branch.title)} ${branch.title}</button>`;
+                            });
+                            html += `</div>`;
+                        }
+                    } else {
+                        html += `<div class="flex flex-wrap gap-3 mb-6 pb-4 w-full border-b border-slate-100 dark:border-slate-700">`;
+                        userYearData.branches.forEach(branch => {
+                            let isActive = window.studentActiveBranchTab === branch.id;
+                            let btnCls = isActive ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30 border-blue-600 dark:border-blue-500' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-blue-50 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700';
+                            html += `<button onclick="switchStudentTab('${branch.id}')" class="whitespace-nowrap px-6 py-3 rounded-2xl font-black text-sm transition-all border flex items-center gap-2 ${btnCls}">${getBranchIcon(branch.title)} ${branch.title}</button>`;
+                        });
+                        html += `</div>`;
+                    }
+                    
+                    html += `<div class="flex flex-col gap-6">`;
+                    userYearData.branches.forEach(branch => {
+                        if (window.studentActiveBranchTab !== branch.id) return; 
+                        let branchLinksTotal = 0; let branchLinksClicked = 0;
+                        let cats = branch.id === 'm4_b5' ? ['past_exams', 'mock_exams'] : (branch.id.includes('_s') ? ['terms', 'exams'] : ['lessons', 'exercises']);
+                        
+                        cats.forEach(cat => {
+                            let links = branch.categories[cat] || []; branchLinksTotal += links.length;
+                            links.forEach((_, lIdx) => { if(clickedLinks.includes(`${branch.id}_${cat}_${lIdx}`)) branchLinksClicked++; });
+                        });
+                        let unitProg = branchLinksTotal === 0 ? 0 : Math.round((branchLinksClicked / branchLinksTotal) * 100);
+                        let isComp = branchLinksTotal > 0 && unitProg === 100;
+                        let cardCls = isComp ? 'border-emerald-400 dark:border-emerald-600 bg-emerald-50/30 dark:bg-emerald-900/10' : 'border-slate-200 dark:border-slate-700 bg-white/90 dark:bg-slate-800/90';
+                        
+                        let gridCols = 'grid-cols-1 md:grid-cols-2';
+
+                        html += `
+                        <div class="student-branch-wrapper rounded-[2rem] shadow-sm border-2 overflow-hidden interactive-card backdrop-blur-xl ${cardCls} animate-[fadeInTab_0.3s_ease]">
+                            <div class="p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-16 h-16 rounded-2xl bg-white dark:bg-slate-700 shadow-inner border border-slate-100 dark:border-slate-600 flex items-center justify-center text-4xl relative text-blue-600 dark:text-amber-400">
+                                        ${getBranchIcon(branch.title)}
+                                        ${isComp ? `<div class="absolute -top-2 -right-2 bg-emerald-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shadow-md border-2 border-white dark:border-slate-800"><i class="ph-bold ph-check"></i></div>` : ''}
                                     </div>
-                                    <div class="w-full bg-slate-100 dark:bg-slate-900 rounded-full h-1.5 overflow-hidden shadow-inner">
+                                    <div>
+                                        <h3 class="branch-title text-2xl font-black text-slate-800 dark:text-white">${branch.title}</h3>
+                                        <p class="text-sm text-slate-500 dark:text-slate-400 font-bold mt-1">تقدمك في هذا القسم</p>
+                                    </div>
+                                </div>
+                                <div class="w-full md:w-64">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <span class="text-xs font-black ${isComp ? 'text-emerald-600 dark:text-emerald-400' : 'text-blue-600 dark:text-blue-400'}">${unitProg}%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5 overflow-hidden shadow-inner">
                                         <div class="${isComp ? 'bg-emerald-500' : 'bg-blue-500'} h-full transition-all duration-700" style="width: ${unitProg}%"></div>
                                     </div>
                                 </div>
-                            </div>`;
+                            </div>
+                            <div class="p-5 md:p-6 bg-slate-50/80 dark:bg-slate-900/80">
+                                <div class="grid ${gridCols} gap-5">`;
+
+                        cats.forEach(cat => {
+                            let links = branch.categories[cat] || []; let conf = catConfig[cat];
+                            
+                            let linksList = links.length ? links.map((lnk, lIdx) => {
+                                let linkId = `${branch.id}_${cat}_${lIdx}`; let isRead = clickedLinks.includes(linkId);
+                                return `<button onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}')" aria-label="مشاهدة المحتوى" class="lesson-item w-full flex items-center justify-between gap-3 bg-white dark:bg-slate-800 p-3 rounded-2xl border ${isRead ? 'border-emerald-200 dark:border-emerald-800 shadow-sm' : 'border-slate-100 dark:border-slate-700'} hover:shadow-md transition group/link relative overflow-hidden text-right">
+                                    <div class="flex items-start sm:items-center gap-3 flex-1 w-full">
+                                        <div class="w-10 h-10 flex-shrink-0 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl group-hover/link:bg-blue-600 group-hover/link:text-white transition shadow-inner mt-1 sm:mt-0">
+                                            <i class="ph-bold ph-link"></i>
+                                        </div>
+                                        <span class="${conf.text} font-bold text-sm flex-1 leading-relaxed text-right group-hover/link:underline decoration-2 underline-offset-4 break-words" style="word-break: break-word; white-space: normal;">${lnk.title}</span>
+                                    </div>
+                                    ${isRead ? `<span class="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 text-[10px] font-black px-2 py-1 rounded-md flex items-center flex-shrink-0 gap-1 ml-1"><i class="ph-bold ph-check"></i> مقروء</span>` : ''}
+                                </button>`;
+                            }).join('') : getEmptyStateHTML(conf.title);
+                            
+                            html += `<div class="${conf.bg} ${conf.border} p-5 rounded-3xl border shadow-sm"><h5 class="font-black ${conf.text} text-lg mb-4 flex items-center gap-2">${conf.icon} ${conf.title}</h5><div class="space-y-2">${linksList}</div></div>`;
                         });
-                        html += `</div>`;
-                    } else {
-                        // 2. عرض محتوى الوحدة المحددة (Detail View)
-                        let branch = userYearData.branches.find(b => b.id === window.studentActiveBranchTab);
-                        if(branch) {
-                            // زر العودة
-                            html += `
-                            <div class="mb-5 animate-[fadeInTab_0.3s_ease]">
-                                <button onclick="switchStudentTab(null)" class="bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-5 py-3 rounded-2xl font-black text-sm shadow-sm border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition flex items-center gap-2 btn-modern">
-                                    <i class="ph-bold ph-arrow-right text-lg"></i> العودة لقائمة الوحدات
-                                </button>
-                            </div>`;
-                            
-                            let branchLinksTotal = 0; let branchLinksClicked = 0;
-                            let cats = branch.id === 'm4_b5' ? ['past_exams', 'mock_exams'] : (branch.id.includes('_s') ? ['terms', 'exams'] : ['lessons', 'exercises']);
-                            
-                            cats.forEach(cat => {
-                                let links = branch.categories[cat] || []; branchLinksTotal += links.length;
-                                links.forEach((_, lIdx) => { if(clickedLinks.includes(`${branch.id}_${cat}_${lIdx}`)) branchLinksClicked++; });
-                            });
-                            
-                            let unitProg = branchLinksTotal === 0 ? 0 : Math.round((branchLinksClicked / branchLinksTotal) * 100);
-                            let isComp = branchLinksTotal > 0 && unitProg === 100;
-                            let cardCls = isComp ? 'border-emerald-400 dark:border-emerald-600 bg-emerald-50/30 dark:bg-emerald-900/10' : 'border-slate-200 dark:border-slate-700 bg-white/90 dark:bg-slate-800/90';
-                            let gridCols = 'grid-cols-1 md:grid-cols-2';
-
-                            // ترويسة الوحدة
-                            html += `
-                            <div class="student-branch-wrapper rounded-[2rem] shadow-sm border-2 overflow-hidden backdrop-blur-xl ${cardCls} animate-[fadeInTab_0.3s_ease]">
-                                <div class="p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50">
-                                    <div class="flex items-center gap-4">
-                                        <div class="w-16 h-16 rounded-2xl bg-white dark:bg-slate-700 shadow-inner border border-slate-100 dark:border-slate-600 flex items-center justify-center text-4xl relative text-blue-600 dark:text-amber-400">
-                                            ${getBranchIcon(branch.title)}
-                                            ${isComp ? `<div class="absolute -top-2 -right-2 bg-emerald-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shadow-md border-2 border-white dark:border-slate-800"><i class="ph-bold ph-check"></i></div>` : ''}
-                                        </div>
-                                        <div>
-                                            <h3 class="branch-title text-2xl font-black text-slate-800 dark:text-white">${branch.title}</h3>
-                                            <p class="text-sm text-slate-500 dark:text-slate-400 font-bold mt-1">تقدمك في هذه الوحدة</p>
-                                        </div>
-                                    </div>
-                                    <div class="w-full md:w-64">
-                                        <div class="flex items-center justify-between mb-1">
-                                            <span class="text-xs font-black ${isComp ? 'text-emerald-600 dark:text-emerald-400' : 'text-blue-600 dark:text-blue-400'}">${unitProg}%</span>
-                                        </div>
-                                        <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5 overflow-hidden shadow-inner">
-                                            <div class="${isComp ? 'bg-emerald-500' : 'bg-blue-500'} h-full transition-all duration-700" style="width: ${unitProg}%"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="p-5 md:p-6 bg-slate-50/80 dark:bg-slate-900/80">
-                                    <div class="grid ${gridCols} gap-5">`;
-
-                            // عرض المحتوى
-                            cats.forEach(cat => {
-                                let links = branch.categories[cat] || []; let conf = catConfig[cat];
-                                let linksList = links.length ? links.map((lnk, lIdx) => {
-                                    let linkId = `${branch.id}_${cat}_${lIdx}`; let isRead = clickedLinks.includes(linkId);
-                                    return `<button onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}')" aria-label="مشاهدة المحتوى" class="lesson-item w-full flex items-center justify-between gap-3 bg-white dark:bg-slate-800 p-3 rounded-2xl border ${isRead ? 'border-emerald-200 dark:border-emerald-800 shadow-sm' : 'border-slate-100 dark:border-slate-700'} hover:shadow-md transition group/link relative overflow-hidden text-right">
-                                        <div class="flex items-start sm:items-center gap-3 flex-1 w-full">
-                                            <div class="w-10 h-10 flex-shrink-0 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl group-hover/link:bg-blue-600 group-hover/link:text-white transition shadow-inner mt-1 sm:mt-0">
-                                                <i class="ph-bold ph-link"></i>
-                                            </div>
-                                            <span class="${conf.text} font-bold text-sm flex-1 leading-relaxed text-right group-hover/link:underline decoration-2 underline-offset-4 break-words" style="word-break: break-word; white-space: normal;">${lnk.title}</span>
-                                        </div>
-                                        ${isRead ? `<span class="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 text-[10px] font-black px-2 py-1 rounded-md flex items-center flex-shrink-0 gap-1 ml-1"><i class="ph-bold ph-check"></i> مقروء</span>` : ''}
-                                    </button>`;
-                                }).join('') : getEmptyStateHTML(conf.title);
-                                
-                                html += `<div class="${conf.bg} ${conf.border} p-5 rounded-3xl border shadow-sm"><h5 class="font-black ${conf.text} text-lg mb-4 flex items-center gap-2">${conf.icon} ${conf.title}</h5><div class="space-y-2">${linksList}</div></div>`;
-                            });
-                            html += `</div></div></div>`;
-                        }
-                    }
-                } else { 
-                    html += `<div class="text-center p-8 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm"><h3 class="text-xl font-bold text-slate-500 dark:text-slate-400">لا يوجد محتوى متاح لمستواك حالياً</h3></div>`; 
-                }
+                        html += `</div></div></div>`; 
+                    });
+                    html += `</div>`;
+                } else { html += `<div class="text-center p-8 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm"><h3 class="text-xl font-bold text-slate-500 dark:text-slate-400">لا يوجد محتوى متاح لمستواك حالياً</h3></div>`; }
             } else {
-                // ==========================================
-                // واجهة الأستاذ
-                // ==========================================
-                if (window.adminDetailedBranch) {
-                    // 1. عرض تفاصيل الوحدة لإضافة المحتوى (Detail View)
-                    let { pIdx, yIdx, bIdx, branch } = window.adminDetailedBranch;
-                    let part = sections[pIdx];
+                sections.forEach((part, pIdx) => {
                     let pColor = part.color === 'blue' ? 'blue' : 'indigo';
-                    let year = part.years[yIdx];
-
-                    html += `<div class="animate-[fadeInTab_0.3s_ease]">`;
-                    
-                    // زر العودة والترويسة
-                    html += `
-                        <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-700 pb-4">
-                            <button onclick="closeAdminBranchDetail()" class="bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-5 py-3 rounded-2xl font-black text-sm shadow-sm border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition flex items-center gap-2 btn-modern w-fit">
-                                <i class="ph-bold ph-arrow-right text-lg"></i> العودة للوحدات
-                            </button>
-                            <div class="bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400 font-bold px-4 py-2 rounded-xl text-sm flex items-center gap-2 border border-slate-200 dark:border-slate-700">
-                                <i class="ph-fill ph-folder-open text-lg"></i> ${part.title} / ${year.title}
-                            </div>
-                        </div>`;
-                    
-                    let cats = branch.id === 'm4_b5' ? ['past_exams', 'mock_exams'] : (branch.id.includes('_s') ? ['terms', 'exams'] : ['lessons', 'exercises']);
-                    let gridCols = 'grid-cols-1 md:grid-cols-2';
-
-                    html += `<div class="border-2 rounded-[2rem] p-5 md:p-6 bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 shadow-sm">
-                        <h4 class="font-black text-slate-800 dark:text-white text-2xl flex items-center gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-700">
-                            <div class="w-12 h-12 bg-${pColor}-50 dark:bg-${pColor}-900/30 text-${pColor}-600 dark:text-${pColor}-400 rounded-xl flex items-center justify-center text-2xl shadow-inner">${getBranchIcon(branch.title)}</div> 
-                            ${branch.title}
-                        </h4>
-                        <div class="grid ${gridCols} gap-5">`;
-                    
-                    cats.forEach(cat => {
-                        let links = branch.categories[cat] || []; let conf = catConfig[cat];
-                        let linksList = links.length ? links.map((lnk, lIdx) => `<div class="flex justify-between items-center bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm text-sm mb-2 group interactive-card">
-                            <a href="${lnk.url}" target="_blank" class="${conf.text} font-bold flex-1 leading-relaxed text-right hover:underline flex items-start sm:items-center gap-2 break-words" style="word-break: break-word; white-space: normal;">
-                                <i class="ph-bold ph-link text-lg opacity-70 mt-1 sm:mt-0 flex-shrink-0"></i>
-                                <span class="flex-1">${lnk.title}</span>
-                            </a>
-                            <div class="flex gap-1 flex-shrink-0 mr-3">
-                                <button onclick="adminEditLinkModal(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" aria-label="تعديل الرابط" class="text-slate-400 hover:text-amber-500 bg-slate-50 dark:bg-slate-700 p-2 rounded-lg transition shadow-sm"><i class="ph-bold ph-pencil text-base"></i></button>
-                                <button onclick="adminDeleteLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" aria-label="حذف الرابط" class="text-slate-400 hover:text-red-500 bg-slate-50 dark:bg-slate-700 p-2 rounded-lg transition shadow-sm"><i class="ph-bold ph-trash text-base"></i></button>
-                            </div>
-                        </div>`).join('') : getEmptyStateHTML('محتوى');
-                        
-                        html += `<div class="${conf.bg} ${conf.border} p-5 rounded-2xl border flex flex-col h-full"><h5 class="font-black ${conf.text} text-lg mb-4 flex items-center gap-2">${conf.icon} ${conf.title}</h5><div class="mb-4 max-h-72 overflow-y-auto pr-2 scroll-smooth flex-1">${linksList}</div><div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 space-y-3 mt-auto bg-white/50 dark:bg-slate-900/50 p-4 rounded-xl">
-                            <input type="text" id="title_${branch.id}_${cat}" aria-label="عنوان المحتوى" class="w-full text-sm font-bold p-3 border border-slate-200 dark:border-slate-600 rounded-xl outline-none focus:border-blue-400 bg-white dark:bg-slate-800 text-slate-700 dark:text-white transition-all shadow-sm" placeholder="عنوان المحتوى...">
-                            <input type="text" id="url_${branch.id}_${cat}" aria-label="رابط المحتوى" class="w-full text-sm p-3 border border-slate-200 dark:border-slate-600 rounded-xl outline-none focus:border-blue-400 bg-white dark:bg-slate-800 text-slate-600 dark:text-white text-left font-bold transition-all shadow-sm" dir="ltr" placeholder="https://...">
-                            <button onclick="adminAddLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', '${branch.id}')" aria-label="إضافة" class="w-full bg-slate-800 dark:bg-blue-600 hover:bg-slate-700 dark:hover:bg-blue-700 text-white text-sm font-black py-3 rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm btn-modern"><i class="ph-bold ph-plus text-lg"></i> إضافة محتوى</button>
-                        </div></div>`;
+                    html += `<div id="content-${part.id}" class="admin-part-content tab-content ${window.adminActivePart === part.id ? 'active' : ''}">`;
+                    html += `<div class="flex flex-wrap gap-2 mb-6 pb-4 border-b border-slate-200 dark:border-slate-700">`;
+                    part.years.forEach((year, yIdx) => {
+                        if(window.adminActiveYear[part.id] === undefined && yIdx === 0) window.adminActiveYear[part.id] = year.id;
+                        let isActive = window.adminActiveYear[part.id] === year.id;
+                        let btnCls = isActive ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400';
+                        html += `<button id="btn-${part.id}-${year.id}" onclick="switchAdminYear('${part.id}', '${year.id}')" class="admin-year-btn-${part.id} whitespace-nowrap px-4 py-3 font-black text-sm transition-all border-b-4 ${btnCls}">${year.title}</button>`;
                     });
-                    html += `</div></div></div>`; 
+                    html += `</div>`;
 
-                } else {
-                    // 2. القائمة الرئيسية للأستاذ (عرض السنوات والوحدات كبطاقات) (Master View)
-                    sections.forEach((part, pIdx) => {
-                        let pColor = part.color === 'blue' ? 'blue' : 'indigo';
-                        html += `<div id="content-${part.id}" class="admin-part-content tab-content ${window.adminActivePart === part.id ? 'active' : ''}">`;
-                        
-                        // أزرار اختيار السنة
-                        html += `<div class="flex flex-wrap gap-2 mb-6 pb-4 border-b border-slate-200 dark:border-slate-700">`;
-                        part.years.forEach((year, yIdx) => {
-                            if(window.adminActiveYear[part.id] === undefined && yIdx === 0) window.adminActiveYear[part.id] = year.id;
-                            let isActive = window.adminActiveYear[part.id] === year.id;
-                            let btnCls = isActive ? 'border-blue-500 text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/20' : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400';
-                            html += `<button id="btn-${part.id}-${year.id}" onclick="switchAdminYear('${part.id}', '${year.id}')" class="admin-year-btn-${part.id} rounded-t-xl px-5 py-3 font-black text-sm transition-all border-b-4 ${btnCls}">${year.title}</button>`;
-                        });
-                        html += `</div>`;
-
-                        part.years.forEach((year, yIdx) => {
-                            let isYearActive = window.adminActiveYear[part.id] === year.id;
-                            html += `<div id="content-${part.id}-${year.id}" class="admin-year-content-${part.id} animate-[fadeInTab_0.3s_ease] ${isYearActive ? '' : 'hidden'}">`;
-                            
-                            if (year.branches && year.branches.length > 0) {
-                                // عرض الوحدات كشبكة (Grid)
-                                html += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-6">`;
-                                year.branches.forEach((branch, bIdx) => {
-                                    html += `
-                                    <div onclick="openAdminBranchDetail(${pIdx}, ${yIdx}, ${bIdx})" class="cursor-pointer bg-white dark:bg-slate-800 p-6 rounded-[2rem] border-2 border-slate-200 dark:border-slate-700 hover:border-${pColor}-500 shadow-sm transition-all group flex flex-col items-center justify-center text-center gap-4 interactive-card">
-                                        <div class="w-16 h-16 rounded-2xl bg-${pColor}-50 dark:bg-slate-700 text-${pColor}-600 dark:text-${pColor}-400 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform shadow-inner border border-white/50 dark:border-slate-600">
-                                            ${getBranchIcon(branch.title)}
-                                        </div>
-                                        <div>
-                                            <h4 class="font-black text-slate-700 dark:text-slate-200 text-lg mb-2">${branch.title}</h4>
-                                            <span class="text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 group-hover:bg-${pColor}-50 group-hover:text-${pColor}-700 transition">إدارة المحتوى <i class="ph-bold ph-pencil-simple"></i></span>
-                                        </div>
-                                    </div>`;
-                                });
-                                html += `</div>`;
-                            } else {
-                                html += getEmptyStateHTML('وحدات');
-                            }
+                    part.years.forEach((year, yIdx) => {
+                        let isYearActive = window.adminActiveYear[part.id] === year.id;
+                        html += `<div id="content-${part.id}-${year.id}" class="admin-year-content-${part.id} animate-[fadeInTab_0.3s_ease] ${isYearActive ? '' : 'hidden'}">`;
+                        if (year.branches && year.branches.length > 0) {
+                            if (!window.adminActiveBranch[year.id]) window.adminActiveBranch[year.id] = year.branches[0].id;
+                            html += `<div class="flex flex-wrap gap-2 mb-6 pb-2">`;
+                            year.branches.forEach(branch => {
+                                let isActive = window.adminActiveBranch[year.id] === branch.id;
+                                let btnCls = isActive ? 'bg-indigo-600 text-white shadow-md' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-indigo-50 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700 border';
+                                html += `<button onclick="switchAdminBranch('${year.id}', '${branch.id}')" class="whitespace-nowrap px-5 py-2.5 rounded-xl font-black text-xs transition-all flex items-center gap-2 ${btnCls}">${getBranchIcon(branch.title)} ${branch.title}</button>`;
+                            });
                             html += `</div>`;
-                        });
-                        html += `</div>`;
+                            year.branches.forEach((branch, bIdx) => {
+                                if (window.adminActiveBranch[year.id] !== branch.id) return;
+                                
+                                let cats = branch.id === 'm4_b5' ? ['past_exams', 'mock_exams'] : (branch.id.includes('_s') ? ['terms', 'exams'] : ['lessons', 'exercises']);
+                                let gridCols = 'grid-cols-1 md:grid-cols-2';
+
+                                html += `<div class="border-2 rounded-[2rem] p-5 md:p-6 bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 shadow-sm animate-[fadeInTab_0.3s_ease]">
+                                    <h4 class="font-black text-slate-800 dark:text-white text-xl flex items-center gap-2 mb-5 border-b border-slate-100 dark:border-slate-700 pb-3"><span class="text-${pColor}-500 text-3xl">${getBranchIcon(branch.title)}</span> ${branch.title}</h4>
+                                    <div class="grid ${gridCols} gap-5">`;
+                                
+                                cats.forEach(cat => {
+                                    let links = branch.categories[cat] || []; let conf = catConfig[cat];
+                                    let linksList = links.length ? links.map((lnk, lIdx) => `<div class="flex justify-between items-center bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm text-sm mb-2 group interactive-card">
+                                        <a href="${lnk.url}" target="_blank" class="${conf.text} font-bold flex-1 leading-relaxed text-right hover:underline flex items-start sm:items-center gap-2 break-words" style="word-break: break-word; white-space: normal;">
+                                            <i class="ph-bold ph-link text-lg opacity-70 mt-1 sm:mt-0 flex-shrink-0"></i>
+                                            <span class="flex-1">${lnk.title}</span>
+                                        </a>
+                                        <div class="flex gap-1 flex-shrink-0 mr-3">
+                                            <button onclick="adminEditLinkModal(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" aria-label="تعديل الرابط" class="text-slate-400 hover:text-amber-500 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg transition"><i class="ph-bold ph-pencil"></i></button>
+                                            <button onclick="adminDeleteLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', ${lIdx})" aria-label="حذف الرابط" class="text-slate-400 hover:text-red-500 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg transition"><i class="ph-bold ph-trash"></i></button>
+                                        </div>
+                                    </div>`).join('') : getEmptyStateHTML('محتوى');
+                                    
+                                    html += `<div class="${conf.bg} ${conf.border} p-5 rounded-2xl border flex flex-col h-full"><h5 class="font-black ${conf.text} text-base mb-3 flex items-center gap-2">${conf.icon} ${conf.title}</h5><div class="mb-2 max-h-60 overflow-y-auto pr-1 scroll-smooth flex-1">${linksList}</div><div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 space-y-2 mt-auto"><input type="text" id="title_${branch.id}_${cat}" aria-label="عنوان المحتوى" class="w-full text-xs font-bold p-3 border border-slate-200 dark:border-slate-600 rounded-lg outline-none focus:border-blue-400 bg-white dark:bg-slate-900 text-slate-700 dark:text-white transition-all" placeholder="عنوان المحتوى..."><input type="text" id="url_${branch.id}_${cat}" aria-label="رابط المحتوى" class="w-full text-xs p-3 border border-slate-200 dark:border-slate-600 rounded-lg outline-none focus:border-blue-400 bg-white dark:bg-slate-900 text-slate-600 dark:text-white text-left font-bold transition-all" dir="ltr" placeholder="https://..."><button onclick="adminAddLink(${pIdx}, ${yIdx}, ${bIdx}, '${cat}', '${branch.id}')" aria-label="إضافة" class="w-full bg-slate-800 dark:bg-blue-600 hover:bg-slate-700 dark:hover:bg-blue-700 text-white text-xs font-black py-2.5 rounded-lg transition-all flex items-center justify-center gap-1"><i class="ph-bold ph-plus"></i> إضافة</button></div></div>`;
+                                });
+                                html += `</div></div>`; 
+                            });
+                        }
+                        html += `</div>`; 
                     });
-                }
+                    html += `</div>`; 
+                });
             }
             document.getElementById(containerId).innerHTML = html;
         };
