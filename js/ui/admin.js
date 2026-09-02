@@ -1,23 +1,14 @@
 // ملف: js/ui/admin.js
 
-// 1. استيراد الإعدادات والدوال المساعدة
 import { db, usersCol, programCol, chatsPath } from '../config/firebase.js';
 import { showToast, confirmAction } from '../utils/helpers.js';
-
-// استيراد دوال مساعدة من واجهة التلميذ (لأن الأستاذ يحتاجها لرسم المحتوى وحساب نقاط التلميذ)
-import { catConfig, getBranchIcon, calculateProgressXP } from './student.js';
-
+import { calculateProgressXP } from './student.js';
 import { doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-// القاموس الخاص بالمستويات
 const levelNames = {
     "m_y1": "الأولى متوسط", "m_y2": "الثانية متوسط", "m_y3": "الثالثة متوسط", "m_y4": "الرابعة متوسط",
     "h_y1": "أولى ثانوي", "h_y2": "الثانية ثانوي", "h_y3": "الثالثة ثانوي"
 };
-
-// ==========================================
-// القسم الأول: التنقل والتبويبات (Tabs)
-// ==========================================
 
 export const switchAdminMainTab = (tab) => {
     window.adminMainTab = tab;
@@ -29,13 +20,11 @@ export const switchAdminMainTab = (tab) => {
     if (tab === 'accounts') {
         secAccounts.classList.remove('hidden'); secAccounts.classList.add('flex');
         secContent.classList.add('hidden');
-        
         btnAccounts.className = "flex-1 min-w-[200px] py-4 rounded-2xl font-black text-lg transition-all bg-blue-600 text-white shadow-lg shadow-blue-500/30 flex justify-center items-center gap-2";
         btnContent.className = "flex-1 min-w-[200px] py-4 rounded-2xl font-black text-lg transition-all bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 shadow-sm flex justify-center items-center gap-2";
     } else {
         secAccounts.classList.remove('flex'); secAccounts.classList.add('hidden');
         secContent.classList.remove('hidden');
-        
         btnContent.className = "flex-1 min-w-[200px] py-4 rounded-2xl font-black text-lg transition-all bg-blue-600 text-white shadow-lg shadow-blue-500/30 flex justify-center items-center gap-2";
         btnAccounts.className = "flex-1 min-w-[200px] py-4 rounded-2xl font-black text-lg transition-all bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 shadow-sm flex justify-center items-center gap-2";
     }
@@ -52,27 +41,30 @@ export const switchAdminPart = (partId) => {
 
 export const switchAdminYear = (partId, yearId) => {
     window.adminActiveYear[partId] = yearId;
+    window.adminActiveBranch[yearId] = null; // إرجاع القيمة لـ null لإظهار البطاقات الافتراضية
+    
     document.querySelectorAll(`.admin-year-content-${partId}`).forEach(el => el.classList.add('hidden'));
     document.querySelectorAll(`.admin-year-btn-${partId}`).forEach(el => { el.classList.remove('border-blue-500', 'text-blue-600', 'dark:text-blue-400'); el.classList.add('border-transparent', 'text-slate-500', 'dark:text-slate-400'); });
+    
     document.getElementById(`content-${partId}-${yearId}`).classList.remove('hidden');
     document.getElementById(`btn-${partId}-${yearId}`).classList.add('border-blue-500', 'text-blue-600', 'dark:text-blue-400');
     document.getElementById(`btn-${partId}-${yearId}`).classList.remove('border-transparent', 'text-slate-500', 'dark:text-slate-400');
+    
+    if(window.renderProgramUI) window.renderProgramUI(window.currentSections, 'admin-program-view', true);
 };
 
 export const switchAdminBranch = (yearId, branchId) => { 
     window.adminActiveBranch[yearId] = branchId; 
-    // نفترض أن دالة renderProgramUI متاحة عبر الـ Window لكي يقوم الأستاذ برسم المحتوى
     if(window.renderProgramUI) window.renderProgramUI(window.currentSections, 'admin-program-view', true); 
 };
 
-
-// ==========================================
-// القسم الثاني: إدارة التلاميذ (الجدول والفلترة)
-// ==========================================
-
-export const executeAdminStudentSearch = () => {
-    renderAdminTable();
+// الدالة الجديدة لزر العودة للبطاقات في إدارة المحتوى
+export const returnToAdminGrid = (yearId) => {
+    window.adminActiveBranch[yearId] = null;
+    if(window.renderProgramUI) window.renderProgramUI(window.currentSections, 'admin-program-view', true);
 };
+
+export const executeAdminStudentSearch = () => { renderAdminTable(); };
 
 export const filterMainStudents = (mainType) => {
     window.adminMainFilter = mainType;
@@ -120,10 +112,7 @@ export const filterSubStudents = (subType) => {
     renderAdminTable();
 };
 
-export const toggleSelectAll = () => { 
-    const state = document.getElementById('select-all-cb').checked; 
-    document.querySelectorAll('.student-cb').forEach(cb => cb.checked = state); 
-};
+export const toggleSelectAll = () => { const state = document.getElementById('select-all-cb').checked; document.querySelectorAll('.student-cb').forEach(cb => cb.checked = state); };
 
 export const toggleUserStatus = async (uid, isApproved, phone) => {
     if (isApproved) {
@@ -166,13 +155,11 @@ export const bulkAction = async (action) => {
 
 export const renderAdminTable = () => {
     const tbody = document.getElementById('students-table-body');
-    if(!tbody) return;
+    if (!tbody) return;
     tbody.innerHTML = ''; let studentCount = 0; let levelStats = {}; 
     
     const searchInput = document.getElementById('admin-student-search');
     const searchQuery = searchInput ? searchInput.value.trim().toLowerCase() : '';
-
-    if(!window.adminUsersList) return;
 
     window.adminUsersList.forEach(d => {
         const data = d.data;
@@ -183,7 +170,6 @@ export const renderAdminTable = () => {
         
         if(window.adminMainFilter === 'middle' && !isMiddle) return;
         if(window.adminMainFilter === 'high' && !isHigh) return;
-        
         if(window.adminSubFilter !== 'all' && data.level !== window.adminSubFilter) return;
 
         if (searchQuery) {
@@ -209,7 +195,7 @@ export const renderAdminTable = () => {
             </div>` 
             : '<div class="text-sm text-slate-400 dark:text-slate-500 font-bold">غير متوفر</div>';
 
-        let unreadCount = window.adminChatsData && window.adminChatsData[d.id] ? window.adminChatsData[d.id].unreadAdmin : 0;
+        let unreadCount = window.adminChatsData[d.id]?.unreadAdmin || 0;
         let chatBadge = unreadCount > 0 ? `<span class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full animate-bounce shadow-md border border-white">${unreadCount}</span>` : '';
 
         let statusBtn = data.approved 
@@ -265,10 +251,6 @@ export const renderAdminTable = () => {
     }
 };
 
-// ==========================================
-// القسم الثالث: إدارة المحتوى (إضافة، تعديل، حذف)
-// ==========================================
-
 export const adminAddLink = async (pIdx, yIdx, bIdx, cat, branchId) => {
     let title = document.getElementById(`title_${branchId}_${cat}`).value.trim(); 
     let url = document.getElementById(`url_${branchId}_${cat}`).value.trim();
@@ -318,11 +300,7 @@ export const adminEditLinkModal = (pIdx, yIdx, bIdx, cat, lIdx) => {
     const modal = document.getElementById('edit-modal'); modal.classList.remove('hidden'); modal.classList.add('flex');
 };
 
-export const closeEditModal = () => { 
-    document.getElementById('edit-modal').classList.add('hidden'); 
-    document.getElementById('edit-modal').classList.remove('flex'); 
-    window.currentEditParams = null; 
-};
+export const closeEditModal = () => { document.getElementById('edit-modal').classList.add('hidden'); document.getElementById('edit-modal').classList.remove('flex'); window.currentEditParams = null; };
 
 export const saveEditedLink = async () => {
     let newTitle = document.getElementById('edit-link-title').value.trim(); let newUrl = document.getElementById('edit-link-url').value.trim();
