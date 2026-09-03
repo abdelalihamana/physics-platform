@@ -734,7 +734,7 @@
         };
 
         const sendTelegramCode = async (code) => {
-            const botToken = "8872128410:AAGiGafbwPhc3EmHeeo1l2lBdhiyxlqlLuk";
+            const botToken = "8872128410:AAGiGafbwPhc3EmHeeo1l2lBdhiyxlqlLuk"; 
             const chatId = "6707334537";
             const message = encodeURIComponent(`🔒 تنبيه أمني:\nرمز الدخول الخاص بك لمنصة المجتهد هو:\n*${code}*\nلا تشارك هذا الرمز مع أحد.`);
             const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${message}&parse_mode=Markdown`;
@@ -946,10 +946,10 @@
                                 switchScreen('pending-screen');
                                 await signOut(auth);
                             } else {
-                                // تحقق من شعلة الحماس عند الدخول
                                 await checkAndUpdateStreak(userRef, window.currentUserRecord);
 
                                 document.getElementById('display-username').innerText = username;
+                                document.getElementById('student-level-badge').innerText = levelNames[window.currentUserRecord.level] || "تلميذ";
                                 switchScreen('app-screen');
                                 startStudentListeners();
                             }
@@ -1112,6 +1112,7 @@
                         await checkAndUpdateStreak(userRef, window.currentUserRecord);
                         
                         document.getElementById('display-username').innerText = username;
+                        document.getElementById('student-level-badge').innerText = levelNames[window.currentUserRecord.level];
                         switchScreen('app-screen');
                         startStudentListeners();
                     }
@@ -1147,6 +1148,7 @@
             window.studentViewMode = 'grid'; 
             
             document.getElementById('display-username').innerText = window.currentUserRecord.username;
+            document.getElementById('student-level-badge').innerText = levelNames[window.currentUserRecord.level];
             document.getElementById('student-streak-count').innerText = window.currentUserRecord.streak || 0;
             
             document.getElementById('return-admin-btn').classList.remove('hidden');
@@ -1438,7 +1440,6 @@
             if(bar) bar.style.width = `${result.percent}%`; 
             if(txt) txt.innerText = `${result.xp}`;
 
-            // تحديث الوسام البصري بناءً على الـ XP
             const badgeInfo = getStudentBadge(result.xp);
             const rankBadgeEl = document.getElementById('student-rank-badge');
             const iconBadgeEl = document.getElementById('student-badge-icon');
@@ -1452,16 +1453,11 @@
                 iconBadgeEl.className = `w-14 h-14 rounded-2xl shadow-lg flex items-center justify-center text-3xl transition-colors ${badgeInfo.cls}`;
             }
             
-            // تحديث رقم الشعلة من الـ DB
             const streakEl = document.getElementById('student-streak-count');
             if (streakEl) streakEl.innerText = window.currentUserRecord.streak || 0;
         };
 
-        window.trackLinkClick = async (branchId, cat, lIdx, url, isLocked) => {
-            if (isLocked) {
-                return showToast("🔒 أكمل المحتوى السابق لفتح هذا الدرس", "error");
-            }
-            
+        window.trackLinkClick = async (branchId, cat, lIdx, url) => {
             window.open(url, '_blank');
             if (window.currentUserRecord && window.currentUserRecord.role !== 'admin') {
                 if (window.originalAdminRecord) {
@@ -1528,13 +1524,9 @@
                                     found = true; 
                                     let linkId = `${branch.id}_${cat}_${lIdx}`; 
                                     let isRead = clickedLinks.includes(linkId);
-                                    let isLocked = false;
-                                    if (lIdx > 0) { isLocked = !clickedLinks.includes(`${branch.id}_${cat}_${lIdx - 1}`); }
-
-                                    let bgLocked = isLocked ? 'bg-slate-100 dark:bg-slate-800 opacity-60 grayscale' : 'bg-slate-50 dark:bg-slate-900/50';
 
                                     html += `
-                                    <div class="${bgLocked} p-4 rounded-2xl border border-slate-100 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition hover:shadow-md">
+                                    <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition hover:shadow-md">
                                         <div>
                                             <div class="flex items-center gap-2 mb-1">
                                                 <span class="text-xs font-black bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400 px-2 py-1 rounded">${branch.title}</span>
@@ -1544,8 +1536,8 @@
                                         </div>
                                         <div class="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
                                             ${isRead ? `<span class="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 text-xs font-black px-3 py-1.5 rounded-lg flex items-center gap-1"><i class="ph-bold ph-check"></i> مكتمل</span>` : ''}
-                                            <button onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${isLocked ? '#' : lnk.url}', ${isLocked})" aria-label="مشاهدة المحتوى" class="${isLocked ? 'bg-slate-300 dark:bg-slate-700 text-slate-500 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'} px-5 py-2 rounded-xl font-black shadow-sm transition flex items-center gap-2 text-sm whitespace-nowrap">
-                                                ${isLocked ? 'مغلق <i class="ph-bold ph-lock"></i>' : 'مشاهدة <i class="ph-bold ph-arrow-left"></i>'}
+                                            <button onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}')" aria-label="مشاهدة المحتوى" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl font-black shadow-sm transition flex items-center gap-2 text-sm whitespace-nowrap">
+                                                مشاهدة <i class="ph-bold ph-arrow-left"></i>
                                             </button>
                                         </div>
                                     </div>`;
@@ -1729,7 +1721,6 @@
 
                 let passDisplay = data.password ? data.password : "مفقودة ⚠";
                 
-                // عرض الوسام والشعلة للأستاذ
                 const badgeInfo = getStudentBadge(prog.xp);
                 const streakCount = data.streak || 0;
 
@@ -1897,7 +1888,6 @@
                         window.currentUserRecord.clickedLinks = data.clickedLinks || [];
                         window.currentUserRecord.phoneNumber = data.phoneNumber || ''; 
                         
-                        // تحديث الشعلة إذا تم تحديثها من الإدارة
                         if(data.streak !== undefined) window.currentUserRecord.streak = data.streak;
                         if(data.lastLoginDate !== undefined) window.currentUserRecord.lastLoginDate = data.lastLoginDate;
                         
@@ -2155,7 +2145,7 @@
                 }
 
             } else {
-                // شاشة التلميذ مع قفل المحتوى
+                // شاشة التلميذ - إزالة قفل المحتوى
                 let clickedLinks = window.currentUserRecord ? (window.currentUserRecord.clickedLinks || []) : [];
                 let userLevel = window.currentUserRecord ? window.currentUserRecord.level : null;
 
@@ -2244,27 +2234,17 @@
                                     let linksList = links.length ? links.map((lnk, lIdx) => {
                                         let linkId = `${branch.id}_${cat}_${lIdx}`; 
                                         let isRead = clickedLinks.includes(linkId);
-                                        
-                                        // منطق قفل المحتوى
-                                        let isLocked = false;
-                                        if (lIdx > 0) {
-                                            let prevLinkId = `${branch.id}_${cat}_${lIdx - 1}`;
-                                            isLocked = !clickedLinks.includes(prevLinkId);
-                                        }
 
-                                        let btnClass = isLocked 
-                                            ? 'border-slate-200 dark:border-slate-700 bg-slate-100/50 dark:bg-slate-800/50 opacity-60 grayscale cursor-not-allowed' 
-                                            : (isRead ? 'border-emerald-200 dark:border-emerald-800 shadow-sm bg-emerald-50/20' : 'border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 hover:shadow-md hover:border-blue-300');
+                                        let btnClass = isRead ? 'border-emerald-200 dark:border-emerald-800 shadow-sm bg-emerald-50/20' : 'border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 hover:shadow-md hover:border-blue-300';
 
-                                        return `<button onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${isLocked ? '#' : lnk.url}', ${isLocked})" aria-label="مشاهدة المحتوى" class="w-full flex items-center justify-between gap-3 p-4 rounded-2xl border transition-all duration-200 group/link relative overflow-hidden text-right mb-3 ${btnClass}">
+                                        return `<button onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}')" aria-label="مشاهدة المحتوى" class="w-full flex items-center justify-between gap-3 p-4 rounded-2xl border transition-all duration-200 group/link relative overflow-hidden text-right mb-3 ${btnClass}">
                                             <div class="flex items-start sm:items-center gap-4 flex-1 w-full">
-                                                <div class="w-12 h-12 flex-shrink-0 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-2xl ${!isLocked ? 'group-hover/link:bg-blue-600 group-hover/link:text-white' : ''} transition-colors shadow-inner mt-1 sm:mt-0 border border-blue-100 dark:border-blue-800">
-                                                    ${isLocked ? '<i class="ph-bold ph-lock text-slate-500"></i>' : '<i class="ph-bold ph-link"></i>'}
+                                                <div class="w-12 h-12 flex-shrink-0 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-2xl group-hover/link:bg-blue-600 group-hover/link:text-white transition-colors shadow-inner mt-1 sm:mt-0 border border-blue-100 dark:border-blue-800">
+                                                    <i class="ph-bold ph-link"></i>
                                                 </div>
-                                                <span class="${conf.text} font-bold text-base flex-1 leading-relaxed text-right ${!isLocked ? 'group-hover/link:underline' : 'text-slate-500'} decoration-2 underline-offset-4 break-words" style="word-break: break-word; white-space: normal;">${lnk.title}</span>
+                                                <span class="${conf.text} font-bold text-base flex-1 leading-relaxed text-right group-hover/link:underline decoration-2 underline-offset-4 break-words" style="word-break: break-word; white-space: normal;">${lnk.title}</span>
                                             </div>
                                             ${isRead ? `<span class="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 text-xs font-black px-3 py-1.5 rounded-lg flex items-center flex-shrink-0 gap-1 ml-1 border border-emerald-200 dark:border-emerald-800"><i class="ph-bold ph-check"></i> مكتمل</span>` : ''}
-                                            ${isLocked ? `<span class="bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 text-xs font-black px-3 py-1.5 rounded-lg flex items-center flex-shrink-0 gap-1 ml-1 border border-slate-300 dark:border-slate-600"><i class="ph-bold ph-lock"></i> مغلق</span>` : ''}
                                         </button>`;
                                     }).join('') : getEmptyStateHTML(conf.title);
                                     
