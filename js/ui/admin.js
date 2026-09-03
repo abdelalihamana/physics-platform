@@ -10,71 +10,64 @@ const levelNames = {
     "h_y1": "أولى ثانوي", "h_y2": "الثانية ثانوي", "h_y3": "الثالثة ثانوي"
 };
 
-export const switchAdminMainTab = (tab) => {
-    window.adminMainTab = tab;
-    const btnAccounts = document.getElementById('main-tab-accounts');
-    const btnContent = document.getElementById('main-tab-content');
-    const secAccounts = document.getElementById('admin-accounts-section');
-    const secContent = document.getElementById('admin-content-section');
-
-    const makeActive = (el) => {
-        el.classList.add('border-blue-500', 'ring-4', 'ring-blue-500/20', 'scale-[1.02]');
-        el.classList.remove('border-slate-100', 'dark:border-slate-700', 'opacity-70');
-        el.querySelector('.icon-bg').classList.add('bg-blue-100', 'dark:bg-blue-900/50', 'text-blue-600', 'dark:text-blue-400');
-        el.querySelector('.icon-bg').classList.remove('bg-slate-100', 'dark:bg-slate-700', 'text-slate-500', 'dark:text-slate-400');
-    };
-
-    const makeInactive = (el) => {
-        el.classList.remove('border-blue-500', 'ring-4', 'ring-blue-500/20', 'scale-[1.02]');
-        el.classList.add('border-slate-100', 'dark:border-slate-700', 'opacity-70');
-        el.querySelector('.icon-bg').classList.remove('bg-blue-100', 'dark:bg-blue-900/50', 'text-blue-600', 'dark:text-blue-400');
-        el.querySelector('.icon-bg').classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-500', 'dark:text-slate-400');
-    };
-
-    if (tab === 'accounts') {
-        secAccounts.classList.remove('hidden'); secAccounts.classList.add('flex');
-        secContent.classList.add('hidden');
-        makeActive(btnAccounts); makeInactive(btnContent);
-    } else {
-        secAccounts.classList.remove('flex'); secAccounts.classList.add('hidden');
-        secContent.classList.remove('hidden');
-        makeActive(btnContent); makeInactive(btnAccounts);
+export const openAdminSection = (section) => {
+    window.adminMainTab = section;
+    document.getElementById('admin-main-menu').classList.add('hidden');
+    
+    if (section === 'accounts') {
+        document.getElementById('admin-accounts-wrapper').classList.remove('hidden');
+        document.getElementById('admin-accounts-wrapper').classList.add('animate-[fadeInTab_0.3s_ease]');
+        renderAdminTable();
+    } else if (section === 'content') {
+        document.getElementById('admin-content-wrapper').classList.remove('hidden');
+        document.getElementById('admin-content-wrapper').classList.add('animate-[fadeInTab_0.3s_ease]');
     }
 };
 
-export const switchAdminPart = (partId) => {
+export const returnToAdminHome = () => {
+    window.adminMainTab = null;
+    document.getElementById('admin-accounts-wrapper').classList.add('hidden');
+    document.getElementById('admin-content-wrapper').classList.add('hidden');
+    
+    document.getElementById('admin-main-menu').classList.remove('hidden');
+    document.getElementById('admin-main-menu').classList.add('animate-[fadeInTab_0.3s_ease]');
+};
+
+export const openAdminPart = (partId) => {
     window.adminActivePart = partId;
-    document.querySelectorAll(`.admin-part-content`).forEach(el => el.classList.remove('active'));
-    document.getElementById(`content-${partId}`).classList.add('active');
+    
+    // إخفاء بطاقات اختيار الطور (متوسط/ثانوي)
+    const partsMenu = document.getElementById('admin-parts-menu');
+    if(partsMenu) partsMenu.classList.add('hidden');
+    
+    // إظهار المحتوى الخاص بالطور الذي تم اختياره
+    const contentWrapper = document.getElementById('admin-part-content-wrapper');
+    if(contentWrapper) {
+        contentWrapper.classList.remove('hidden');
+        contentWrapper.classList.add('animate-[fadeInTab_0.3s_ease]');
+    }
+    
+    if(window.renderProgramUI) window.renderProgramUI(window.currentSections, 'admin-program-view', true);
+};
 
-    const btnMiddle = document.getElementById('tab-btn-part_middle');
-    const btnHigh = document.getElementById('tab-btn-part_high');
-
-    if(partId === 'part_middle') {
-        btnMiddle.classList.add('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/20', 'shadow-md');
-        btnMiddle.classList.remove('border-slate-200', 'dark:border-slate-700', 'bg-white', 'dark:bg-slate-800', 'opacity-70');
-        
-        btnHigh.classList.remove('border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-900/20', 'shadow-md');
-        btnHigh.classList.add('border-slate-200', 'dark:border-slate-700', 'bg-white', 'dark:bg-slate-800', 'opacity-70');
-    } else {
-        btnHigh.classList.add('border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-900/20', 'shadow-md');
-        btnHigh.classList.remove('border-slate-200', 'dark:border-slate-700', 'bg-white', 'dark:bg-slate-800', 'opacity-70');
-        
-        btnMiddle.classList.remove('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/20', 'shadow-md');
-        btnMiddle.classList.add('border-slate-200', 'dark:border-slate-700', 'bg-white', 'dark:bg-slate-800', 'opacity-70');
+export const returnToAdminParts = () => {
+    window.adminActivePart = null;
+    
+    // إخفاء محتوى الطور
+    const contentWrapper = document.getElementById('admin-part-content-wrapper');
+    if(contentWrapper) contentWrapper.classList.add('hidden');
+    
+    // إظهار بطاقات اختيار الطور (متوسط/ثانوي)
+    const partsMenu = document.getElementById('admin-parts-menu');
+    if(partsMenu) {
+        partsMenu.classList.remove('hidden');
+        partsMenu.classList.add('animate-[fadeInTab_0.3s_ease]');
     }
 };
 
 export const switchAdminYear = (partId, yearId) => {
     window.adminActiveYear[partId] = yearId;
     window.adminActiveBranch[yearId] = null; 
-    
-    document.querySelectorAll(`.admin-year-content-${partId}`).forEach(el => el.classList.add('hidden'));
-    document.querySelectorAll(`.admin-year-btn-${partId}`).forEach(el => { el.classList.remove('border-blue-500', 'text-blue-600', 'dark:text-blue-400'); el.classList.add('border-transparent', 'text-slate-500', 'dark:text-slate-400'); });
-    
-    document.getElementById(`content-${partId}-${yearId}`).classList.remove('hidden');
-    document.getElementById(`btn-${partId}-${yearId}`).classList.add('border-blue-500', 'text-blue-600', 'dark:text-blue-400');
-    document.getElementById(`btn-${partId}-${yearId}`).classList.remove('border-transparent', 'text-slate-500', 'dark:text-slate-400');
     
     if(window.renderProgramUI) window.renderProgramUI(window.currentSections, 'admin-program-view', true);
 };
