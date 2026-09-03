@@ -1,9 +1,7 @@
-// ملف: js/ui/admin.js
-
 import { db, usersCol, programCol, chatsPath } from '../config/firebase.js';
 import { showToast, confirmAction } from '../utils/helpers.js';
 import { calculateProgressXP } from './student.js';
-import { doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { doc, updateDoc, deleteDoc, setDoc, collection, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 const levelNames = {
     "m_y1": "الأولى متوسط", "m_y2": "الثانية متوسط", "m_y3": "الثالثة متوسط", "m_y4": "الرابعة متوسط",
@@ -36,11 +34,11 @@ export const returnToAdminHome = () => {
 export const openAdminPart = (partId) => {
     window.adminActivePart = partId;
     
-    // إخفاء بطاقات اختيار الطور (متوسط/ثانوي)
+    // إخفاء بطاقات الأطوار
     const partsMenu = document.getElementById('admin-parts-menu');
     if(partsMenu) partsMenu.classList.add('hidden');
     
-    // إظهار المحتوى الخاص بالطور الذي تم اختياره
+    // إظهار حاوية المحتوى (السنوات والوحدات)
     const contentWrapper = document.getElementById('admin-part-content-wrapper');
     if(contentWrapper) {
         contentWrapper.classList.remove('hidden');
@@ -53,11 +51,11 @@ export const openAdminPart = (partId) => {
 export const returnToAdminParts = () => {
     window.adminActivePart = null;
     
-    // إخفاء محتوى الطور
+    // إخفاء حاوية المحتوى
     const contentWrapper = document.getElementById('admin-part-content-wrapper');
     if(contentWrapper) contentWrapper.classList.add('hidden');
     
-    // إظهار بطاقات اختيار الطور (متوسط/ثانوي)
+    // إظهار بطاقات الأطوار
     const partsMenu = document.getElementById('admin-parts-menu');
     if(partsMenu) {
         partsMenu.classList.remove('hidden');
@@ -67,8 +65,7 @@ export const returnToAdminParts = () => {
 
 export const switchAdminYear = (partId, yearId) => {
     window.adminActiveYear[partId] = yearId;
-    window.adminActiveBranch[yearId] = null; 
-    
+    window.adminActiveBranch[yearId] = null; // الرجوع لوضع البطاقات
     if(window.renderProgramUI) window.renderProgramUI(window.currentSections, 'admin-program-view', true);
 };
 
@@ -101,14 +98,14 @@ export const filterMainStudents = (mainType) => {
         subContainer.classList.add('hidden'); subContainer.classList.remove('flex');
     } else {
         subContainer.classList.remove('hidden'); subContainer.classList.add('flex');
-        let html = `<button onclick="filterSubStudents('all')" id="filter-sub-all" class="px-4 py-1.5 rounded-lg font-black text-xs bg-indigo-600 text-white shadow-sm transition-all flex items-center gap-1"><i class="ph-fill ph-circles-four"></i> كل السنوات</button>`;
+        let html = `<button onclick="window.filterSubStudents('all')" id="filter-sub-all" class="px-4 py-1.5 rounded-lg font-black text-xs bg-indigo-600 text-white shadow-sm transition-all flex items-center gap-1"><i class="ph-fill ph-circles-four"></i> كل السنوات</button>`;
         
         if (mainType === 'middle') {
             const years = [{id: 'm_y1', t: 'الأولى متوسط'}, {id: 'm_y2', t: 'الثانية متوسط'}, {id: 'm_y3', t: 'الثالثة متوسط'}, {id: 'm_y4', t: 'الرابعة متوسط'}];
-            years.forEach(y => { html += `<button onclick="filterSubStudents('${y.id}')" id="filter-sub-${y.id}" class="px-4 py-1.5 rounded-lg font-black text-xs bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all flex items-center gap-1"><i class="ph-fill ph-door"></i> ${y.t}</button>`; });
+            years.forEach(y => { html += `<button onclick="window.filterSubStudents('${y.id}')" id="filter-sub-${y.id}" class="px-4 py-1.5 rounded-lg font-black text-xs bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all flex items-center gap-1"><i class="ph-fill ph-door"></i> ${y.t}</button>`; });
         } else if (mainType === 'high') {
             const years = [{id: 'h_y1', t: 'أولى ثانوي'}, {id: 'h_y2', t: 'الثانية ثانوي'}, {id: 'h_y3', t: 'الثالثة ثانوي'}];
-            years.forEach(y => { html += `<button onclick="filterSubStudents('${y.id}')" id="filter-sub-${y.id}" class="px-4 py-1.5 rounded-lg font-black text-xs bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all flex items-center gap-1"><i class="ph-fill ph-door"></i> ${y.t}</button>`; });
+            years.forEach(y => { html += `<button onclick="window.filterSubStudents('${y.id}')" id="filter-sub-${y.id}" class="px-4 py-1.5 rounded-lg font-black text-xs bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all flex items-center gap-1"><i class="ph-fill ph-door"></i> ${y.t}</button>`; });
         }
         subContainer.innerHTML = html;
     }
@@ -157,7 +154,7 @@ export const toggleUserStatus = async (uid, isApproved, phone) => {
 
 export const bulkAction = async (action) => {
     const checked = Array.from(document.querySelectorAll('.student-cb:checked')).map(cb => cb.value);
-    if(checked.length === 0) return showToast("يرجى تحديد تلميذ واحد على الأقل", "error");
+    if(checked.length === 0) return showToast("يرجى تحديد تلميذ واحد على حداقل", "error");
     
     const actionText = action === 'approve' ? 'تفعيل' : (action === 'deactivate' ? 'إلغاء تفعيل' : 'حذف نهائي لـ');
     if(!await confirmAction(`هل أنت متأكد من ${actionText} ${checked.length} حساب(ات)؟`)) return;
@@ -217,8 +214,8 @@ export const renderAdminTable = () => {
         let chatBadge = unreadCount > 0 ? `<span class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full animate-bounce shadow-md border border-white">${unreadCount}</span>` : '';
 
         let statusBtn = data.approved 
-            ? `<button onclick="toggleUserStatus('${d.id}', true, '${data.phoneNumber||''}')" aria-label="تغيير الحالة" class="px-4 py-1.5 rounded-full text-xs font-black shadow-sm bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:scale-105 transition" title="انقر لإلغاء التفعيل">مفعل ✅</button>`
-            : `<button onclick="toggleUserStatus('${d.id}', false, '${data.phoneNumber||''}')" aria-label="تغيير الحالة" class="px-4 py-1.5 rounded-full text-xs font-black shadow-sm bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800 hover:scale-105 transition" title="اضغط للتفعيل ومراسلة الولي">انتظار ⏳</button>`;
+            ? `<button onclick="window.toggleUserStatus('${d.id}', true, '${data.phoneNumber||''}')" aria-label="تغيير الحالة" class="px-4 py-1.5 rounded-full text-xs font-black shadow-sm bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:scale-105 transition" title="انقر لإلغاء التفعيل">مفعل ✅</button>`
+            : `<button onclick="window.toggleUserStatus('${d.id}', false, '${data.phoneNumber||''}')" aria-label="تغيير الحالة" class="px-4 py-1.5 rounded-full text-xs font-black shadow-sm bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800 hover:scale-105 transition" title="اضغط للتفعيل ومراسلة الولي">انتظار ⏳</button>`;
 
         let passDisplay = data.password ? data.password : "مفقودة ⚠";
 
@@ -243,8 +240,8 @@ export const renderAdminTable = () => {
                 <td class="p-4 text-center border-b border-slate-100 dark:border-slate-700">${statusBtn}</td>
                 <td class="p-4 text-left border-b border-slate-100 dark:border-slate-700">
                     <div class="flex gap-2 justify-end">
-                        <button onclick="loginAsStudent('${d.id}')" aria-label="مراقبة حساب التلميذ" class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 px-3 py-1.5 rounded-lg text-xs font-black hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition border border-indigo-200 dark:border-indigo-800 shadow-sm flex items-center gap-1" title="مراقبة حساب التلميذ"><i class="ph-bold ph-sign-in"></i> دخول للحساب</button>
-                        <button onclick="openChat('${d.id}')" aria-label="مراسلة التلميذ" class="relative icon-btn w-9 h-9 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-lg shadow-sm border border-blue-200 dark:border-blue-800" title="مراسلة"><i class="ph-bold ph-chat-circle-dots"></i>${chatBadge}</button>
+                        <button onclick="window.loginAsStudent('${d.id}')" aria-label="مراقبة حساب التلميذ" class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 px-3 py-1.5 rounded-lg text-xs font-black hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition border border-indigo-200 dark:border-indigo-800 shadow-sm flex items-center gap-1" title="مراقبة حساب التلميذ"><i class="ph-bold ph-sign-in"></i> دخول للحساب</button>
+                        <button onclick="window.openChat('${d.id}')" aria-label="مراسلة التلميذ" class="relative bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 w-9 h-9 rounded-lg flex items-center justify-center text-lg shadow-sm border border-blue-200 dark:border-blue-800 hover:bg-blue-100 transition" title="مراسلة"><i class="ph-bold ph-chat-circle-dots"></i>${chatBadge}</button>
                     </div>
                 </td>
             </tr>`;
@@ -328,4 +325,72 @@ export const saveEditedLink = async () => {
         sections[pIdx].years[yIdx].branches[bIdx].categories[cat][lIdx] = { title: newTitle, url: newUrl };
         await updateDoc(doc(programCol, 'main'), { sections }); showToast("تم التعديل بنجاح ✏️"); closeEditModal();
     }
+};
+
+export const openBulkChatModal = () => {
+    document.getElementById('bulk-chat-modal').classList.remove('hidden');
+    document.getElementById('bulk-chat-modal').classList.add('flex');
+};
+
+export const closeBulkChatModal = () => {
+    document.getElementById('bulk-chat-modal').classList.add('hidden');
+    document.getElementById('bulk-chat-modal').classList.remove('flex');
+    document.getElementById('bulk-chat-level').value = '';
+    document.getElementById('bulk-chat-input').value = '';
+};
+
+export const sendBulkChatMessage = async () => {
+    const level = document.getElementById('bulk-chat-level').value;
+    const text = document.getElementById('bulk-chat-input').value.trim();
+
+    if (!level || !text) return showToast("يرجى اختيار المستوى وكتابة نص الرسالة", "error");
+
+    const btn = document.getElementById('send-bulk-msg-btn');
+    const origHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-2xl"></i> جاري التوزيع...';
+
+    try {
+        // جلب قائمة التلاميذ المفعلين الذين ينتمون للمستوى المحدد
+        const targetStudents = window.adminUsersList.filter(u => u.data.level === level && u.data.approved === true);
+
+        if (targetStudents.length === 0) {
+            btn.disabled = false; btn.innerHTML = origHtml;
+            return showToast("عذراً، لا يوجد تلاميذ مفعلين في هذا المستوى حالياً.", "error");
+        }
+
+        const timestamp = Date.now();
+        let successCount = 0;
+
+        // إرسال الرسالة لكل تلميذ عبر Promise.all (توزيع سريع متزامن)
+        const promises = targetStudents.map(async (student) => {
+            const chatRoomId = student.id;
+            const messagesRef = collection(db, chatsPath, chatRoomId, 'messages');
+            const chatDocRef = doc(db, chatsPath, chatRoomId);
+
+            // إضافة رسالة عادية للدردشة تبدو وكأن الأستاذ كتبها خصيصاً له
+            const msgPromise = setDoc(doc(messagesRef, (timestamp + Math.floor(Math.random() * 1000)).toString()), {
+                sender: 'admin',
+                text: text,
+                timestamp: timestamp
+            });
+
+            // تحديث عداد الإشعارات عند التلميذ
+            const unreadPromise = setDoc(chatDocRef, { unreadStudent: increment(1) }, { merge: true });
+
+            await Promise.all([msgPromise, unreadPromise]);
+            successCount++;
+        });
+
+        await Promise.all(promises);
+
+        showToast(`تم إرسال الرسالة إلى ${successCount} تلميذ بنجاح 📣`, "success");
+        closeBulkChatModal();
+
+    } catch (error) {
+        console.error("Bulk Message Error", error);
+        showToast("حدث خطأ أثناء الإرسال الجماعي.", "error");
+    }
+
+    btn.disabled = false; btn.innerHTML = origHtml;
 };
