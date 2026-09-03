@@ -1,10 +1,6 @@
-// ملف: js/auth/auth.js
-
-import { auth, db, usersCol, chatsPath } from '../config/firebase.js';
+import { auth, usersCol } from '../config/firebase.js';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { doc, getDoc, setDoc, updateDoc, collection, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-window.isRegistering = false;
+import { doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 export const toggleAuthMode = () => {
     window.isRegistering = !window.isRegistering;
@@ -28,11 +24,6 @@ export const toggleAuthMode = () => {
 };
 
 export const handleAuth = async () => {
-    if (typeof window.isAuthReady !== 'undefined' && !window.isAuthReady) {
-        if(window.showToast) window.showToast("يتم الاتصال بالسحابة... يرجى الانتظار", "error");
-        return;
-    }
-    
     const username = document.getElementById('username').value.trim().toLowerCase();
     const password = document.getElementById('password').value.trim();
     const level = document.getElementById('user-level').value;
@@ -46,11 +37,6 @@ export const handleAuth = async () => {
     if (window.isRegistering) {
         if (!level || !parentName || !phoneNumber) {
             if(window.showToast) window.showToast("يرجى تعبئة جميع الحقول بدقة", "error");
-            return;
-        }
-        const phoneRegex = /^(05|06|07)\d{8}$/;
-        if(!phoneRegex.test(phoneNumber)) {
-            if(window.showToast) window.showToast("رقم الهاتف غير صحيح! يجب أن يتكون من 10 أرقام ويبدأ بـ 05، 06، أو 07", "error");
             return;
         }
     }
@@ -69,7 +55,6 @@ export const handleAuth = async () => {
                 if(window.showToast) window.showToast("اسم المستخدم مستخدم مسبقاً، اختر اسماً آخر", "error");
             } else {
                 await createUserWithEmailAndPassword(auth, pseudoEmail, password);
-                
                 await setDoc(userRef, { 
                     role: 'student', 
                     approved: false, 
@@ -80,66 +65,38 @@ export const handleAuth = async () => {
                     password: password 
                 });
                 
-                document.getElementById('registration-success-modal').classList.remove('hidden');
-                document.getElementById('registration-success-modal').classList.add('flex');
+                if(window.showToast) window.showToast("تم التسجيل بنجاح! حسابك قيد المراجعة.");
                 document.getElementById('username').value = ''; document.getElementById('password').value = '';
                 await signOut(auth); 
+                toggleAuthMode();
             }
         } else {
             await signInWithEmailAndPassword(auth, pseudoEmail, password);
             const userSnap = await getDoc(userRef);
             
             if (!userSnap.exists()) {
-                if(window.showToast) window.showToast("حدث خطأ: الحساب موجود لكن البيانات مفقودة.", "error");
+                if(window.showToast) window.showToast("بيانات الحساب غير مكتملة.", "error");
                 await signOut(auth);
-                btn.disabled = false; btn.innerHTML = originalHTML;
-                return;
+            } else {
+                window.currentUserRecord = { username, ...userSnap.data() };
+                window.dispatchEvent(new CustomEvent('authSuccess'));
             }
-
-            window.currentUserRecord = { username, ...userSnap.data() };
-            
-            if (!window.currentUserRecord.password && window.currentUserRecord.role !== 'admin') {
-                 await updateDoc(userRef, { password: password });
-                 window.currentUserRecord.password = password;
-            }
-            
-            window.dispatchEvent(new CustomEvent('authSuccess', { detail: window.currentUserRecord }));
         }
     } catch (err) { 
         console.error(err);
-        if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
-            if(window.showToast) window.showToast("بيانات الدخول غير صحيحة", "error");
-        } else if (err.code === 'auth/email-already-in-use') {
-            if(window.showToast) window.showToast("اسم المستخدم مستخدم مسبقاً.", "error");
-        } else if (err.code === 'auth/network-request-failed') {
-            if(window.showToast) window.showToast("لا يوجد اتصال بالإنترنت! يرجى التحقق من الشبكة.", "error");
-        } else {
-            if(window.showToast) window.showToast("حدث خطأ في الاتصال، يرجى المحاولة لاحقاً.", "error");
-        }
+        if(window.showToast) window.showToast("بيانات الدخول غير صحيحة أو يوجد خطأ بالاتصال.", "error");
     }
     
     btn.disabled = false; btn.innerHTML = originalHTML;
 };
 
 export const logout = async () => {
-    if(window.confirmAction && await window.confirmAction("هل أنت متأكد أنك تريد تسجيل الخروج من حسابك؟")) {
-        try {
-            await signOut(auth);
-        } catch(e) { console.error("Logout error", e); }
-        
+    if(window.confirmAction && await window.confirmAction("هل أنت متأكد أنك تريد تسجيل الخروج؟")) {
+        try { await signOut(auth); } catch(e) { console.error(e); }
         window.currentUserRecord = null; 
-        window.originalAdminRecord = null;
         document.getElementById('password').value = '';
         window.studentActiveBranchTab = null;
-        
-        document.getElementById('return-admin-btn').classList.add('hidden');
-        document.getElementById('student-settings-btn').classList.remove('hidden');
-        document.getElementById('student-chat-btn').classList.remove('hidden');
-        document.getElementById('student-dark-btn').classList.remove('hidden');
-        document.getElementById('student-logout-btn').classList.remove('hidden');
-        document.getElementById('student-notif-btn').classList.remove('hidden');
-
-        window.dispatchEvent(new Event('userLoggedOut'));
+        window.switchScreen('auth-screen');
     }
 };
 
@@ -177,28 +134,16 @@ export const saveSettingsData = async () => {
     
     if(newPass) {
         try {
-            if(auth.currentUser) {
-                await updatePassword(auth.currentUser, newPass);
-            }
+            if(auth.currentUser) await updatePassword(auth.currentUser, newPass);
             updates.password = newPass; 
         } catch(e) {
-            console.error("Password update error", e);
-            if (e.code === 'auth/requires-recent-login') {
-                if(window.showToast) window.showToast("يرجى تسجيل الخروج والدخول مجدداً لتغيير كلمة المرور", "error");
-                return;
-            }
-            if(window.showToast) window.showToast("حدث خطأ أثناء تغيير كلمة المرور في نظام الحماية", "error");
+            if(window.showToast) window.showToast("يرجى تسجيل الخروج والدخول مجدداً لتغيير كلمة المرور", "error");
             return;
         }
     }
 
     if(window.currentUserRecord.role !== 'admin') {
         const newPhone = phoneInput.value.trim();
-        const phoneRegex = /^(05|06|07)\d{8}$/;
-        if(newPhone && !phoneRegex.test(newPhone)) {
-            if(window.showToast) window.showToast("رقم الهاتف غير صحيح! يجب أن يبدأ بـ 05، 06، أو 07", "error");
-            return;
-        }
         if(newPhone) updates.phoneNumber = newPhone;
     }
 
@@ -212,48 +157,4 @@ export const saveSettingsData = async () => {
         if(window.showToast) window.showToast("تم تحديث الإعدادات بنجاح 💾");
         closeSettings();
     } catch(e) { if(window.showToast) window.showToast("حدث خطأ أثناء الحفظ", "error"); }
-};
-
-export const requestPasswordReset = async () => {
-    const username = document.getElementById('username').value.trim();
-    if (!username) {
-        if(window.showToast) window.showToast("يرجى إدخال اسم المستخدم أولاً لطلب استرجاع كلمة المرور", "error");
-        return;
-    }
-
-    if(window.confirmAction && await window.confirmAction(`هل أنت متأكد من إرسال طلب استرجاع كلمة المرور للحساب "${username}" للأستاذ؟`)) {
-        try {
-            const userRef = doc(usersCol, username);
-            const userSnap = await getDoc(userRef);
-
-            if (!userSnap.exists()) {
-                if(window.showToast) window.showToast("حساب المستخدم غير موجود.", "error");
-                return;
-            }
-
-            const userData = userSnap.data();
-            if (userData.role === 'admin') {
-                if(window.showToast) window.showToast("لا يمكن استخدام هذه الميزة لحساب الإدارة.", "error");
-                return;
-            }
-
-            const levelNames = { "m_y1": "الأولى متوسط", "m_y2": "الثانية متوسط", "m_y3": "الثالثة متوسط", "m_y4": "الرابعة متوسط", "h_y1": "أولى ثانوي", "h_y2": "الثانية ثانوي", "h_y3": "الثالثة ثانوي" };
-            const levelDisplay = levelNames[userData.level] || "مستوى غير محدد";
-            
-            const chatRoomId = username; 
-            const messagesRef = collection(db, chatsPath, chatRoomId, 'messages');
-            const chatDocRef = doc(db, chatsPath, chatRoomId);
-            
-            const resetMessage = `🔴 إشعار استرجاع كلمة مرور 🔴\n\nالتلميذ: ${username}\nالمستوى: ${levelDisplay}\nالهاتف: ${userData.phoneNumber || 'غير متوفر'}\n\n(يرجى من الأستاذ التواصل مع التلميذ وتزويده بكلمة المرور الجديدة بعد تغييرها من الإعدادات)`;
-
-            await setDoc(doc(messagesRef, Date.now().toString()), { sender: 'student', text: resetMessage, timestamp: Date.now(), isSystemMessage: true });
-            await setDoc(chatDocRef, { unreadAdmin: increment(1) }, { merge: true });
-
-            if(window.showToast) window.showToast("تم إرسال طلب استرجاع كلمة المرور للأستاذ بنجاح. سيتم التواصل معك.", "success");
-
-        } catch (err) {
-            console.error(err);
-            if(window.showToast) window.showToast("حدث خطأ أثناء إرسال الطلب، يرجى المحاولة لاحقاً.", "error");
-        }
-    }
 };
