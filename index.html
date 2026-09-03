@@ -9,8 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://www.gstatic.com">
-    <link rel="preload" as="image" href="bg-pattern.webp">
-
+    
     <meta name="description" content="منصة المجتهد للعلوم الفيزيائية - منصة تعليمية تفاعلية.">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
@@ -18,10 +17,10 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
 
-    <!-- أضف هذا السطر لاستدعاء مكتبة Tailwind -->
+    <!-- استدعاء مكتبة Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- استدعاء ملف التصميم المحلي (مهم لسرعة التطبيق) -->
+    <!-- استدعاء ملف التصميم المحلي -->
     <link href="./output.css" rel="stylesheet">
     
     <script>
@@ -164,10 +163,12 @@
         </div>
     </div>
 
+    <!-- ===================================== -->
+    <!-- الحاوية الرئيسية للشاشات -->
+    <!-- ===================================== -->
     <div class="max-w-7xl mx-auto relative z-10">
-        <!-- ===================================== -->
+        
         <!-- شاشة المصادقة (Auth Screen) -->
-        <!-- ===================================== -->
         <div id="auth-screen" class="screen active max-w-md mx-auto mt-8 md:mt-12 bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl p-8 md:p-12 rounded-[3rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] border border-white/60 dark:border-slate-700/60 relative overflow-hidden interactive-card">
             
             <div class="absolute top-4 left-4 z-20">
@@ -231,9 +232,7 @@
             </div>
         </div>
 
-        <!-- ===================================== -->
         <!-- شاشة الانتظار (Pending) -->
-        <!-- ===================================== -->
         <div id="pending-screen" class="screen max-w-md mx-auto mt-20 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md p-10 rounded-[3rem] shadow-2xl text-center border-t-8 border-amber-400 border border-white/50 dark:border-slate-700 interactive-card">
             <div class="w-32 h-32 bg-amber-100 dark:bg-amber-900/30 text-amber-500 rounded-full flex items-center justify-center text-7xl mx-auto mb-8 shadow-inner animate-pulse"><i class="ph-fill ph-hourglass-high"></i></div>
             <h2 class="text-4xl font-black text-slate-800 dark:text-white mb-4 drop-shadow-sm">طلبك قيد المراجعة</h2>
@@ -241,11 +240,9 @@
             <button onclick="logout()" class="w-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-black py-5 rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-600 transition btn-modern text-xl flex justify-center items-center gap-2"><i class="ph-bold ph-arrow-right"></i> العودة للرئيسية</button>
         </div>
 
-        <!-- ===================================== -->
         <!-- شاشة الأستاذ (Admin Panel) -->
-        <!-- ===================================== -->
         <div id="admin-screen" class="screen">
-            <!-- Header -->
+            <!-- Header الأستاذ -->
             <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-5 md:p-6 rounded-[2.5rem] shadow-lg border border-white/50 dark:border-slate-700 mb-6 gap-5 sticky top-4 z-40 transition-all duration-300">
                 <div class="flex items-center gap-4 w-full md:w-auto">
                     <div class="w-16 h-16 rounded-2xl shadow-lg overflow-hidden bg-white p-1 border border-slate-100 dark:border-slate-700"><img src="icon.png" alt="شعار المنصة" width="64" height="64" class="w-full h-full object-cover rounded-xl"></div>
@@ -257,7 +254,6 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3 w-full md:w-auto justify-end flex-wrap relative">
-                    
                     <!-- إحصائيات الإدارة العائمة -->
                     <div class="relative group z-50">
                         <button class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-blue-600 dark:text-blue-400 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" aria-label="إحصائيات التلاميذ" title="إحصائيات التلاميذ">
@@ -294,110 +290,135 @@
                 </div>
             </header>
 
-            <!-- التبويبات الرئيسية كـ (Grid Cards) بدلاً من الأزرار العادية -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <!-- بطاقة إدارة الحسابات -->
-                <div onclick="switchAdminMainTab('accounts')" id="main-tab-accounts" class="cursor-pointer bg-white dark:bg-slate-800 rounded-[2rem] p-6 shadow-sm hover:shadow-xl transition-all duration-300 border-2 border-blue-500 ring-4 ring-blue-500/20 scale-[1.02] flex items-center gap-5 relative overflow-hidden interactive-card">
-                    <div class="icon-bg w-16 h-16 rounded-2xl bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center text-4xl shadow-inner transition-colors duration-300"><i class="ph-fill ph-users-three"></i></div>
-                    <div>
-                        <h3 class="font-black text-2xl text-slate-800 dark:text-white mb-1">إدارة الحسابات</h3>
-                        <p class="text-sm font-bold text-slate-500 dark:text-slate-400">متابعة التلاميذ وتفعيلهم</p>
-                    </div>
-                </div>
-                <!-- بطاقة إدارة المحتوى -->
-                <div onclick="switchAdminMainTab('content')" id="main-tab-content" class="cursor-pointer bg-white dark:bg-slate-800 rounded-[2rem] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-2 border-slate-100 dark:border-slate-700 flex items-center gap-5 relative overflow-hidden interactive-card opacity-70 hover:opacity-100">
-                    <div class="icon-bg w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 flex items-center justify-center text-4xl shadow-inner transition-colors duration-300"><i class="ph-fill ph-books"></i></div>
-                    <div>
-                        <h3 class="font-black text-2xl text-slate-800 dark:text-white mb-1">إدارة المحتوى</h3>
-                        <p class="text-sm font-bold text-slate-500 dark:text-slate-400">إضافة وتعديل الدروس والتمارين</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- قسم إدارة الحسابات -->
-            <div id="admin-accounts-section" class="bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-6 md:p-8 rounded-[2.5rem] shadow-lg border border-white/50 dark:border-slate-700 flex flex-col mb-10 h-[700px] animate-[fadeInTab_0.3s_ease]">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b border-slate-100 dark:border-slate-700 pb-4">
-                    <h3 class="text-2xl font-black text-slate-800 dark:text-white flex items-center gap-3">
-                        <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center text-3xl shadow-inner"><i class="ph-fill ph-users"></i></div>
-                        متابعة التلاميذ
-                    </h3>
-                    <div class="flex flex-wrap gap-2">
-                        <button onclick="bulkAction('approve')" aria-label="تفعيل المحدد" class="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-xl text-sm font-black hover:bg-emerald-100 transition border border-emerald-200 dark:border-emerald-800 flex items-center gap-2"><i class="ph-bold ph-check"></i> تفعيل المحدد</button>
-                        <button onclick="bulkAction('deactivate')" aria-label="إلغاء التفعيل" class="bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 px-4 py-2 rounded-xl text-sm font-black hover:bg-amber-100 transition border border-amber-200 dark:border-amber-800 flex items-center gap-2"><i class="ph-bold ph-x"></i> إلغاء التفعيل</button>
-                        <button onclick="bulkAction('delete')" aria-label="حذف المحدد" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-4 py-2 rounded-xl text-sm font-black hover:bg-red-100 transition border border-red-200 dark:border-red-800 flex items-center gap-2"><i class="ph-bold ph-trash"></i> حذف المحدد</button>
-                    </div>
-                </div>
-
-                <!-- شريط البحث عن التلاميذ -->
-                <div class="mb-5 relative group w-full md:w-2/3 lg:w-1/2">
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500 transition-colors text-xl"><i class="ph-bold ph-magnifying-glass"></i></div>
-                    <input type="text" id="admin-student-search" aria-label="البحث عن تلميذ" onkeyup="executeAdminStudentSearch()" class="w-full pl-5 pr-14 py-3.5 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-900 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-sm placeholder-slate-400 shadow-sm" placeholder="ابحث عن تلميذ باسم المستخدم أو اسم الولي...">
-                </div>
-
-                <!-- أزرار فلترة الجدول الرئيسية والبوابات الفرعية -->
-                <div class="flex flex-col gap-3 mb-4">
-                    <div class="flex flex-wrap gap-2 bg-slate-100 dark:bg-slate-900 p-1.5 rounded-xl w-fit border border-slate-200 dark:border-slate-700">
-                        <button onclick="filterMainStudents('all')" id="filter-main-all" aria-label="الكل" class="px-5 py-2 rounded-lg font-black text-sm bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-white transition-all">الكل</button>
-                        <button onclick="filterMainStudents('middle')" id="filter-main-middle" aria-label="المتوسط" class="px-5 py-2 rounded-lg font-black text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-all">المتوسط</button>
-                        <button onclick="filterMainStudents('high')" id="filter-main-high" aria-label="الثانوي" class="px-5 py-2 rounded-lg font-black text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-all">الثانوي</button>
-                    </div>
-                    <!-- بوابات السنوات (Sub-filters) -->
-                    <div id="sub-filter-container" class="hidden flex-wrap gap-2 p-2 rounded-xl border border-indigo-100 dark:border-indigo-800 bg-indigo-50/50 dark:bg-indigo-900/20 w-fit animate-[fadeInTab_0.3s_ease]">
-                    </div>
-                </div>
-
-                <div class="overflow-y-auto overflow-x-auto rounded-3xl border border-slate-100 dark:border-slate-700 shadow-inner bg-slate-50/50 dark:bg-slate-900/50 flex-1">
-                    <table class="w-full text-right border-collapse whitespace-nowrap min-w-[900px]">
-                        <thead class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-sm font-black border-b border-slate-200 dark:border-slate-700 sticky top-0 z-10 shadow-sm">
-                            <tr>
-                                <th class="p-5 w-12 text-center rounded-tr-3xl"><input type="checkbox" id="select-all-cb" aria-label="تحديد الكل" onclick="toggleSelectAll()" class="custom-cb"></th>
-                                <th class="p-5">التلميذ / ولي الأمر</th>
-                                <th class="p-5 text-center">المستوى</th>
-                                <th class="p-5 text-center">نقاط (XP)</th>
-                                <th class="p-5 text-center">الحالة (إضغط للتغيير)</th>
-                                <th class="p-5 text-left rounded-tl-3xl">الإجراءات</th>
-                            </tr>
-                        </thead>
-                        <tbody id="students-table-body" class="bg-white dark:bg-slate-800 divide-y divide-slate-100 dark:divide-slate-700 text-sm"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- قسم إدارة المحتوى -->
-            <div id="admin-content-section" class="bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-6 md:p-8 rounded-[2.5rem] shadow-lg border border-white/50 dark:border-slate-700 mb-10 hidden animate-[fadeInTab_0.3s_ease]">
-                <div class="mb-8 border-b border-slate-100 dark:border-slate-700 pb-6">
-                    <h3 class="text-3xl font-black text-slate-800 dark:text-white flex items-center gap-4 mb-3">
-                        <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center text-3xl shadow-inner"><i class="ph-fill ph-books"></i></div>
-                        تعديل المناهج والدروس
-                    </h3>
-                    <p class="text-slate-500 dark:text-slate-400 font-bold text-lg">اختر الطور التعليمي أدناه لعرض وحدات المادة وإدارتها.</p>
+            <!-- الشاشة الرئيسية للأستاذ (البطاقات الرئيسية) -->
+            <div id="admin-main-menu" class="animate-[fadeInTab_0.3s_ease]">
+                <div class="mb-8 border-b border-slate-100 dark:border-slate-700 pb-6 text-center">
+                    <h2 class="text-3xl md:text-4xl font-black text-slate-800 dark:text-white mb-4">مرحباً بك أستاذي الكريم</h2>
+                    <p class="text-slate-500 dark:text-slate-400 font-bold text-lg">اختر القسم الذي تريد إدارته من البطاقات أدناه.</p>
                 </div>
                 
-                <!-- تبويبات الأطوار التعليمية كـ (Grid Cards) بدلاً من الأزرار العادية -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
-                    <div onclick="switchAdminPart('part_middle')" id="tab-btn-part_middle" class="cursor-pointer bg-blue-50 dark:bg-blue-900/20 rounded-[1.5rem] p-5 border-2 border-blue-500 shadow-md flex items-center gap-4 transition-all hover:-translate-y-1">
-                        <div class="w-16 h-16 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400 text-3xl shadow-sm border border-blue-100 dark:border-blue-800"><i class="ph-fill ph-student"></i></div>
-                        <div>
-                            <h4 class="font-black text-xl text-slate-800 dark:text-white mb-1">التعليم المتوسط</h4>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 font-bold">من السنة الأولى إلى الرابعة</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 max-w-4xl mx-auto">
+                    <div onclick="openAdminSection('accounts')" class="group cursor-pointer bg-white dark:bg-slate-800 rounded-[2.5rem] p-8 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-slate-100 dark:border-slate-700 flex flex-col items-center text-center interactive-card relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div class="w-24 h-24 mb-6 rounded-[2rem] bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-5xl shadow-inner border border-blue-100 dark:border-blue-800 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300"><i class="ph-fill ph-users-three"></i></div>
+                        <h3 class="font-black text-3xl text-slate-800 dark:text-white mb-3">إدارة الحسابات</h3>
+                        <p class="text-base font-bold text-slate-500 dark:text-slate-400 mb-6">متابعة التلاميذ، تفعيل حساباتهم، ومراقبة إنجازاتهم بدقة.</p>
+                        <div class="mt-auto flex items-center justify-center gap-2 text-blue-600 dark:text-blue-400 font-black">الدخول للقسم <i class="ph-bold ph-arrow-left"></i></div>
+                    </div>
+                    
+                    <div onclick="openAdminSection('content')" class="group cursor-pointer bg-white dark:bg-slate-800 rounded-[2.5rem] p-8 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-slate-100 dark:border-slate-700 flex flex-col items-center text-center interactive-card relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div class="w-24 h-24 mb-6 rounded-[2rem] bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-5xl shadow-inner border border-indigo-100 dark:border-indigo-800 group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300"><i class="ph-fill ph-books"></i></div>
+                        <h3 class="font-black text-3xl text-slate-800 dark:text-white mb-3">إدارة المحتوى</h3>
+                        <p class="text-base font-bold text-slate-500 dark:text-slate-400 mb-6">إضافة، تعديل، وحذف الدروس، التمارين، والشهادات.</p>
+                        <div class="mt-auto flex items-center justify-center gap-2 text-indigo-600 dark:text-indigo-400 font-black">الدخول للقسم <i class="ph-bold ph-arrow-left"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- قسم إدارة الحسابات (يظهر عند الطلب) -->
+            <div id="admin-accounts-wrapper" class="hidden">
+                <div class="mb-6 flex justify-start animate-[fadeInTab_0.3s_ease]">
+                    <button onclick="returnToAdminHome()" class="flex items-center gap-2 px-6 py-3 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-2xl shadow-sm hover:shadow-md border border-slate-200 dark:border-slate-700 font-black text-sm transition-all hover:bg-slate-50 dark:hover:bg-slate-700 hover:-translate-x-1">
+                        <i class="ph-bold ph-arrow-right text-lg"></i> العودة للقائمة الرئيسية
+                    </button>
+                </div>
+                
+                <div id="admin-accounts-section" class="bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-6 md:p-8 rounded-[2.5rem] shadow-lg border border-white/50 dark:border-slate-700 flex flex-col mb-10 h-[700px]">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b border-slate-100 dark:border-slate-700 pb-4">
+                        <h3 class="text-2xl font-black text-slate-800 dark:text-white flex items-center gap-3">
+                            <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center text-3xl shadow-inner"><i class="ph-fill ph-users"></i></div>
+                            متابعة التلاميذ
+                        </h3>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="bulkAction('approve')" aria-label="تفعيل المحدد" class="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-xl text-sm font-black hover:bg-emerald-100 transition border border-emerald-200 dark:border-emerald-800 flex items-center gap-2"><i class="ph-bold ph-check"></i> تفعيل المحدد</button>
+                            <button onclick="bulkAction('deactivate')" aria-label="إلغاء التفعيل" class="bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 px-4 py-2 rounded-xl text-sm font-black hover:bg-amber-100 transition border border-amber-200 dark:border-amber-800 flex items-center gap-2"><i class="ph-bold ph-x"></i> إلغاء التفعيل</button>
+                            <button onclick="bulkAction('delete')" aria-label="حذف المحدد" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-4 py-2 rounded-xl text-sm font-black hover:bg-red-100 transition border border-red-200 dark:border-red-800 flex items-center gap-2"><i class="ph-bold ph-trash"></i> حذف المحدد</button>
                         </div>
                     </div>
-                    <div onclick="switchAdminPart('part_high')" id="tab-btn-part_high" class="cursor-pointer bg-white dark:bg-slate-800 rounded-[1.5rem] p-5 border-2 border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700 shadow-sm flex items-center gap-4 transition-all hover:-translate-y-1 opacity-70 hover:opacity-100">
-                        <div class="w-16 h-16 bg-slate-50 dark:bg-slate-700 rounded-2xl flex items-center justify-center text-slate-500 dark:text-slate-400 text-3xl shadow-sm border border-slate-100 dark:border-slate-600"><i class="ph-fill ph-graduation-cap"></i></div>
-                        <div>
-                            <h4 class="font-black text-xl text-slate-800 dark:text-white mb-1">التعليم الثانوي</h4>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 font-bold">من الأولى إلى الثالثة ثانوي</p>
+
+                    <!-- شريط البحث عن التلاميذ -->
+                    <div class="mb-5 relative group w-full md:w-2/3 lg:w-1/2">
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500 transition-colors text-xl"><i class="ph-bold ph-magnifying-glass"></i></div>
+                        <input type="text" id="admin-student-search" aria-label="البحث عن تلميذ" onkeyup="executeAdminStudentSearch()" class="w-full pl-5 pr-14 py-3.5 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-900 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-sm placeholder-slate-400 shadow-sm" placeholder="ابحث عن تلميذ باسم المستخدم أو اسم الولي...">
+                    </div>
+
+                    <!-- أزرار الفلترة -->
+                    <div class="flex flex-col gap-3 mb-4">
+                        <div class="flex flex-wrap gap-2 bg-slate-100 dark:bg-slate-900 p-1.5 rounded-xl w-fit border border-slate-200 dark:border-slate-700">
+                            <button onclick="filterMainStudents('all')" id="filter-main-all" aria-label="الكل" class="px-5 py-2 rounded-lg font-black text-sm bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-white transition-all">الكل</button>
+                            <button onclick="filterMainStudents('middle')" id="filter-main-middle" aria-label="المتوسط" class="px-5 py-2 rounded-lg font-black text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-all">المتوسط</button>
+                            <button onclick="filterMainStudents('high')" id="filter-main-high" aria-label="الثانوي" class="px-5 py-2 rounded-lg font-black text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-all">الثانوي</button>
+                        </div>
+                        <div id="sub-filter-container" class="hidden flex-wrap gap-2 p-2 rounded-xl border border-indigo-100 dark:border-indigo-800 bg-indigo-50/50 dark:bg-indigo-900/20 w-fit animate-[fadeInTab_0.3s_ease]"></div>
+                    </div>
+
+                    <div class="overflow-y-auto overflow-x-auto rounded-3xl border border-slate-100 dark:border-slate-700 shadow-inner bg-slate-50/50 dark:bg-slate-900/50 flex-1">
+                        <table class="w-full text-right border-collapse whitespace-nowrap min-w-[900px]">
+                            <thead class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-sm font-black border-b border-slate-200 dark:border-slate-700 sticky top-0 z-10 shadow-sm">
+                                <tr>
+                                    <th class="p-5 w-12 text-center rounded-tr-3xl"><input type="checkbox" id="select-all-cb" aria-label="تحديد الكل" onclick="toggleSelectAll()" class="custom-cb"></th>
+                                    <th class="p-5">التلميذ / ولي الأمر</th>
+                                    <th class="p-5 text-center">المستوى</th>
+                                    <th class="p-5 text-center">نقاط (XP)</th>
+                                    <th class="p-5 text-center">الحالة (إضغط للتغيير)</th>
+                                    <th class="p-5 text-left rounded-tl-3xl">الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="students-table-body" class="bg-white dark:bg-slate-800 divide-y divide-slate-100 dark:divide-slate-700 text-sm"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- قسم إدارة المحتوى (يظهر عند الطلب) -->
+            <div id="admin-content-wrapper" class="hidden">
+                <div class="mb-6 flex justify-start animate-[fadeInTab_0.3s_ease]">
+                    <button onclick="returnToAdminHome()" class="flex items-center gap-2 px-6 py-3 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-2xl shadow-sm hover:shadow-md border border-slate-200 dark:border-slate-700 font-black text-sm transition-all hover:bg-slate-50 dark:hover:bg-slate-700 hover:-translate-x-1">
+                        <i class="ph-bold ph-arrow-right text-lg"></i> العودة للقائمة الرئيسية
+                    </button>
+                </div>
+                
+                <!-- اختيار الطور (بطاقات) -->
+                <div id="admin-parts-menu" class="animate-[fadeInTab_0.3s_ease]">
+                    <div class="mb-8 border-b border-slate-100 dark:border-slate-700 pb-6">
+                        <h3 class="text-3xl font-black text-slate-800 dark:text-white flex items-center gap-4 mb-3">
+                            <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center text-3xl shadow-inner"><i class="ph-fill ph-books"></i></div>
+                            إدارة محتوى المنصة
+                        </h3>
+                        <p class="text-slate-500 dark:text-slate-400 font-bold text-lg">اختر الطور التعليمي أدناه لعرض تفاصيله وإدارتها.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div onclick="openAdminPart('part_middle')" class="group cursor-pointer bg-white dark:bg-slate-800 rounded-[2rem] p-8 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 border border-slate-100 dark:border-slate-700 flex flex-col items-center text-center interactive-card">
+                            <div class="w-20 h-20 mb-6 rounded-[1.5rem] bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-4xl shadow-inner border border-blue-100 dark:border-blue-800 group-hover:scale-110 transition-all"><i class="ph-fill ph-student"></i></div>
+                            <h4 class="font-black text-2xl text-slate-800 dark:text-white mb-2">التعليم المتوسط</h4>
+                            <p class="text-sm font-bold text-slate-500 dark:text-slate-400">إدارة محتوى السنوات من الأولى إلى الرابعة متوسط</p>
+                        </div>
+                        <div onclick="openAdminPart('part_high')" class="group cursor-pointer bg-white dark:bg-slate-800 rounded-[2rem] p-8 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 border border-slate-100 dark:border-slate-700 flex flex-col items-center text-center interactive-card">
+                            <div class="w-20 h-20 mb-6 rounded-[1.5rem] bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-4xl shadow-inner border border-indigo-100 dark:border-indigo-800 group-hover:scale-110 transition-all"><i class="ph-fill ph-graduation-cap"></i></div>
+                            <h4 class="font-black text-2xl text-slate-800 dark:text-white mb-2">التعليم الثانوي</h4>
+                            <p class="text-sm font-bold text-slate-500 dark:text-slate-400">إدارة محتوى السنوات من الأولى إلى الثالثة ثانوي</p>
                         </div>
                     </div>
                 </div>
-
-                <div id="admin-program-view" class="min-h-[400px]"></div>
+                
+                <!-- تفاصيل الطور المختار (سنوات وبطاقات الوحدات) -->
+                <div id="admin-part-content-wrapper" class="hidden">
+                    <div class="mb-6 flex justify-start animate-[fadeInTab_0.3s_ease]">
+                        <button onclick="returnToAdminParts()" class="flex items-center gap-2 px-6 py-3 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-2xl shadow-sm hover:shadow-md border border-slate-200 dark:border-slate-700 font-black text-sm transition-all hover:bg-slate-50 dark:hover:bg-slate-700 hover:-translate-x-1">
+                            <i class="ph-bold ph-arrow-right text-lg"></i> العودة لاختيار الطور
+                        </button>
+                    </div>
+                    
+                    <div id="admin-content-section" class="bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-6 md:p-8 rounded-[2.5rem] shadow-lg border border-white/50 dark:border-slate-700 mb-10">
+                        <div id="admin-program-view" class="min-h-[400px]"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- ===================================== -->
         <!-- شاشة التلميذ -->
-        <!-- ===================================== -->
         <div id="app-screen" class="screen">
             <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-4 md:p-6 rounded-[2.5rem] shadow-lg border border-white/50 dark:border-slate-700 mb-8 gap-5 sticky top-4 z-40">
                 <div class="flex items-center gap-4 w-full md:w-auto">
@@ -447,7 +468,7 @@
                         </div>
                     </div>
 
-                    <!-- زر العودة للإدارة الجديد -->
+                    <!-- زر العودة للإدارة -->
                     <button id="return-admin-btn" onclick="returnToAdmin()" aria-label="العودة للإدارة" class="hidden relative px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-2xl text-lg shadow-[0_0_15px_rgba(249,115,22,0.6)] animate-pulse hover:animate-none transition-all flex items-center gap-2 border border-orange-300 dark:border-orange-700" title="العودة للإدارة">
                         <i class="ph-bold ph-arrow-right"></i> العودة للإدارة
                     </button>
@@ -494,10 +515,10 @@
         </div>
     </div>
 
-    <!-- مكتبة Confetti (احتفالات التلميذ) -->
+    <!-- مكتبة زينة الاحتفال -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
     
-    <!-- ربط الملف الرئيسي الذي يجمع جميع الوحدات -->
+    <!-- ربط الملف الرئيسي الذي قمنا ببنائه مؤخراً -->
     <script type="module" src="./js/app.js"></script>
 
     <script>
