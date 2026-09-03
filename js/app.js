@@ -73,16 +73,13 @@ window.toggleDarkMode = () => {
 };
 
 window.switchScreen = (screenId) => {
-    // نستخدم كلاس hidden لإخفاء الشاشات بدقة تامة بدلاً من الاعتماد على active فقط
-    const screens = ['auth-screen', 'pending-screen', 'admin-screen', 'app-screen'];
-    screens.forEach(id => {
+    // تم إضافة admin-screen للمصفوفة لضمان التنقل السليم
+    ['auth-screen', 'pending-screen', 'app-screen', 'admin-screen'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
             if (id === screenId) {
-                el.classList.remove('hidden');
-                el.classList.add('active'); 
+                el.classList.add('active');
             } else {
-                el.classList.add('hidden');
                 el.classList.remove('active');
             }
         }
@@ -156,29 +153,18 @@ onAuthStateChanged(auth, async (user) => {
             }
             
             const displayUserEl = document.getElementById('display-username');
-            if(displayUserEl) displayUserEl.innerText = username;
+            if (displayUserEl) displayUserEl.innerText = username;
             
             if (uData.role === 'admin') {
-                const badgeEl = document.getElementById('student-level-badge');
-                if(badgeEl) {
-                    badgeEl.innerText = 'لوحة الإدارة';
-                    badgeEl.className = 'inline-block mt-1.5 px-3 py-1 bg-purple-50 text-purple-700 text-xs font-black rounded-lg border border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800';
-                }
-                
-                // توجيه الأستاذ لشاشته الخاصة
+                // فتح شاشة الأستاذ كشاشة رئيسية
                 window.switchScreen('admin-screen');
-                
-                const adminMenu = document.getElementById('admin-main-menu');
-                if(adminMenu) adminMenu.classList.remove('hidden');
-                
-                const notifBtn = document.getElementById('student-notif-btn');
-                if(notifBtn) notifBtn.classList.add('hidden');
+                // فتح تبويبة إدارة الحسابات كخيار افتراضي لمنع بقاء الشاشة فارغة
+                if (window.switchAdminMainTab) window.switchAdminMainTab('accounts');
             } else {
                 const levelNames = { "m_y1": "الأولى متوسط", "m_y2": "الثانية متوسط", "m_y3": "الثالثة متوسط", "m_y4": "الرابعة متوسط", "h_y1": "أولى ثانوي", "h_y2": "الثانية ثانوي", "h_y3": "الثالثة ثانوي" };
-                const badgeEl = document.getElementById('student-level-badge');
-                if(badgeEl) badgeEl.innerText = levelNames[uData.level] || 'طالب';
+                const badge = document.getElementById('student-level-badge');
+                if(badge) badge.innerText = levelNames[uData.level] || 'طالب';
                 
-                // توجيه التلميذ لشاشته الخاصة
                 window.switchScreen('app-screen');
             }
             
@@ -191,7 +177,6 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
-// تطبيق الثيم المحفوظ
 if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
     document.documentElement.classList.add('dark');
 } else {
