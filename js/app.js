@@ -73,12 +73,16 @@ window.toggleDarkMode = () => {
 };
 
 window.switchScreen = (screenId) => {
-    ['auth-screen', 'pending-screen', 'app-screen'].forEach(id => {
+    // نستخدم كلاس hidden لإخفاء الشاشات بدقة تامة بدلاً من الاعتماد على active فقط
+    const screens = ['auth-screen', 'pending-screen', 'admin-screen', 'app-screen'];
+    screens.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
             if (id === screenId) {
-                el.classList.add('active');
+                el.classList.remove('hidden');
+                el.classList.add('active'); 
             } else {
+                el.classList.add('hidden');
                 el.classList.remove('active');
             }
         }
@@ -151,28 +155,33 @@ onAuthStateChanged(auth, async (user) => {
                 return;
             }
             
-            document.getElementById('display-username').innerText = username;
+            const displayUserEl = document.getElementById('display-username');
+            if(displayUserEl) displayUserEl.innerText = username;
             
             if (uData.role === 'admin') {
-                document.getElementById('student-level-badge').innerText = 'لوحة الإدارة';
-                document.getElementById('student-level-badge').className = 'inline-block mt-1.5 px-3 py-1 bg-purple-50 text-purple-700 text-xs font-black rounded-lg border border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800';
+                const badgeEl = document.getElementById('student-level-badge');
+                if(badgeEl) {
+                    badgeEl.innerText = 'لوحة الإدارة';
+                    badgeEl.className = 'inline-block mt-1.5 px-3 py-1 bg-purple-50 text-purple-700 text-xs font-black rounded-lg border border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800';
+                }
                 
-                document.getElementById('student-dashboard').classList.add('hidden');
-                document.getElementById('admin-screen').classList.remove('hidden');
+                // توجيه الأستاذ لشاشته الخاصة
+                window.switchScreen('admin-screen');
                 
-                document.getElementById('admin-main-menu').classList.remove('hidden');
-                document.getElementById('admin-content-wrapper').classList.add('hidden');
-                document.getElementById('admin-accounts-wrapper').classList.add('hidden');
+                const adminMenu = document.getElementById('admin-main-menu');
+                if(adminMenu) adminMenu.classList.remove('hidden');
                 
-                document.getElementById('student-notif-btn').classList.add('hidden');
+                const notifBtn = document.getElementById('student-notif-btn');
+                if(notifBtn) notifBtn.classList.add('hidden');
             } else {
                 const levelNames = { "m_y1": "الأولى متوسط", "m_y2": "الثانية متوسط", "m_y3": "الثالثة متوسط", "m_y4": "الرابعة متوسط", "h_y1": "أولى ثانوي", "h_y2": "الثانية ثانوي", "h_y3": "الثالثة ثانوي" };
-                document.getElementById('student-level-badge').innerText = levelNames[uData.level] || 'طالب';
-                document.getElementById('student-dashboard').classList.remove('hidden');
-                document.getElementById('admin-screen').classList.add('hidden');
+                const badgeEl = document.getElementById('student-level-badge');
+                if(badgeEl) badgeEl.innerText = levelNames[uData.level] || 'طالب';
+                
+                // توجيه التلميذ لشاشته الخاصة
+                window.switchScreen('app-screen');
             }
             
-            window.switchScreen('app-screen');
             setupDataListeners();
         } else {
             window.switchScreen('auth-screen');
