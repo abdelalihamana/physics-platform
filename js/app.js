@@ -5,17 +5,25 @@ import { auth, db, usersCol, programCol, chatsPath } from './config/firebase.js'
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { doc, setDoc, getDoc, collection, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-// 2. استيراد جميع الوحدات (Modules)
+// 2. استيراد جميع الوحدات
 import * as Helpers from './utils/helpers.js';
 import * as AuthUI from './auth/auth.js';
 import * as AdminUI from './ui/admin.js';
 import * as StudentUI from './ui/student.js';
 
-// 3. ربط جميع الدوال بالـ Window لكي تعمل مع أزرار HTML (onclick)
+// 3. ربط جميع الدوال بالـ Window لكي تعمل مع أزرار HTML
 Object.assign(window, Helpers);
 Object.assign(window, AuthUI);
 Object.assign(window, AdminUI);
 Object.assign(window, StudentUI);
+
+// إضافة دالة مساعدة لحماية النصوص إذا لم تكن موجودة في helpers
+if (!window.escapeHtml) {
+    window.escapeHtml = (str) => {
+        if (!str) return '';
+        return str.replace(/[&<>'"]/g, tag => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'}[tag] || tag));
+    };
+}
 
 // 4. تعريف المتغيرات العالمية (Global State)
 window.isAuthReady = false;
@@ -28,7 +36,7 @@ window.currentEditParams = null;
 
 // متغيرات حالة الأستاذ
 window.adminMainTab = null; 
-window.adminActivePart = null; 
+window.adminActivePart = null; // هام: يجب أن يكون null كافتراضي لكي تعمل البطاقات بشكل صحيح
 window.adminActiveYear = {}; 
 window.adminActiveBranch = {}; 
 window.adminMainFilter = 'all'; 
@@ -118,13 +126,14 @@ const defaultProgramData = [
 // 5. دوال التنقل والمظهر الأساسية
 window.switchScreen = (screenId) => {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(screenId).classList.add('active');
+    const target = document.getElementById(screenId);
+    if(target) target.classList.add('active');
 };
 
 window.closeRegModal = () => {
     document.getElementById('registration-success-modal').classList.add('hidden');
     document.getElementById('registration-success-modal').classList.remove('flex');
-    window.toggleAuthMode();
+    if (window.toggleAuthMode) window.toggleAuthMode();
 };
 
 window.toggleDarkMode = () => {
@@ -135,6 +144,7 @@ window.toggleDarkMode = () => {
 
 // 6. دوال المحادثة (الدردشة)
 window.openChat = async (targetUser) => {
+    if (!window.currentUserRecord) return;
     window.activeChatUser = targetUser; 
     let displayTarget = window.currentUserRecord.role === 'admin' ? targetUser : "الأستاذ";
     document.getElementById('chat-target-name').innerText = displayTarget;
@@ -170,8 +180,10 @@ window.openChat = async (targetUser) => {
         });
         
         const msgBox = document.getElementById('chat-messages');
-        msgBox.innerHTML = chatHtml || `<div class="h-full flex flex-col items-center justify-center opacity-50"><i class="ph-fill ph-hand-waving text-6xl text-slate-400 mb-3"></i><div class="text-center text-slate-500 font-bold bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm text-sm">أهلاً بك! يمكنك المراسلة هنا.</div></div>`;
-        msgBox.scrollTop = msgBox.scrollHeight;
+        if(msgBox) {
+            msgBox.innerHTML = chatHtml || `<div class="h-full flex flex-col items-center justify-center opacity-50"><i class="ph-fill ph-hand-waving text-6xl text-slate-400 mb-3"></i><div class="text-center text-slate-500 font-bold bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm text-sm">أهلاً بك! يمكنك المراسلة هنا.</div></div>`;
+            msgBox.scrollTop = msgBox.scrollHeight;
+        }
         if (window.activeChatUser) setDoc(doc(db, chatsPath, chatRoomId), { [window.currentUserRecord.role === 'admin' ? 'unreadAdmin' : 'unreadStudent']: 0 }, { merge: true });
     }, e => { console.error("Chat Error", e); });
 };
@@ -196,7 +208,7 @@ window.sendChatMessage = async () => {
         await setDoc(doc(messagesRef, Date.now().toString()), { sender: window.currentUserRecord.role, text: text, timestamp: Date.now() });
         await setDoc(chatDocRef, { [window.currentUserRecord.role === 'admin' ? 'unreadStudent' : 'unreadAdmin']: increment(1) }, { merge: true });
         inputEl.value = ''; setTimeout(() => { const msgBox = document.getElementById('chat-messages'); msgBox.scrollTop = msgBox.scrollHeight; }, 100);
-    } catch(e) { console.error(e); window.showToast("فشل الإرسال. تأكد من اتصالك بالإنترنت", "error"); }
+    } catch(e) { console.error(e); if(window.showToast) window.showToast("فشل الإرسال. تأكد من اتصالك بالإنترنت", "error"); }
     btn.disabled = false; btn.innerHTML = origHtml;
 };
 
@@ -223,12 +235,11 @@ window.loginAsStudent = (studentUsername) => {
 
     window.studentActiveBranchTab = null;
     window.switchScreen('app-screen');
-    // تصحيح التوجيه الداخلي للمراقبة
     document.getElementById('admin-screen').classList.add('hidden');
     document.getElementById('student-dashboard').classList.remove('hidden');
     
     startStudentListeners();
-    window.showToast(`أنت الآن داخل حساب التلميذ في وضع المراقبة`);
+    if(window.showToast) window.showToast(`أنت الآن داخل حساب التلميذ في وضع المراقبة`);
 };
 
 window.returnToAdmin = () => {
@@ -247,16 +258,15 @@ window.returnToAdmin = () => {
     if(unsubscribeChatMeta) unsubscribeChatMeta();
 
     window.switchScreen('app-screen');
-    // تصحيح التوجيه للعودة لشاشة الأستاذ
     document.getElementById('student-dashboard').classList.add('hidden');
     document.getElementById('admin-screen').classList.remove('hidden');
     if (window.returnToAdminHome) window.returnToAdminHome();
     
     startAdminListeners();
-    window.showToast("تمت العودة للوحة الإدارة بنجاح");
+    if(window.showToast) window.showToast("تمت العودة للوحة الإدارة بنجاح");
 };
 
-// 8. مستمعو البيانات (Listeners)
+// 8. مستمعو البيانات
 const startAdminListeners = () => {
     unsubscribeProgram = onSnapshot(doc(programCol, 'main'), (docSnap) => {
         if(docSnap.exists()) { 
@@ -370,7 +380,7 @@ const startStudentListeners = () => {
                     window.allStudentsProgress.push({ id: d.id, level: data.level, xp: prog.xp, approved: data.approved });
                 }
             }
-            if(d.id === window.currentUserRecord.username) {
+            if(window.currentUserRecord && d.id === window.currentUserRecord.username) {
                 window.currentUserRecord.clickedLinks = data.clickedLinks || [];
                 window.currentUserRecord.phoneNumber = data.phoneNumber || ''; 
                 if (window.updateProgressUI) window.updateProgressUI(window.currentSections || []); 
@@ -386,15 +396,17 @@ const startStudentListeners = () => {
     });
 
     if(unsubscribeChatMeta) unsubscribeChatMeta();
-    unsubscribeChatMeta = onSnapshot(doc(db, chatsPath, window.currentUserRecord.username), (docSnap) => {
-        const badge = document.getElementById('student-chat-badge');
-        if(docSnap.exists() && docSnap.data().unreadStudent > 0) { 
-            badge.innerText = docSnap.data().unreadStudent; 
-            badge.classList.remove('hidden'); 
-        } else { 
-            badge.classList.add('hidden'); 
-        }
-    });
+    if(window.currentUserRecord) {
+        unsubscribeChatMeta = onSnapshot(doc(db, chatsPath, window.currentUserRecord.username), (docSnap) => {
+            const badge = document.getElementById('student-chat-badge');
+            if(badge && docSnap.exists() && docSnap.data().unreadStudent > 0) { 
+                badge.innerText = docSnap.data().unreadStudent; 
+                badge.classList.remove('hidden'); 
+            } else if (badge) { 
+                badge.classList.add('hidden'); 
+            }
+        });
+    }
 };
 
 // 9. المستمع الرئيسي للمصادقة (نقطة الدخول)
@@ -436,7 +448,6 @@ onAuthStateChanged(auth, async (user) => {
                     window.currentUserRecord = { username, ...userSnap.data() };
                     
                     if (window.currentUserRecord.role === 'admin') {
-                        // تصحيح التوجيه للأستاذ
                         window.switchScreen('app-screen');
                         document.getElementById('student-dashboard').classList.add('hidden');
                         document.getElementById('admin-screen').classList.remove('hidden');
@@ -448,7 +459,6 @@ onAuthStateChanged(auth, async (user) => {
                     } else {
                         document.getElementById('display-username').innerText = username;
                         document.getElementById('student-level-badge').innerText = levelNames[window.currentUserRecord.level] || "تلميذ";
-                        // تصحيح التوجيه للتلميذ
                         window.switchScreen('app-screen');
                         document.getElementById('admin-screen').classList.add('hidden');
                         document.getElementById('student-dashboard').classList.remove('hidden');
@@ -462,7 +472,7 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
-// 10. مستمع مخصص لتنظيف الذاكرة بعد تسجيل الخروج
+// 10. مستمع لتسجيل الخروج والنجاح
 window.addEventListener('userLoggedOut', () => {
     if(unsubscribeProgram) unsubscribeProgram();
     if(unsubscribeUsers) unsubscribeUsers();
@@ -472,11 +482,9 @@ window.addEventListener('userLoggedOut', () => {
     window.switchScreen('auth-screen');
 });
 
-// 11. مستمع مخصص لنجاح تسجيل الدخول ونقل المستخدم للشاشة المناسبة
 window.addEventListener('authSuccess', (e) => {
     const userRecord = e.detail;
     if (userRecord.role === 'admin') {
-        // تصحيح التوجيه للأستاذ
         window.switchScreen('app-screen');
         document.getElementById('student-dashboard').classList.add('hidden');
         document.getElementById('admin-screen').classList.remove('hidden');
@@ -486,9 +494,7 @@ window.addEventListener('authSuccess', (e) => {
         window.switchScreen('pending-screen');
     } else {
         document.getElementById('display-username').innerText = userRecord.username;
-        const levelNames = { "m_y1": "الأولى متوسط", "m_y2": "الثانية متوسط", "m_y3": "الثالثة متوسط", "m_y4": "الرابعة متوسط", "h_y1": "أولى ثانوي", "h_y2": "الثانية ثانوي", "h_y3": "الثالثة ثانوي" };
         document.getElementById('student-level-badge').innerText = levelNames[userRecord.level] || "تلميذ";
-        // تصحيح التوجيه للتلميذ
         window.switchScreen('app-screen');
         document.getElementById('admin-screen').classList.add('hidden');
         document.getElementById('student-dashboard').classList.remove('hidden');
