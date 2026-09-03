@@ -28,7 +28,7 @@ window.currentEditParams = null;
 
 // متغيرات حالة الأستاذ
 window.adminMainTab = null; 
-window.adminActivePart = null; // تم التعديل: لا يفتح أي مستوى افتراضياً
+window.adminActivePart = null; 
 window.adminActiveYear = {}; 
 window.adminActiveBranch = {}; 
 window.adminMainFilter = 'all'; 
@@ -133,12 +133,6 @@ window.toggleDarkMode = () => {
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
 };
 
-window.closeWelcomeScreen = () => {
-    const screen = document.getElementById('welcome-quote-screen');
-    screen.classList.remove('welcome-visible');
-    screen.classList.add('welcome-hidden');
-};
-
 // 6. دوال المحادثة (الدردشة)
 window.openChat = async (targetUser) => {
     window.activeChatUser = targetUser; 
@@ -229,6 +223,10 @@ window.loginAsStudent = (studentUsername) => {
 
     window.studentActiveBranchTab = null;
     window.switchScreen('app-screen');
+    // تصحيح التوجيه الداخلي للمراقبة
+    document.getElementById('admin-screen').classList.add('hidden');
+    document.getElementById('student-dashboard').classList.remove('hidden');
+    
     startStudentListeners();
     window.showToast(`أنت الآن داخل حساب التلميذ في وضع المراقبة`);
 };
@@ -248,7 +246,12 @@ window.returnToAdmin = () => {
     if(unsubscribeUsers) unsubscribeUsers();
     if(unsubscribeChatMeta) unsubscribeChatMeta();
 
-    window.switchScreen('admin-screen');
+    window.switchScreen('app-screen');
+    // تصحيح التوجيه للعودة لشاشة الأستاذ
+    document.getElementById('student-dashboard').classList.add('hidden');
+    document.getElementById('admin-screen').classList.remove('hidden');
+    if (window.returnToAdminHome) window.returnToAdminHome();
+    
     startAdminListeners();
     window.showToast("تمت العودة للوحة الإدارة بنجاح");
 };
@@ -260,8 +263,8 @@ const startAdminListeners = () => {
             let data = docSnap.data();
             window.currentSections = data.sections; 
             window.currentUpdates = data.latestUpdates || []; 
-            window.renderProgramUI(window.currentSections, 'admin-program-view', true); 
-            window.renderAdminTable(); 
+            if (window.renderProgramUI) window.renderProgramUI(window.currentSections, 'admin-program-view', true); 
+            if (window.renderAdminTable) window.renderAdminTable(); 
         }
     });
 
@@ -271,11 +274,13 @@ const startAdminListeners = () => {
         snapshot.forEach(d => { 
             if(d.data().role !== 'admin') {
                 let data = d.data(); window.adminUsersList.push({id: d.id, data: data}); 
-                let prog = window.calculateProgressXP(data.level, data, window.currentSections);
-                window.allStudentsProgress.push({ id: d.id, level: data.level, xp: prog.xp, approved: data.approved });
+                if (window.calculateProgressXP) {
+                    let prog = window.calculateProgressXP(data.level, data, window.currentSections);
+                    window.allStudentsProgress.push({ id: d.id, level: data.level, xp: prog.xp, approved: data.approved });
+                }
             }
         });
-        window.renderAdminTable();
+        if (window.renderAdminTable) window.renderAdminTable();
     });
 
     if(unsubscribeChatMeta) unsubscribeChatMeta();
@@ -303,7 +308,7 @@ const startAdminListeners = () => {
                 `;
             }
         }); 
-        window.renderAdminTable();
+        if (window.renderAdminTable) window.renderAdminTable();
         
         const globalBadge = document.getElementById('admin-global-badge');
         const notifContainer = document.getElementById('admin-notifications-container');
@@ -330,10 +335,10 @@ const startStudentListeners = () => {
             window.currentUpdates = data.latestUpdates || [];
 
             if(document.getElementById('lesson-search').value.trim() === '') { 
-                window.renderProgramUI(window.currentSections, 'student-program-view', false); 
+                if (window.renderProgramUI) window.renderProgramUI(window.currentSections, 'student-program-view', false); 
             }
-            window.updateProgressUI(window.currentSections); 
-            window.renderLeaderboard(); 
+            if (window.updateProgressUI) window.updateProgressUI(window.currentSections); 
+            if (window.renderLeaderboard) window.renderLeaderboard(); 
 
             if (window.currentUserRecord && window.currentUserRecord.role === 'student') {
                 let myUpdates = window.currentUpdates.filter(u => u.level === window.currentUserRecord.level);
@@ -342,12 +347,12 @@ const startStudentListeners = () => {
                 if (!isInitialProgramLoad) {
                     myUpdates.forEach(u => {
                         if (!seenUpdates.includes(u.id) && (Date.now() - u.timestamp < 15000)) {
-                            window.showToast(`محتوى جديد متاح: ${u.title}`, 'success');
+                            if (window.showToast) window.showToast(`محتوى جديد متاح: ${u.title}`, 'success');
                         }
                     });
                 }
                 
-                window.renderStudentNotifications(myUpdates, seenUpdates);
+                if (window.renderStudentNotifications) window.renderStudentNotifications(myUpdates, seenUpdates);
             }
             
             isInitialProgramLoad = false;
@@ -360,22 +365,24 @@ const startStudentListeners = () => {
         snapshot.forEach(d => {
             let data = d.data();
             if(data.role !== 'admin') {
-                let prog = window.calculateProgressXP(data.level, data, window.currentSections);
-                window.allStudentsProgress.push({ id: d.id, level: data.level, xp: prog.xp, approved: data.approved });
+                if (window.calculateProgressXP) {
+                    let prog = window.calculateProgressXP(data.level, data, window.currentSections);
+                    window.allStudentsProgress.push({ id: d.id, level: data.level, xp: prog.xp, approved: data.approved });
+                }
             }
             if(d.id === window.currentUserRecord.username) {
                 window.currentUserRecord.clickedLinks = data.clickedLinks || [];
                 window.currentUserRecord.phoneNumber = data.phoneNumber || ''; 
-                window.updateProgressUI(window.currentSections || []); 
+                if (window.updateProgressUI) window.updateProgressUI(window.currentSections || []); 
                 
                 if(document.getElementById('lesson-search').value.trim() === '') { 
-                    window.renderProgramUI(window.currentSections || [], 'student-program-view', false); 
+                    if (window.renderProgramUI) window.renderProgramUI(window.currentSections || [], 'student-program-view', false); 
                 } else { 
-                    window.executeStudentSearch(); 
+                    if (window.executeStudentSearch) window.executeStudentSearch(); 
                 }
             }
         });
-        window.renderLeaderboard(); 
+        if (window.renderLeaderboard) window.renderLeaderboard(); 
     });
 
     if(unsubscribeChatMeta) unsubscribeChatMeta();
@@ -429,7 +436,11 @@ onAuthStateChanged(auth, async (user) => {
                     window.currentUserRecord = { username, ...userSnap.data() };
                     
                     if (window.currentUserRecord.role === 'admin') {
-                        window.switchScreen('admin-screen');
+                        // تصحيح التوجيه للأستاذ
+                        window.switchScreen('app-screen');
+                        document.getElementById('student-dashboard').classList.add('hidden');
+                        document.getElementById('admin-screen').classList.remove('hidden');
+                        if (window.returnToAdminHome) window.returnToAdminHome();
                         startAdminListeners();
                     } else if (!window.currentUserRecord.approved) {
                         window.switchScreen('pending-screen');
@@ -437,7 +448,10 @@ onAuthStateChanged(auth, async (user) => {
                     } else {
                         document.getElementById('display-username').innerText = username;
                         document.getElementById('student-level-badge').innerText = levelNames[window.currentUserRecord.level] || "تلميذ";
+                        // تصحيح التوجيه للتلميذ
                         window.switchScreen('app-screen');
+                        document.getElementById('admin-screen').classList.add('hidden');
+                        document.getElementById('student-dashboard').classList.remove('hidden');
                         startStudentListeners();
                     }
                 }
@@ -462,7 +476,11 @@ window.addEventListener('userLoggedOut', () => {
 window.addEventListener('authSuccess', (e) => {
     const userRecord = e.detail;
     if (userRecord.role === 'admin') {
-        window.switchScreen('admin-screen');
+        // تصحيح التوجيه للأستاذ
+        window.switchScreen('app-screen');
+        document.getElementById('student-dashboard').classList.add('hidden');
+        document.getElementById('admin-screen').classList.remove('hidden');
+        if (window.returnToAdminHome) window.returnToAdminHome();
         if (typeof startAdminListeners === 'function') startAdminListeners();
     } else if (!userRecord.approved) {
         window.switchScreen('pending-screen');
@@ -470,7 +488,10 @@ window.addEventListener('authSuccess', (e) => {
         document.getElementById('display-username').innerText = userRecord.username;
         const levelNames = { "m_y1": "الأولى متوسط", "m_y2": "الثانية متوسط", "m_y3": "الثالثة متوسط", "m_y4": "الرابعة متوسط", "h_y1": "أولى ثانوي", "h_y2": "الثانية ثانوي", "h_y3": "الثالثة ثانوي" };
         document.getElementById('student-level-badge').innerText = levelNames[userRecord.level] || "تلميذ";
+        // تصحيح التوجيه للتلميذ
         window.switchScreen('app-screen');
+        document.getElementById('admin-screen').classList.add('hidden');
+        document.getElementById('student-dashboard').classList.remove('hidden');
         if (typeof startStudentListeners === 'function') startStudentListeners();
     }
 });
