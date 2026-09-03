@@ -120,6 +120,40 @@
         </div>
     </div>
 
+    <!-- نافذة الإعلان الجماعي -->
+    <div id="broadcast-modal" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-[80] backdrop-blur-md transition-opacity duration-300">
+        <div class="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] max-w-md w-[90%] mx-auto shadow-2xl border border-white/50 dark:border-slate-700">
+            <h3 class="text-2xl font-black mb-6 text-slate-800 dark:text-white flex items-center gap-3"><i class="ph-fill ph-megaphone text-blue-500"></i> رسالة جماعية</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2"><i class="ph-fill ph-users"></i> تحديد المستلمين</label>
+                    <select id="broadcast-target" class="w-full p-4 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 outline-none focus:border-blue-500 font-black text-slate-700 dark:text-white transition shadow-sm cursor-pointer appearance-none">
+                        <option value="all">جميع التلاميذ (كل الأطوار)</option>
+                        <optgroup label="التعليم المتوسط">
+                            <option value="m_y1">السنة الأولى متوسط</option>
+                            <option value="m_y2">السنة الثانية متوسط</option>
+                            <option value="m_y3">السنة الثالثة متوسط</option>
+                            <option value="m_y4">السنة الرابعة متوسط</option>
+                        </optgroup>
+                        <optgroup label="التعليم الثانوي">
+                            <option value="h_y1">السنة أولى ثانوي</option>
+                            <option value="h_y2">السنة الثانية ثانوي</option>
+                            <option value="h_y3">السنة الثالثة ثانوي</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2"><i class="ph-fill ph-text-align-right"></i> نص الإعلان</label>
+                    <textarea id="broadcast-message" rows="5" class="w-full p-4 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 outline-none focus:border-blue-500 font-bold text-slate-700 dark:text-white resize-none shadow-sm transition leading-relaxed" placeholder="اكتب إعلانك أو رسالتك الجماعية هنا... ستصل كإشعار في دردشة كل تلميذ."></textarea>
+                </div>
+            </div>
+            <div class="flex justify-center gap-3 mt-8">
+                <button onclick="closeBroadcastModal()" class="flex-1 py-4 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-black text-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition btn-modern">إلغاء</button>
+                <button id="send-broadcast-btn" onclick="executeBroadcast()" class="flex-1 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-black text-lg hover:from-blue-700 hover:to-indigo-700 transition shadow-lg shadow-blue-500/30 btn-modern flex items-center justify-center gap-2">إرسال <i class="ph-bold ph-paper-plane-tilt text-xl"></i></button>
+            </div>
+        </div>
+    </div>
+
     <!-- نافذة تأكيد الإجراءات -->
     <div id="confirm-modal" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-[80] backdrop-blur-md transition-opacity duration-300">
         <div class="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] max-w-sm w-[90%] mx-auto shadow-2xl text-center border border-white/50 dark:border-slate-700">
@@ -318,9 +352,10 @@
                         متابعة التلاميذ
                     </h3>
                     <div class="flex flex-wrap gap-2">
-                        <button onclick="bulkAction('approve')" aria-label="تفعيل المحدد" class="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-xl text-sm font-black hover:bg-emerald-100 transition border border-emerald-200 dark:border-emerald-800 flex items-center gap-2"><i class="ph-bold ph-check"></i> تفعيل المحدد</button>
-                        <button onclick="bulkAction('deactivate')" aria-label="إلغاء التفعيل" class="bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 px-4 py-2 rounded-xl text-sm font-black hover:bg-amber-100 transition border border-amber-200 dark:border-amber-800 flex items-center gap-2"><i class="ph-bold ph-x"></i> إلغاء التفعيل</button>
-                        <button onclick="bulkAction('delete')" aria-label="حذف المحدد" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-4 py-2 rounded-xl text-sm font-black hover:bg-red-100 transition border border-red-200 dark:border-red-800 flex items-center gap-2"><i class="ph-bold ph-trash"></i> حذف المحدد</button>
+                        <button onclick="openBroadcastModal()" aria-label="رسالة جماعية" class="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-4 py-2 rounded-xl text-sm font-black hover:bg-blue-100 transition border border-blue-200 dark:border-blue-800 flex items-center gap-2 shadow-sm"><i class="ph-bold ph-megaphone"></i> إعلان جماعي</button>
+                        <button onclick="bulkAction('approve')" aria-label="تفعيل المحدد" class="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-xl text-sm font-black hover:bg-emerald-100 transition border border-emerald-200 dark:border-emerald-800 flex items-center gap-2 shadow-sm"><i class="ph-bold ph-check"></i> تفعيل المحدد</button>
+                        <button onclick="bulkAction('deactivate')" aria-label="إلغاء التفعيل" class="bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 px-4 py-2 rounded-xl text-sm font-black hover:bg-amber-100 transition border border-amber-200 dark:border-amber-800 flex items-center gap-2 shadow-sm"><i class="ph-bold ph-x"></i> إلغاء التفعيل</button>
+                        <button onclick="bulkAction('delete')" aria-label="حذف المحدد" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-4 py-2 rounded-xl text-sm font-black hover:bg-red-100 transition border border-red-200 dark:border-red-800 flex items-center gap-2 shadow-sm"><i class="ph-bold ph-trash"></i> حذف المحدد</button>
                     </div>
                 </div>
 
@@ -471,10 +506,11 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         
-        // استدعاء نظام المصادقة الجديد
+        // استدعاء نظام المصادقة
         import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         
-        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, deleteDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // إضافة writeBatch لنظام الرسائل الجماعية
+        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, deleteDoc, increment, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDuuYHwmSW0UV1TO3gDGyETrvOimE7iGLs",
@@ -510,13 +546,13 @@
         window.currentUpdates = []; 
         window.currentEditParams = null; 
         
-        // Admin & Student States - محدثة لنظام البطاقات الشبكية
-        window.adminContentStep = 'parts'; // 'parts' | 'years' | 'branches' | 'details'
+        // Admin & Student States
+        window.adminContentStep = 'parts'; 
         window.adminActivePart = null;
         window.adminActiveYear = {}; 
         window.adminActiveBranch = {}; 
 
-        window.studentViewMode = 'grid'; // 'grid' | 'details'
+        window.studentViewMode = 'grid'; 
         window.studentActiveBranchTab = null;
         
         window.adminMainFilter = 'all'; 
@@ -541,7 +577,6 @@
             "طريق الألف ميل يبدأ بخطوة واحدة، وأنت الآن في المسار الصحيح. 🚶‍♂️"
         ];
 
-        // مصفوفة الألوان السبع الأساسية للبطاقات (تدرجات أنيقة مع ظلال)
         const gridColors = [
             'from-red-500 to-rose-600 shadow-red-500/40 text-white',
             'from-orange-500 to-amber-600 shadow-orange-500/40 text-white',
@@ -639,108 +674,6 @@
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
         };
-
-        const defaultProgramData = [
-            { 
-                id: "part_middle", 
-                title: "التعليم المتوسط", 
-                color: "blue", 
-                years: [
-                    { 
-                        id: "m_y1", 
-                        title: "السنة الأولى متوسط", 
-                        branches: [
-                            { id: "m1_b1", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [] } },
-                            { id: "m1_b2", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [] } },
-                            { id: "m1_b3", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [] } },
-                            { id: "m1_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
-                            { id: "m1_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
-                            { id: "m1_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
-                        ] 
-                    },
-                    { 
-                        id: "m_y2", 
-                        title: "السنة الثانية متوسط", 
-                        branches: [
-                            { id: "m2_b1", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [] } },
-                            { id: "m2_b2", title: "الظواهر الميكانيكية", categories: { lessons: [], exercises: [] } },
-                            { id: "m2_b3", title: "الظواهر الكهرومغناطيسية", categories: { lessons: [], exercises: [] } },
-                            { id: "m2_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
-                            { id: "m2_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
-                            { id: "m2_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
-                        ] 
-                    },
-                    { 
-                        id: "m_y3", 
-                        title: "السنة الثالثة متوسط", 
-                        branches: [
-                            { id: "m3_b1", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [] } },
-                            { id: "m3_b2", title: "الطاقة", categories: { lessons: [], exercises: [] } },
-                            { id: "m3_b3", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [] } },
-                            { id: "m3_b4", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [] } },
-                            { id: "m3_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
-                            { id: "m3_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
-                            { id: "m3_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
-                        ] 
-                    },
-                    { 
-                        id: "m_y4", 
-                        title: "السنة الرابعة متوسط", 
-                        branches: [
-                            { id: "m4_b1", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [] } },
-                            { id: "m4_b2", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [] } },
-                            { id: "m4_b3", title: "الظواهر الميكانيكية", categories: { lessons: [], exercises: [] } },
-                            { id: "m4_b4", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [] } },
-                            { id: "m4_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
-                            { id: "m4_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
-                            { id: "m4_s3", title: "الفصل 3", categories: { terms: [], exams: [] } },
-                            { id: "m4_b5", title: "شهادتك 🎓", categories: { past_exams: [], mock_exams: [] } }
-                        ] 
-                    }
-                ] 
-            },
-            { 
-                id: "part_high", 
-                title: "التعليم الثانوي", 
-                color: "indigo", 
-                years: [
-                    { 
-                        id: "h_y1", 
-                        title: "السنة أولى ثانوي", 
-                        branches: [
-                            { id: "h1_b1", title: "بنية وهندسة أفراد بعض الأنواع الكيميائية", categories: { lessons: [], exercises: [] } },
-                            { id: "h1_b2", title: "القوة والحركات المستقيمة", categories: { lessons: [], exercises: [] } },
-                            { id: "h1_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
-                            { id: "h1_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
-                            { id: "h1_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
-                        ] 
-                    },
-                    { 
-                        id: "h_y2", 
-                        title: "السنة الثانية ثانوي", 
-                        branches: [
-                            { id: "h2_b1", title: "المقاربة الكيفية لطاقة جملة وانحفاظها", categories: { lessons: [], exercises: [] } },
-                            { id: "h2_b2", title: "العمل والطاقة الحركية", categories: { lessons: [], exercises: [] } },
-                            { id: "h2_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
-                            { id: "h2_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
-                            { id: "h2_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
-                        ] 
-                    },
-                    { 
-                        id: "h_y3", 
-                        title: "السنة الثالثة ثانوي", 
-                        branches: [
-                            { id: "h3_b1", title: "تطور جملة كيميائية نحو حالة التوازن", categories: { lessons: [], exercises: [] } },
-                            { id: "h3_b2", title: "التحولات النووية", categories: { lessons: [], exercises: [] } },
-                            { id: "h3_b3", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [] } },
-                            { id: "h3_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
-                            { id: "h3_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
-                            { id: "h3_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
-                        ] 
-                    }
-                ] 
-            }
-        ];
 
         onAuthStateChanged(auth, async (user) => {
             isAuthReady = true;
@@ -963,7 +896,7 @@
 
             window.originalAdminRecord = { ...window.currentUserRecord };
             window.currentUserRecord = { username: studentObj.id, ...studentObj.data };
-            window.studentViewMode = 'grid'; // Reset view for the monitored student
+            window.studentViewMode = 'grid'; 
             
             document.getElementById('display-username').innerText = window.currentUserRecord.username;
             document.getElementById('student-level-badge').innerText = levelNames[window.currentUserRecord.level];
@@ -999,7 +932,6 @@
             if(unsubscribeChatMeta) unsubscribeChatMeta();
 
             switchScreen('admin-screen');
-            // Reset to dashboard grid
             returnToAdminDashboard();
             startAdminListeners();
             showToast("تمت العودة للوحة الإدارة بنجاح");
@@ -1094,6 +1026,81 @@
             } catch(e) { showToast("حدث خطأ أثناء الحفظ", "error"); }
         };
 
+        // --- وظائف الرسائل الجماعية ---
+        window.openBroadcastModal = () => {
+            document.getElementById('broadcast-modal').classList.remove('hidden');
+            document.getElementById('broadcast-modal').classList.add('flex');
+            document.getElementById('broadcast-message').value = '';
+        };
+
+        window.closeBroadcastModal = () => {
+            document.getElementById('broadcast-modal').classList.add('hidden');
+            document.getElementById('broadcast-modal').classList.remove('flex');
+        };
+
+        window.executeBroadcast = async () => {
+            const target = document.getElementById('broadcast-target').value;
+            const message = document.getElementById('broadcast-message').value.trim();
+
+            if (!message) return showToast("يرجى كتابة نص الإعلان أولاً!", "error");
+
+            let targetName = document.querySelector(`#broadcast-target option[value="${target}"]`).innerText;
+            if (!await confirmAction(`هل أنت متأكد من إرسال هذا الإعلان إلى: ${targetName}؟`)) return;
+
+            const btn = document.getElementById('send-broadcast-btn');
+            const origHTML = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-xl"></i> جاري الإرسال...';
+
+            try {
+                let targetUsers = window.adminUsersList;
+                if (target !== 'all') {
+                    targetUsers = targetUsers.filter(u => u.data.level === target);
+                }
+
+                // فلترة التلاميذ المفعلين فقط
+                targetUsers = targetUsers.filter(u => u.data.approved === true);
+
+                if (targetUsers.length === 0) {
+                    showToast("لا يوجد تلاميذ مفعلين في هذا المستوى حالياً", "error");
+                    btn.disabled = false; btn.innerHTML = origHTML;
+                    return;
+                }
+                
+                const batch = writeBatch(db);
+                const timestamp = Date.now();
+                let count = 0;
+
+                targetUsers.forEach(user => {
+                    const username = user.id;
+                    const msgId = timestamp.toString() + '_' + count;
+                    const msgRef = doc(collection(db, chatsPath, username, 'messages'), msgId);
+                    const chatDocRef = doc(db, chatsPath, username);
+
+                    batch.set(msgRef, {
+                        sender: 'admin',
+                        text: `📢 إعلان إداري:\n\n${message}`, 
+                        timestamp: timestamp + count, 
+                        isSystemMessage: true 
+                    });
+
+                    batch.set(chatDocRef, { unreadStudent: increment(1) }, { merge: true });
+                    count++;
+                });
+
+                await batch.commit();
+                showToast(`تم إرسال الإعلان إلى ${count} تلميذ بنجاح 🚀`, "success");
+                window.closeBroadcastModal();
+
+            } catch (e) {
+                console.error("Broadcast Error", e);
+                showToast("حدث خطأ أثناء إرسال الإعلان. تحقق من الإنترنت", "error");
+            }
+
+            btn.disabled = false; btn.innerHTML = origHTML;
+        };
+
+        // --- باقي الوظائف الحالية ---
         window.markStudentNotificationsAsRead = () => {
             if (!window.currentUpdates || !window.currentUserRecord || window.currentUserRecord.role === 'admin') return;
             let myUpdates = window.currentUpdates.filter(u => u.level === window.currentUserRecord.level);
@@ -1746,7 +1753,6 @@
 
         const getEmptyStateHTML = (title) => `<div class="flex flex-col items-center justify-center p-6 text-center bg-white/50 dark:bg-slate-800/30 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 h-32"><i class="ph-fill ph-folder-open text-4xl text-slate-300 dark:text-slate-600 mb-2"></i><h3 class="text-sm font-black text-slate-500 dark:text-slate-400">لا يوجد ${title} حالياً</h3></div>`;
 
-        // تم إصلاح الإعلان عن الدالة هنا بربطها بالمتغير window
         window.renderProgramUI = (sections, containerId, isAdmin) => {
             if(!sections) return; 
             window.currentSections = sections; 
@@ -1757,7 +1763,6 @@
 
                 html += `<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 border-b border-slate-100 dark:border-slate-700 pb-4">`;
                 
-                // زر العودة للإدارة يظهر دائمًا في شريط المحتوى العلوي إذا كنا داخل قسم
                 if (window.adminContentStep === 'parts') {
                     html += `<button onclick="returnToAdminDashboard()" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-bold ph-arrow-right"></i> عودة للوحة الرئيسية</button>`;
                     html += `<h3 class="text-2xl font-black text-slate-800 dark:text-white flex items-center gap-2"><div class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center text-xl shadow-inner"><i class="ph-fill ph-books"></i></div> اختيار الطور التعليمي</h3>`;
@@ -1798,7 +1803,7 @@
                     let part = sections.find(p => p.id === window.adminActivePart);
                     html += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-[fadeInTab_0.3s_ease]">`;
                     part.years.forEach((year, idx) => {
-                        let color = gridColors[(idx + 2) % 7]; // لتنويع الألوان
+                        let color = gridColors[(idx + 2) % 7]; 
                         html += `<button onclick="window.adminActiveYear['${part.id}']='${year.id}'; window.adminContentStep='branches'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="bg-gradient-to-br ${color} p-6 rounded-[2rem] shadow-lg hover:scale-[1.03] transition-all duration-300 flex flex-col items-center justify-center gap-3 text-center min-h-[180px]">
                             <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-4xl shadow-inner"><i class="ph-fill ph-calendar-blank"></i></div>
                             <h3 class="text-2xl font-black drop-shadow-sm">${year.title}</h3>
@@ -1859,7 +1864,7 @@
                 }
 
             } else {
-                // شاشة التلميذ - نظام البطاقات الشبكية
+                // شاشة التلميذ
                 let clickedLinks = window.currentUserRecord ? (window.currentUserRecord.clickedLinks || []) : [];
                 let userLevel = window.currentUserRecord ? window.currentUserRecord.level : null;
 
@@ -1984,3 +1989,4 @@
 </script>
 </body>
 </html>
+```eof
