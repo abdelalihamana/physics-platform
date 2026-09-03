@@ -294,14 +294,24 @@
                 </div>
             </header>
 
-            <!-- تبويبات لوحة الأستاذ الرئيسية -->
-            <div class="flex gap-4 mb-6 bg-white/50 dark:bg-slate-800/50 p-2 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm flex-wrap">
-                <button onclick="switchAdminMainTab('accounts')" id="main-tab-accounts" class="flex-1 min-w-[200px] py-4 rounded-2xl font-black text-lg transition-all bg-blue-600 text-white shadow-lg shadow-blue-500/30 flex justify-center items-center gap-2">
-                    <i class="ph-fill ph-users"></i> إدارة الحسابات
-                </button>
-                <button onclick="switchAdminMainTab('content')" id="main-tab-content" class="flex-1 min-w-[200px] py-4 rounded-2xl font-black text-lg transition-all bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 shadow-sm flex justify-center items-center gap-2">
-                    <i class="ph-fill ph-books"></i> إدارة المحتوى
-                </button>
+            <!-- التبويبات الرئيسية كـ (Grid Cards) بدلاً من الأزرار العادية -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <!-- بطاقة إدارة الحسابات -->
+                <div onclick="switchAdminMainTab('accounts')" id="main-tab-accounts" class="cursor-pointer bg-white dark:bg-slate-800 rounded-[2rem] p-6 shadow-sm hover:shadow-xl transition-all duration-300 border-2 border-blue-500 ring-4 ring-blue-500/20 scale-[1.02] flex items-center gap-5 relative overflow-hidden interactive-card">
+                    <div class="icon-bg w-16 h-16 rounded-2xl bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center text-4xl shadow-inner transition-colors duration-300"><i class="ph-fill ph-users-three"></i></div>
+                    <div>
+                        <h3 class="font-black text-2xl text-slate-800 dark:text-white mb-1">إدارة الحسابات</h3>
+                        <p class="text-sm font-bold text-slate-500 dark:text-slate-400">متابعة التلاميذ وتفعيلهم</p>
+                    </div>
+                </div>
+                <!-- بطاقة إدارة المحتوى -->
+                <div onclick="switchAdminMainTab('content')" id="main-tab-content" class="cursor-pointer bg-white dark:bg-slate-800 rounded-[2rem] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-2 border-slate-100 dark:border-slate-700 flex items-center gap-5 relative overflow-hidden interactive-card opacity-70 hover:opacity-100">
+                    <div class="icon-bg w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 flex items-center justify-center text-4xl shadow-inner transition-colors duration-300"><i class="ph-fill ph-books"></i></div>
+                    <div>
+                        <h3 class="font-black text-2xl text-slate-800 dark:text-white mb-1">إدارة المحتوى</h3>
+                        <p class="text-sm font-bold text-slate-500 dark:text-slate-400">إضافة وتعديل الدروس والتمارين</p>
+                    </div>
+                </div>
             </div>
 
             <!-- قسم إدارة الحسابات -->
@@ -355,20 +365,32 @@
 
             <!-- قسم إدارة المحتوى -->
             <div id="admin-content-section" class="bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-6 md:p-8 rounded-[2.5rem] shadow-lg border border-white/50 dark:border-slate-700 mb-10 hidden animate-[fadeInTab_0.3s_ease]">
-                <div class="mb-8 border-b border-slate-100 dark:border-slate-700 pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div>
-                        <h3 class="text-3xl font-black text-slate-800 dark:text-white flex items-center gap-4 mb-2">
-                            <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center text-3xl shadow-inner"><i class="ph-fill ph-books"></i></div>
-                            إدارة محتوى المنصة
-                        </h3>
-                        <p class="text-slate-500 dark:text-slate-400 font-bold text-lg">أضف الدروس، التمارين والشهادات حسب الطور والسنة.</p>
+                <div class="mb-8 border-b border-slate-100 dark:border-slate-700 pb-6">
+                    <h3 class="text-3xl font-black text-slate-800 dark:text-white flex items-center gap-4 mb-3">
+                        <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center text-3xl shadow-inner"><i class="ph-fill ph-books"></i></div>
+                        تعديل المناهج والدروس
+                    </h3>
+                    <p class="text-slate-500 dark:text-slate-400 font-bold text-lg">اختر الطور التعليمي أدناه لعرض وحدات المادة وإدارتها.</p>
+                </div>
+                
+                <!-- تبويبات الأطوار التعليمية كـ (Grid Cards) بدلاً من الأزرار العادية -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+                    <div onclick="switchAdminPart('part_middle')" id="tab-btn-part_middle" class="cursor-pointer bg-blue-50 dark:bg-blue-900/20 rounded-[1.5rem] p-5 border-2 border-blue-500 shadow-md flex items-center gap-4 transition-all hover:-translate-y-1">
+                        <div class="w-16 h-16 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400 text-3xl shadow-sm border border-blue-100 dark:border-blue-800"><i class="ph-fill ph-student"></i></div>
+                        <div>
+                            <h4 class="font-black text-xl text-slate-800 dark:text-white mb-1">التعليم المتوسط</h4>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 font-bold">من السنة الأولى إلى الرابعة</p>
+                        </div>
                     </div>
-                    
-                    <div class="flex flex-wrap bg-slate-100 dark:bg-slate-900 p-1.5 rounded-2xl shadow-inner border border-slate-200 dark:border-slate-700 w-full md:w-auto">
-                        <button onclick="switchAdminPart('part_middle')" id="tab-btn-part_middle" class="flex-1 min-w-[150px] md:w-48 py-3 rounded-xl font-black text-base transition-all bg-white dark:bg-slate-700 text-blue-600 dark:text-white shadow-md">التعليم المتوسط</button>
-                        <button onclick="switchAdminPart('part_high')" id="tab-btn-part_high" class="flex-1 min-w-[150px] md:w-48 py-3 rounded-xl font-black text-base transition-all text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">التعليم الثانوي</button>
+                    <div onclick="switchAdminPart('part_high')" id="tab-btn-part_high" class="cursor-pointer bg-white dark:bg-slate-800 rounded-[1.5rem] p-5 border-2 border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700 shadow-sm flex items-center gap-4 transition-all hover:-translate-y-1 opacity-70 hover:opacity-100">
+                        <div class="w-16 h-16 bg-slate-50 dark:bg-slate-700 rounded-2xl flex items-center justify-center text-slate-500 dark:text-slate-400 text-3xl shadow-sm border border-slate-100 dark:border-slate-600"><i class="ph-fill ph-graduation-cap"></i></div>
+                        <div>
+                            <h4 class="font-black text-xl text-slate-800 dark:text-white mb-1">التعليم الثانوي</h4>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 font-bold">من الأولى إلى الثالثة ثانوي</p>
+                        </div>
                     </div>
                 </div>
+
                 <div id="admin-program-view" class="min-h-[400px]"></div>
             </div>
         </div>
