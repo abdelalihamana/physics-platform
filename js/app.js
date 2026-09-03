@@ -1,503 +1,195 @@
-// ملف: js/app.js
-
-// 1. استيراد إعدادات قاعدة البيانات
 import { auth, db, usersCol, programCol, chatsPath } from './config/firebase.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { doc, setDoc, getDoc, collection, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { doc, getDoc, collection, onSnapshot, setDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-// 2. استيراد جميع الوحدات
-import * as Helpers from './utils/helpers.js';
 import * as AuthUI from './auth/auth.js';
 import * as AdminUI from './ui/admin.js';
 import * as StudentUI from './ui/student.js';
 
-// 3. ربط جميع الدوال بالـ Window لكي تعمل مع أزرار HTML
-Object.assign(window, Helpers);
-Object.assign(window, AuthUI);
-Object.assign(window, AdminUI);
-Object.assign(window, StudentUI);
-
-// إضافة دالة مساعدة لحماية النصوص إذا لم تكن موجودة في helpers
-if (!window.escapeHtml) {
-    window.escapeHtml = (str) => {
-        if (!str) return '';
-        return str.replace(/[&<>'"]/g, tag => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'}[tag] || tag));
-    };
-}
-
-// 4. تعريف المتغيرات العالمية (Global State)
-window.isAuthReady = false;
 window.currentUserRecord = null;
-window.originalAdminRecord = null; 
-window.activeChatUser = null; 
+window.originalAdminRecord = null;
 window.currentSections = [];
-window.currentUpdates = []; 
-window.currentEditParams = null; 
-
-// متغيرات حالة الأستاذ
-window.adminMainTab = null; 
-window.adminActivePart = null; // هام: يجب أن يكون null كافتراضي لكي تعمل البطاقات بشكل صحيح
-window.adminActiveYear = {}; 
-window.adminActiveBranch = {}; 
-window.adminMainFilter = 'all'; 
-window.adminSubFilter = 'all'; 
+window.currentUpdates = [];
 window.adminUsersList = [];
 window.adminChatsData = {};
+window.allStudentsProgress = [];
+window.activeChatUser = null;
+window.chatUnsubscribe = null;
 
-// متغيرات حالة التلميذ
+// المتغيرات الخاصة بتتبع شاشات الأستاذ والتلميذ (مهمة لمنع حلقات التكرار)
+window.adminMainTab = null;
+window.adminActivePart = null;
+window.adminActiveYear = {};
+window.adminActiveBranch = {};
+window.adminMainFilter = 'all';
+window.adminSubFilter = 'all';
 window.studentActiveBranchTab = null;
-window.allStudentsProgress = []; 
+window.isRegistering = false;
 
-// متغيرات تنظيف الذاكرة
-let unsubscribeProgram = null;
-let unsubscribeUsers = null;
-let unsubscribeChat = null;
-let unsubscribeChatMeta = null;
+// ربط جميع الدوال المعزولة بالنافذة العالمية لتتمكن أزرار الـ HTML من قراءتها
+Object.assign(window, AuthUI, AdminUI, StudentUI);
 
-const levelNames = {
-    "m_y1": "الأولى متوسط", "m_y2": "الثانية متوسط", "m_y3": "الثالثة متوسط", "m_y4": "الرابعة متوسط",
-    "h_y1": "أولى ثانوي", "h_y2": "الثانية ثانوي", "h_y3": "الثالثة ثانوي"
+window.escapeHtml = (str) => {
+    if (!str) return '';
+    return str.replace(/[&<>'"]/g, tag => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'}[tag] || tag));
 };
 
-const defaultProgramData = [
-    { id: "part_middle", title: "التعليم المتوسط", color: "blue", years: [
-        { id: "m_y1", title: "السنة الأولى متوسط", branches: [
-            { id: "m1_b1", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [] } },
-            { id: "m1_b2", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [] } },
-            { id: "m1_b3", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [] } },
-            { id: "m1_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
-            { id: "m1_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
-            { id: "m1_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
-        ]},
-        { id: "m_y2", title: "السنة الثانية متوسط", branches: [
-            { id: "m2_b1", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [] } },
-            { id: "m2_b2", title: "الظواهر الميكانيكية", categories: { lessons: [], exercises: [] } },
-            { id: "m2_b3", title: "الظواهر الكهرومغناطيسية", categories: { lessons: [], exercises: [] } },
-            { id: "m2_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
-            { id: "m2_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
-            { id: "m2_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
-        ]},
-        { id: "m_y3", title: "السنة الثالثة متوسط", branches: [
-            { id: "m3_b1", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [] } },
-            { id: "m3_b2", title: "الطاقة", categories: { lessons: [], exercises: [] } },
-            { id: "m3_b3", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [] } },
-            { id: "m3_b4", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [] } },
-            { id: "m3_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
-            { id: "m3_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
-            { id: "m3_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
-        ]},
-        { id: "m_y4", title: "السنة الرابعة متوسط", branches: [
-            { id: "m4_b1", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [] } },
-            { id: "m4_b2", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [] } },
-            { id: "m4_b3", title: "الظواهر الميكانيكية", categories: { lessons: [], exercises: [] } },
-            { id: "m4_b4", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [] } },
-            { id: "m4_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
-            { id: "m4_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
-            { id: "m4_s3", title: "الفصل 3", categories: { terms: [], exams: [] } },
-            { id: "m4_b5", title: "شهادتك 🎓", categories: { past_exams: [], mock_exams: [] } }
-        ]}
-    ]},
-    { id: "part_high", title: "التعليم الثانوي", color: "indigo", years: [
-        { id: "h_y1", title: "السنة أولى ثانوي", branches: [
-            { id: "h1_b1", title: "بنية وهندسة أفراد بعض الأنواع الكيميائية", categories: { lessons: [], exercises: [] } },
-            { id: "h1_b2", title: "القوة والحركات المستقيمة", categories: { lessons: [], exercises: [] } },
-            { id: "h1_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
-            { id: "h1_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
-            { id: "h1_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
-        ]},
-        { id: "h_y2", title: "السنة الثانية ثانوي", branches: [
-            { id: "h2_b1", title: "المقاربة الكيفية لطاقة جملة وانحفاظها", categories: { lessons: [], exercises: [] } },
-            { id: "h2_b2", title: "العمل والطاقة الحركية", categories: { lessons: [], exercises: [] } },
-            { id: "h2_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
-            { id: "h2_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
-            { id: "h2_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
-        ]},
-        { id: "h_y3", title: "السنة الثالثة ثانوي", branches: [
-            { id: "h3_b1", title: "تطور جملة كيميائية نحو حالة التوازن", categories: { lessons: [], exercises: [] } },
-            { id: "h3_b2", title: "التحولات النووية", categories: { lessons: [], exercises: [] } },
-            { id: "h3_b3", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [] } },
-            { id: "h3_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
-            { id: "h3_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
-            { id: "h3_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
-        ]}
-    ]}
-];
-
-// 5. دوال التنقل والمظهر الأساسية
-window.switchScreen = (screenId) => {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    const target = document.getElementById(screenId);
-    if(target) target.classList.add('active');
+window.showToast = (msg, type = 'success') => {
+    const container = document.getElementById('toast-container');
+    if(!container) return;
+    const toast = document.createElement('div');
+    toast.className = `p-4 rounded-xl shadow-lg text-white font-bold text-sm transform transition-all duration-300 translate-y-[-100%] opacity-0 flex items-center gap-2 ${type === 'error' ? 'bg-red-500' : 'bg-emerald-500'}`;
+    toast.innerHTML = type === 'error' ? `<i class="ph-bold ph-warning-circle text-lg"></i> ${msg}` : `<i class="ph-bold ph-check-circle text-lg"></i> ${msg}`;
+    container.appendChild(toast);
+    setTimeout(() => { toast.classList.remove('translate-y-[-100%]', 'opacity-0'); }, 10);
+    setTimeout(() => { toast.classList.add('opacity-0'); setTimeout(() => toast.remove(), 300); }, 3000);
 };
 
-window.closeRegModal = () => {
-    document.getElementById('registration-success-modal').classList.add('hidden');
-    document.getElementById('registration-success-modal').classList.remove('flex');
-    if (window.toggleAuthMode) window.toggleAuthMode();
+window.confirmAction = (message) => {
+    return new Promise((resolve) => {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-slate-900/60 flex items-center justify-center z-[100] backdrop-blur-sm p-4';
+        modal.innerHTML = `
+            <div class="bg-white dark:bg-slate-800 p-8 rounded-[2rem] max-w-sm w-full text-center shadow-2xl border border-slate-100 dark:border-slate-700 animate-[fadeInTab_0.3s_ease]">
+                <div class="w-20 h-20 bg-amber-100 dark:bg-amber-900/50 rounded-full mx-auto flex items-center justify-center mb-5 text-amber-500 text-4xl"><i class="ph-fill ph-warning-circle"></i></div>
+                <p class="font-black text-slate-800 dark:text-white mb-8 text-lg leading-relaxed">${message}</p>
+                <div class="flex gap-3">
+                    <button id="confirm-yes" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white py-3 rounded-xl font-black transition">نعم، متأكد</button>
+                    <button id="confirm-no" class="flex-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 py-3 rounded-xl font-black transition">إلغاء</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        document.getElementById('confirm-yes').onclick = () => { modal.remove(); resolve(true); };
+        document.getElementById('confirm-no').onclick = () => { modal.remove(); resolve(false); };
+    });
 };
 
 window.toggleDarkMode = () => {
     document.documentElement.classList.toggle('dark');
     const isDark = document.documentElement.classList.contains('dark');
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    if(window.showToast) window.showToast(isDark ? 'تم تفعيل الوضع الليلي 🌙' : 'تم تفعيل الوضع النهاري ☀️');
 };
 
-// 6. دوال المحادثة (الدردشة)
-window.openChat = async (targetUser) => {
-    if (!window.currentUserRecord) return;
-    window.activeChatUser = targetUser; 
-    let displayTarget = window.currentUserRecord.role === 'admin' ? targetUser : "الأستاذ";
-    document.getElementById('chat-target-name').innerText = displayTarget;
-    
-    const modal = document.getElementById('chat-modal');
-    modal.classList.remove('hidden'); modal.classList.add('flex');
-    
-    let chatRoomId = window.currentUserRecord.role === 'admin' ? targetUser : window.currentUserRecord.username;
-    let messagesRef = collection(db, chatsPath, chatRoomId, 'messages');
-    
-    const chatDocRef = doc(db, chatsPath, chatRoomId);
-    await setDoc(chatDocRef, { [window.currentUserRecord.role === 'admin' ? 'unreadAdmin' : 'unreadStudent']: 0 }, { merge: true });
-
-    if(unsubscribeChat) unsubscribeChat();
-    unsubscribeChat = onSnapshot(messagesRef, (snapshot) => {
-        let msgs = []; snapshot.forEach(d => msgs.push({ id: d.id, ...d.data() }));
-        msgs.sort((a, b) => a.timestamp - b.timestamp); 
-        
-        let chatHtml = '';
-        msgs.forEach(m => {
-            let isMine = m.sender === window.currentUserRecord.role; let isAdminMsg = m.sender === 'admin';
-            let bubbleClass = isMine ? 'chat-mine dark:bg-blue-900/30 dark:border-blue-800' : 'chat-other dark:bg-slate-800 dark:border-slate-700';
-            let alignment = isMine ? 'self-end' : 'self-start';
-            let textColor = isAdminMsg && !isMine ? 'text-red-600 dark:text-red-400 font-bold' : 'text-slate-700 dark:text-slate-200';
-            
-            if (m.isSystemMessage) {
-                bubbleClass = 'bg-amber-100 dark:bg-amber-900/40 border-amber-300 dark:border-amber-700 border-2 w-full max-w-[95%] text-center mx-auto shadow-md';
-                alignment = 'self-center';
-                textColor = 'text-amber-900 dark:text-amber-400 font-black';
-            }
-
-            chatHtml += `<div class="chat-bubble ${bubbleClass} ${alignment} shadow-sm transition hover:shadow-md"><p class="text-[14px] whitespace-pre-wrap break-words ${textColor}" dir="auto">${window.escapeHtml(m.text)}</p></div>`;
-        });
-        
-        const msgBox = document.getElementById('chat-messages');
-        if(msgBox) {
-            msgBox.innerHTML = chatHtml || `<div class="h-full flex flex-col items-center justify-center opacity-50"><i class="ph-fill ph-hand-waving text-6xl text-slate-400 mb-3"></i><div class="text-center text-slate-500 font-bold bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm text-sm">أهلاً بك! يمكنك المراسلة هنا.</div></div>`;
-            msgBox.scrollTop = msgBox.scrollHeight;
-        }
-        if (window.activeChatUser) setDoc(doc(db, chatsPath, chatRoomId), { [window.currentUserRecord.role === 'admin' ? 'unreadAdmin' : 'unreadStudent']: 0 }, { merge: true });
-    }, e => { console.error("Chat Error", e); });
-};
-
-window.closeChat = () => { 
-    document.getElementById('chat-modal').classList.add('hidden'); 
-    document.getElementById('chat-modal').classList.remove('flex'); 
-    if(unsubscribeChat) unsubscribeChat(); 
-    window.activeChatUser = null; 
-};
-
-window.sendChatMessage = async () => {
-    let inputEl = document.getElementById('chat-input'); let text = inputEl.value.trim();
-    if(!text) return; 
-    
-    let btn = document.getElementById('send-msg-btn'); const origHtml = btn.innerHTML;
-    btn.disabled = true; btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i>';
-
-    try {
-        let chatRoomId = window.currentUserRecord.role === 'admin' ? window.activeChatUser : window.currentUserRecord.username;
-        let chatDocRef = doc(db, chatsPath, chatRoomId); let messagesRef = collection(db, chatsPath, chatRoomId, 'messages');
-        await setDoc(doc(messagesRef, Date.now().toString()), { sender: window.currentUserRecord.role, text: text, timestamp: Date.now() });
-        await setDoc(chatDocRef, { [window.currentUserRecord.role === 'admin' ? 'unreadStudent' : 'unreadAdmin']: increment(1) }, { merge: true });
-        inputEl.value = ''; setTimeout(() => { const msgBox = document.getElementById('chat-messages'); msgBox.scrollTop = msgBox.scrollHeight; }, 100);
-    } catch(e) { console.error(e); if(window.showToast) window.showToast("فشل الإرسال. تأكد من اتصالك بالإنترنت", "error"); }
-    btn.disabled = false; btn.innerHTML = origHtml;
-};
-
-// 7. دوال الإدارة وصلاحيات الأستاذ (المراقبة)
-window.loginAsStudent = (studentUsername) => {
-    const studentObj = window.adminUsersList.find(u => u.id === studentUsername);
-    if(!studentObj) return;
-
-    window.originalAdminRecord = { ...window.currentUserRecord };
-    window.currentUserRecord = { username: studentObj.id, ...studentObj.data };
-    
-    document.getElementById('display-username').innerText = window.currentUserRecord.username;
-    document.getElementById('student-level-badge').innerText = levelNames[window.currentUserRecord.level];
-    
-    document.getElementById('return-admin-btn').classList.remove('hidden');
-    document.getElementById('student-settings-btn').classList.add('hidden'); 
-    document.getElementById('student-chat-btn').classList.add('hidden'); 
-    document.getElementById('student-dark-btn').classList.add('hidden'); 
-    document.getElementById('student-logout-btn').classList.add('hidden'); 
-    document.getElementById('student-notif-btn').classList.add('hidden');
-
-    if(unsubscribeUsers) unsubscribeUsers();
-    if(unsubscribeChatMeta) unsubscribeChatMeta();
-
-    window.studentActiveBranchTab = null;
-    window.switchScreen('app-screen');
-    document.getElementById('admin-screen').classList.add('hidden');
-    document.getElementById('student-dashboard').classList.remove('hidden');
-    
-    startStudentListeners();
-    if(window.showToast) window.showToast(`أنت الآن داخل حساب التلميذ في وضع المراقبة`);
-};
-
-window.returnToAdmin = () => {
-    if(!window.originalAdminRecord) return;
-    window.currentUserRecord = { ...window.originalAdminRecord };
-    window.originalAdminRecord = null;
-    
-    document.getElementById('return-admin-btn').classList.add('hidden');
-    document.getElementById('student-settings-btn').classList.remove('hidden');
-    document.getElementById('student-chat-btn').classList.remove('hidden');
-    document.getElementById('student-dark-btn').classList.remove('hidden');
-    document.getElementById('student-logout-btn').classList.remove('hidden');
-    document.getElementById('student-notif-btn').classList.remove('hidden');
-
-    if(unsubscribeUsers) unsubscribeUsers();
-    if(unsubscribeChatMeta) unsubscribeChatMeta();
-
-    window.switchScreen('app-screen');
-    document.getElementById('student-dashboard').classList.add('hidden');
-    document.getElementById('admin-screen').classList.remove('hidden');
-    if (window.returnToAdminHome) window.returnToAdminHome();
-    
-    startAdminListeners();
-    if(window.showToast) window.showToast("تمت العودة للوحة الإدارة بنجاح");
-};
-
-// 8. مستمعو البيانات
-const startAdminListeners = () => {
-    unsubscribeProgram = onSnapshot(doc(programCol, 'main'), (docSnap) => {
-        if(docSnap.exists()) { 
-            let data = docSnap.data();
-            window.currentSections = data.sections; 
-            window.currentUpdates = data.latestUpdates || []; 
-            if (window.renderProgramUI) window.renderProgramUI(window.currentSections, 'admin-program-view', true); 
-            if (window.renderAdminTable) window.renderAdminTable(); 
-        }
-    });
-
-    if(unsubscribeUsers) unsubscribeUsers();
-    unsubscribeUsers = onSnapshot(usersCol, (snapshot) => {
-        window.adminUsersList = []; window.allStudentsProgress = []; 
-        snapshot.forEach(d => { 
-            if(d.data().role !== 'admin') {
-                let data = d.data(); window.adminUsersList.push({id: d.id, data: data}); 
-                if (window.calculateProgressXP) {
-                    let prog = window.calculateProgressXP(data.level, data, window.currentSections);
-                    window.allStudentsProgress.push({ id: d.id, level: data.level, xp: prog.xp, approved: data.approved });
-                }
-            }
-        });
-        if (window.renderAdminTable) window.renderAdminTable();
-    });
-
-    if(unsubscribeChatMeta) unsubscribeChatMeta();
-    unsubscribeChatMeta = onSnapshot(collection(db, chatsPath), (snapshot) => {
-        window.adminChatsData = {}; 
-        let totalUnread = 0;
-        let notifHtml = '';
-
-        snapshot.forEach(d => { 
-            let data = d.data();
-            window.adminChatsData[d.id] = data; 
-            if(data.unreadAdmin > 0) {
-                totalUnread += data.unreadAdmin;
-                notifHtml += `
-                    <button onclick="openChat('${d.id}')" class="flex items-center justify-between p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl hover:bg-amber-100 dark:hover:bg-amber-900/40 transition border border-amber-100 dark:border-amber-800/50 group text-right w-full">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-amber-200 dark:bg-amber-800 text-amber-700 dark:text-amber-300 flex items-center justify-center text-xl shadow-inner"><i class="ph-fill ph-user"></i></div>
-                            <div>
-                                <div class="font-black text-slate-800 dark:text-white text-sm group-hover:text-amber-600 transition">${d.id}</div>
-                                <div class="text-xs text-slate-500 dark:text-slate-400 font-bold mt-0.5">لديك ${data.unreadAdmin} رسالة/إشعار</div>
-                            </div>
-                        </div>
-                        <i class="ph-bold ph-chat-circle-dots text-amber-500 text-xl group-hover:scale-110 transition"></i>
-                    </button>
-                `;
-            }
-        }); 
-        if (window.renderAdminTable) window.renderAdminTable();
-        
-        const globalBadge = document.getElementById('admin-global-badge');
-        const notifContainer = document.getElementById('admin-notifications-container');
-        if (globalBadge) {
-            if (totalUnread > 0) {
-                globalBadge.innerText = totalUnread > 99 ? '99+' : totalUnread;
-                globalBadge.classList.remove('hidden');
-                if(notifContainer) notifContainer.innerHTML = notifHtml;
+window.switchScreen = (screenId) => {
+    ['auth-screen', 'pending-screen', 'app-screen'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            if (id === screenId) {
+                el.classList.add('active');
             } else {
-                globalBadge.classList.add('hidden');
-                if(notifContainer) notifContainer.innerHTML = '<div class="text-center text-slate-500 dark:text-slate-400 text-sm font-bold p-4">لا توجد إشعارات جديدة</div>';
+                el.classList.remove('active');
             }
         }
     });
 };
 
-const startStudentListeners = () => {
-    let isInitialProgramLoad = true;
+window.logoutAndGoAuth = async () => {
+    await signOut(auth);
+    window.currentUserRecord = null;
+    window.switchScreen('auth-screen');
+};
 
-    unsubscribeProgram = onSnapshot(doc(programCol, 'main'), (docSnap) => {
-        if(docSnap.exists()) { 
-            let data = docSnap.data();
-            window.currentSections = data.sections; 
+const setupDataListeners = () => {
+    onSnapshot(doc(programCol, 'main'), (docSnap) => {
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            window.currentSections = data.sections || [];
             window.currentUpdates = data.latestUpdates || [];
-
-            if(document.getElementById('lesson-search').value.trim() === '') { 
-                if (window.renderProgramUI) window.renderProgramUI(window.currentSections, 'student-program-view', false); 
-            }
-            if (window.updateProgressUI) window.updateProgressUI(window.currentSections); 
-            if (window.renderLeaderboard) window.renderLeaderboard(); 
-
-            if (window.currentUserRecord && window.currentUserRecord.role === 'student') {
-                let myUpdates = window.currentUpdates.filter(u => u.level === window.currentUserRecord.level);
-                let seenUpdates = JSON.parse(localStorage.getItem(`seen_updates_${window.currentUserRecord.username}`)) || [];
-
-                if (!isInitialProgramLoad) {
-                    myUpdates.forEach(u => {
-                        if (!seenUpdates.includes(u.id) && (Date.now() - u.timestamp < 15000)) {
-                            if (window.showToast) window.showToast(`محتوى جديد متاح: ${u.title}`, 'success');
-                        }
-                    });
-                }
-                
-                if (window.renderStudentNotifications) window.renderStudentNotifications(myUpdates, seenUpdates);
-            }
             
-            isInitialProgramLoad = false;
+            if (window.currentUserRecord) {
+                if (window.currentUserRecord.role === 'admin') {
+                    if (window.adminActivePart) {
+                        window.renderProgramUI(window.currentSections, 'admin-program-view', true);
+                    }
+                } else {
+                    window.renderProgramUI(window.currentSections, 'student-program-view', false);
+                    window.updateProgressUI(window.currentSections);
+                    
+                    let seenUpdates = JSON.parse(localStorage.getItem(`seen_updates_${window.currentUserRecord.username}`)) || [];
+                    let myUpdates = window.currentUpdates.filter(u => u.level === window.currentUserRecord.level);
+                    window.renderStudentNotifications(myUpdates, seenUpdates);
+                }
+            }
         }
-    });
-    
-    if(unsubscribeUsers) unsubscribeUsers();
-    unsubscribeUsers = onSnapshot(usersCol, (snapshot) => {
-        window.allStudentsProgress = [];
-        snapshot.forEach(d => {
-            let data = d.data();
-            if(data.role !== 'admin') {
-                if (window.calculateProgressXP) {
-                    let prog = window.calculateProgressXP(data.level, data, window.currentSections);
-                    window.allStudentsProgress.push({ id: d.id, level: data.level, xp: prog.xp, approved: data.approved });
-                }
-            }
-            if(window.currentUserRecord && d.id === window.currentUserRecord.username) {
-                window.currentUserRecord.clickedLinks = data.clickedLinks || [];
-                window.currentUserRecord.phoneNumber = data.phoneNumber || ''; 
-                if (window.updateProgressUI) window.updateProgressUI(window.currentSections || []); 
-                
-                if(document.getElementById('lesson-search').value.trim() === '') { 
-                    if (window.renderProgramUI) window.renderProgramUI(window.currentSections || [], 'student-program-view', false); 
-                } else { 
-                    if (window.executeStudentSearch) window.executeStudentSearch(); 
-                }
-            }
-        });
-        if (window.renderLeaderboard) window.renderLeaderboard(); 
+    }, (error) => {
+        console.error("Error listening to program:", error);
     });
 
-    if(unsubscribeChatMeta) unsubscribeChatMeta();
-    if(window.currentUserRecord) {
-        unsubscribeChatMeta = onSnapshot(doc(db, chatsPath, window.currentUserRecord.username), (docSnap) => {
-            const badge = document.getElementById('student-chat-badge');
-            if(badge && docSnap.exists() && docSnap.data().unreadStudent > 0) { 
-                badge.innerText = docSnap.data().unreadStudent; 
-                badge.classList.remove('hidden'); 
-            } else if (badge) { 
-                badge.classList.add('hidden'); 
+    onSnapshot(usersCol, (snapshot) => {
+        window.adminUsersList = [];
+        window.allStudentsProgress = [];
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.role !== 'admin') {
+                window.adminUsersList.push({ id: doc.id, data: data });
+                let p = window.calculateProgressXP ? window.calculateProgressXP(data.level, data, window.currentSections) : {xp:0};
+                window.allStudentsProgress.push({ id: doc.id, level: data.level, xp: p.xp, approved: data.approved });
             }
         });
-    }
+        if (window.currentUserRecord && window.currentUserRecord.role === 'admin' && window.adminMainTab === 'accounts') {
+            if(window.renderAdminTable) window.renderAdminTable();
+            if(window.renderLeaderboard) window.renderLeaderboard();
+        }
+    }, (error) => {
+        console.error("Error listening to users:", error);
+    });
 };
 
-// 9. المستمع الرئيسي للمصادقة (نقطة الدخول)
 onAuthStateChanged(auth, async (user) => {
-    window.isAuthReady = true;
     if (user) {
-        try {
-            const progDoc = await getDoc(doc(programCol, 'main'));
-            if (!progDoc.exists()) {
-                await setDoc(doc(programCol, 'main'), { sections: defaultProgramData, latestUpdates: [] });
-            } else {
-                let data = progDoc.data();
-                let needsUpdate = false;
-                data.sections.forEach(part => {
-                    part.years.forEach(year => {
-                        ['s1', 's2', 's3'].forEach((sem, idx) => {
-                            let semId = `${year.id}_${sem}`; let semTitle = `الفصل ${idx + 1}`;
-                            let existingSem = year.branches.find(b => b.id === semId);
-                            if (!existingSem) { year.branches.push({ id: semId, title: semTitle, categories: { terms: [], exams: [] } }); needsUpdate = true; }
-                        });
-                        if (year.id === 'm_y4') {
-                            let existingB5 = year.branches.find(b => b.id === 'm4_b5');
-                            if (!existingB5) { year.branches.push({ id: "m4_b5", title: "شهادتك 🎓", categories: { 'past_exams': [], 'mock_exams': [] } }); needsUpdate = true; }
-                        }
-                    });
-                });
-                if (needsUpdate) await updateDoc(doc(programCol, 'main'), { sections: data.sections });
+        const username = user.email.split('@')[0];
+        const userDoc = await getDoc(doc(usersCol, username));
+        
+        if (userDoc.exists()) {
+            window.currentUserRecord = { username: username, ...userDoc.data() };
+            const uData = window.currentUserRecord;
+            
+            if (uData.role !== 'admin' && !uData.approved) {
+                window.switchScreen('pending-screen');
+                return;
             }
-
-            const adminDoc = await getDoc(doc(usersCol, 'admin'));
-            if (!adminDoc.exists()) await setDoc(doc(usersCol, 'admin'), { role: 'admin', approved: true, clickedLinks: [] });
-
-            if (user.email && !window.currentUserRecord && !window.isRegistering) {
-                const username = user.email.split('@')[0];
-                const userRef = doc(usersCol, username);
-                const userSnap = await getDoc(userRef);
+            
+            document.getElementById('display-username').innerText = username;
+            
+            if (uData.role === 'admin') {
+                document.getElementById('student-level-badge').innerText = 'لوحة الإدارة';
+                document.getElementById('student-level-badge').className = 'inline-block mt-1.5 px-3 py-1 bg-purple-50 text-purple-700 text-xs font-black rounded-lg border border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800';
                 
-                if (userSnap.exists()) {
-                    window.currentUserRecord = { username, ...userSnap.data() };
-                    
-                    if (window.currentUserRecord.role === 'admin') {
-                        window.switchScreen('app-screen');
-                        document.getElementById('student-dashboard').classList.add('hidden');
-                        document.getElementById('admin-screen').classList.remove('hidden');
-                        if (window.returnToAdminHome) window.returnToAdminHome();
-                        startAdminListeners();
-                    } else if (!window.currentUserRecord.approved) {
-                        window.switchScreen('pending-screen');
-                        await signOut(auth);
-                    } else {
-                        document.getElementById('display-username').innerText = username;
-                        document.getElementById('student-level-badge').innerText = levelNames[window.currentUserRecord.level] || "تلميذ";
-                        window.switchScreen('app-screen');
-                        document.getElementById('admin-screen').classList.add('hidden');
-                        document.getElementById('student-dashboard').classList.remove('hidden');
-                        startStudentListeners();
-                    }
-                }
+                document.getElementById('student-dashboard').classList.add('hidden');
+                document.getElementById('admin-screen').classList.remove('hidden');
+                
+                document.getElementById('admin-main-menu').classList.remove('hidden');
+                document.getElementById('admin-content-wrapper').classList.add('hidden');
+                document.getElementById('admin-accounts-wrapper').classList.add('hidden');
+                
+                document.getElementById('student-notif-btn').classList.add('hidden');
+            } else {
+                const levelNames = { "m_y1": "الأولى متوسط", "m_y2": "الثانية متوسط", "m_y3": "الثالثة متوسط", "m_y4": "الرابعة متوسط", "h_y1": "أولى ثانوي", "h_y2": "الثانية ثانوي", "h_y3": "الثالثة ثانوي" };
+                document.getElementById('student-level-badge').innerText = levelNames[uData.level] || 'طالب';
+                document.getElementById('student-dashboard').classList.remove('hidden');
+                document.getElementById('admin-screen').classList.add('hidden');
             }
-        } catch(e) { console.error(e); }
+            
+            window.switchScreen('app-screen');
+            setupDataListeners();
+        } else {
+            window.switchScreen('auth-screen');
+        }
     } else {
         window.switchScreen('auth-screen');
     }
 });
 
-// 10. مستمع لتسجيل الخروج والنجاح
-window.addEventListener('userLoggedOut', () => {
-    if(unsubscribeProgram) unsubscribeProgram();
-    if(unsubscribeUsers) unsubscribeUsers();
-    if(unsubscribeChat) unsubscribeChat();
-    if(unsubscribeChatMeta) unsubscribeChatMeta();
-    if (typeof window.closeChat === 'function') window.closeChat();
-    window.switchScreen('auth-screen');
-});
+// تطبيق الثيم المحفوظ
+if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    document.documentElement.classList.add('dark');
+} else {
+    document.documentElement.classList.remove('dark');
+}
 
-window.addEventListener('authSuccess', (e) => {
-    const userRecord = e.detail;
-    if (userRecord.role === 'admin') {
-        window.switchScreen('app-screen');
-        document.getElementById('student-dashboard').classList.add('hidden');
-        document.getElementById('admin-screen').classList.remove('hidden');
-        if (window.returnToAdminHome) window.returnToAdminHome();
-        if (typeof startAdminListeners === 'function') startAdminListeners();
-    } else if (!userRecord.approved) {
-        window.switchScreen('pending-screen');
-    } else {
-        document.getElementById('display-username').innerText = userRecord.username;
-        document.getElementById('student-level-badge').innerText = levelNames[userRecord.level] || "تلميذ";
-        window.switchScreen('app-screen');
-        document.getElementById('admin-screen').classList.add('hidden');
-        document.getElementById('student-dashboard').classList.remove('hidden');
-        if (typeof startStudentListeners === 'function') startStudentListeners();
-    }
+// الترحيب عند نجاح الدخول
+window.addEventListener('authSuccess', () => {
+    if(window.showToast) window.showToast(`أهلاً بك مجدداً ${window.currentUserRecord.username} 👋`);
 });
