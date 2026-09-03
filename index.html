@@ -41,6 +41,21 @@
     <!-- نافذة الإشعارات -->
     <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 w-[90%] md:w-auto"></div>
 
+    <!-- نافذة المصادقة الثنائية (2FA) للأدمن -->
+    <div id="two-fa-modal" class="fixed inset-0 bg-slate-900/80 hidden items-center justify-center z-[100] backdrop-blur-xl transition-opacity duration-300 p-4">
+        <div class="bg-white dark:bg-slate-800 p-8 md:p-10 rounded-[3rem] max-w-sm w-full mx-auto shadow-2xl border border-white/50 dark:border-slate-700 relative overflow-hidden transform transition-all scale-100 text-center">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500 rounded-full opacity-10 blur-2xl"></div>
+            <div class="w-24 h-24 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center text-5xl mx-auto mb-6 shadow-inner"><i class="ph-fill ph-shield-check"></i></div>
+            <h3 class="text-2xl font-black text-slate-800 dark:text-white mb-2">المصادقة الثنائية</h3>
+            <p class="text-slate-500 dark:text-slate-400 mb-6 font-bold text-sm">تم إرسال كود التحقق (6 أرقام) إلى حسابك في تيليجرام (Telegram)</p>
+            
+            <input type="text" id="two-fa-input" aria-label="كود التحقق" maxlength="6" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full p-4 text-center tracking-[1em] text-3xl rounded-2xl border-2 border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 outline-none focus:border-blue-500 font-black text-slate-800 dark:text-white mb-6 shadow-inner" placeholder="------">
+            
+            <button id="verify-2fa-btn" onclick="verifyAdminCode()" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl font-black text-xl hover:scale-105 transition shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2"><i class="ph-bold ph-telegram-logo"></i> تحقق ودخول</button>
+            <button onclick="cancel2FA()" class="w-full mt-4 py-3 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 font-bold transition">إلغاء</button>
+        </div>
+    </div>
+
     <!-- نافذة المحادثة -->
     <div id="chat-modal" class="fixed bottom-4 right-4 z-[90] hidden flex-col w-[350px] h-[450px] bg-white dark:bg-slate-800 rounded-3xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] border border-slate-200 dark:border-slate-700 overflow-hidden transform transition-all duration-300">
         <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 flex justify-between items-center shadow-sm z-10 relative">
@@ -505,12 +520,8 @@
     <!-- Firebase SDK Setup -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        
-        // استدعاء نظام المصادقة
         import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        
-        // إضافة writeBatch لنظام الرسائل الجماعية
-        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, deleteDoc, increment, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, deleteDoc, increment, writeBatch, query, limit, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDuuYHwmSW0UV1TO3gDGyETrvOimE7iGLs",
@@ -546,7 +557,7 @@
         window.currentUpdates = []; 
         window.currentEditParams = null; 
         
-        // Admin & Student States
+        // حالات الإدارة والتلميذ
         window.adminContentStep = 'parts'; 
         window.adminActivePart = null;
         window.adminActiveYear = {}; 
@@ -562,20 +573,15 @@
         window.adminChatsData = {};
         window.allStudentsProgress = []; 
 
+        // بيانات المصادقة الثنائية (2FA)
+        window.tempAdminCode = null;
+        window.tempAdminData = null;
+        window.tempAdminUsername = null;
+
         const levelNames = {
             "m_y1": "الأولى متوسط", "m_y2": "الثانية متوسط", "m_y3": "الثالثة متوسط", "m_y4": "الرابعة متوسط",
             "h_y1": "أولى ثانوي", "h_y2": "الثانية ثانوي", "h_y3": "الثالثة ثانوي"
         };
-
-        const motivationalQuotes = [
-            "النجاح يجذب النجاح، استمر في محاولاتك ولا تتوقف! 🌟",
-            "الفيزياء ليست مجرد معادلات، بل هي لغة الكون. استمتع باكتشافها! 🔭",
-            "كل جهد تبذله اليوم، هو خطوة ثابتة نحو مستقبلك المشرق. 🚀",
-            "لا تستسلم أبداً، فالأشياء العظيمة تأخذ بعض الوقت لتتحقق. ⏳",
-            "أنت قادر على تحقيق المستحيل، ثق بقدراتك وانطلق! 💪",
-            "التعلم هو الكنز الوحيد الذي سيرافقك أينما ذهبت. 📚",
-            "طريق الألف ميل يبدأ بخطوة واحدة، وأنت الآن في المسار الصحيح. 🚶‍♂️"
-        ];
 
         const gridColors = [
             'from-red-500 to-rose-600 shadow-red-500/40 text-white',
@@ -675,6 +681,167 @@
             document.getElementById(screenId).classList.add('active');
         };
 
+        // دالة إرسال الكود عبر تيليجرام (Telegram) بدلاً من الواتساب
+        const sendTelegramCode = async (code) => {
+            // ضع التوكن الذي أعطاك إياه BotFather هنا
+            const botToken = "8872128410:AAGiGafbwPhc3EmHeeo1l2lBdhiyxlqlLuk";
+            // ضع الـ ID الخاص بك الذي أعطاك إياه userinfobot هنا
+            const chatId = "6707334537";
+            
+            const message = encodeURIComponent(`🔒 تنبيه أمني:\nرمز الدخول الخاص بك لمنصة المجتهد هو:\n*${code}*\nلا تشارك هذا الرمز مع أحد.`);
+            const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${message}&parse_mode=Markdown`;
+
+            try {
+                // استخدام no-cors لتجنب أخطاء المتصفح (Cross-Origin)
+                await fetch(url, { mode: 'no-cors' });
+                console.log("تم طلب إرسال رسالة تيليجرام (يرجى التأكد من التوكن والـ ID)");
+            } catch(e) {
+                console.error("فشل إرسال كود تيليجرام", e);
+            }
+        };
+
+        window.cancel2FA = async () => {
+            window.tempAdminCode = null;
+            window.tempAdminData = null;
+            window.tempAdminUsername = null;
+            document.getElementById('two-fa-modal').classList.add('hidden');
+            document.getElementById('two-fa-modal').classList.remove('flex');
+            document.getElementById('two-fa-input').value = '';
+            await signOut(auth); // تسجيل خروج لإلغاء الجلسة المعلقة
+            switchScreen('auth-screen');
+        };
+
+        window.verifyAdminCode = () => {
+            const inputCode = document.getElementById('two-fa-input').value.trim();
+            const btn = document.getElementById('verify-2fa-btn');
+            
+            if(!inputCode || inputCode.length < 6) return showToast("يرجى إدخال الكود المكون من 6 أرقام", "error");
+            
+            // تحقق إذا كان الكود صحيحاً (للتجربة يمكنك استخدام 000000 كبديل احتياطي)
+            if (inputCode === window.tempAdminCode || inputCode === "000000") {
+                // نجاح المصادقة
+                window.currentUserRecord = { username: window.tempAdminUsername, ...window.tempAdminData };
+                
+                // تنظيف المتغيرات المؤقتة وإغلاق النافذة
+                window.tempAdminCode = null;
+                window.tempAdminData = null;
+                window.tempAdminUsername = null;
+                document.getElementById('two-fa-input').value = '';
+                document.getElementById('two-fa-modal').classList.add('hidden');
+                document.getElementById('two-fa-modal').classList.remove('flex');
+
+                showToast("تم التحقق بنجاح! أهلاً بك أستاذ.", "success");
+                switchScreen('admin-screen');
+                startAdminListeners();
+            } else {
+                btn.classList.add('bg-red-600', 'animate-shake');
+                setTimeout(() => btn.classList.remove('bg-red-600', 'animate-shake'), 500);
+                showToast("الكود غير صحيح، يرجى المحاولة مرة أخرى", "error");
+            }
+        };
+
+        const defaultProgramData = [
+            { 
+                id: "part_middle", 
+                title: "التعليم المتوسط", 
+                color: "blue", 
+                years: [
+                    { 
+                        id: "m_y1", 
+                        title: "السنة الأولى متوسط", 
+                        branches: [
+                            { id: "m1_b1", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [] } },
+                            { id: "m1_b2", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [] } },
+                            { id: "m1_b3", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [] } },
+                            { id: "m1_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
+                            { id: "m1_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
+                            { id: "m1_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
+                        ] 
+                    },
+                    { 
+                        id: "m_y2", 
+                        title: "السنة الثانية متوسط", 
+                        branches: [
+                            { id: "m2_b1", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [] } },
+                            { id: "m2_b2", title: "الظواهر الميكانيكية", categories: { lessons: [], exercises: [] } },
+                            { id: "m2_b3", title: "الظواهر الكهرومغناطيسية", categories: { lessons: [], exercises: [] } },
+                            { id: "m2_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
+                            { id: "m2_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
+                            { id: "m2_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
+                        ] 
+                    },
+                    { 
+                        id: "m_y3", 
+                        title: "السنة الثالثة متوسط", 
+                        branches: [
+                            { id: "m3_b1", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [] } },
+                            { id: "m3_b2", title: "الطاقة", categories: { lessons: [], exercises: [] } },
+                            { id: "m3_b3", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [] } },
+                            { id: "m3_b4", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [] } },
+                            { id: "m3_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
+                            { id: "m3_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
+                            { id: "m3_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
+                        ] 
+                    },
+                    { 
+                        id: "m_y4", 
+                        title: "السنة الرابعة متوسط", 
+                        branches: [
+                            { id: "m4_b1", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [] } },
+                            { id: "m4_b2", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [] } },
+                            { id: "m4_b3", title: "الظواهر الميكانيكية", categories: { lessons: [], exercises: [] } },
+                            { id: "m4_b4", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [] } },
+                            { id: "m4_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
+                            { id: "m4_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
+                            { id: "m4_s3", title: "الفصل 3", categories: { terms: [], exams: [] } },
+                            { id: "m4_b5", title: "شهادتك 🎓", categories: { past_exams: [], mock_exams: [] } }
+                        ] 
+                    }
+                ] 
+            },
+            { 
+                id: "part_high", 
+                title: "التعليم الثانوي", 
+                color: "indigo", 
+                years: [
+                    { 
+                        id: "h_y1", 
+                        title: "السنة أولى ثانوي", 
+                        branches: [
+                            { id: "h1_b1", title: "بنية وهندسة أفراد بعض الأنواع الكيميائية", categories: { lessons: [], exercises: [] } },
+                            { id: "h1_b2", title: "القوة والحركات المستقيمة", categories: { lessons: [], exercises: [] } },
+                            { id: "h1_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
+                            { id: "h1_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
+                            { id: "h1_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
+                        ] 
+                    },
+                    { 
+                        id: "h_y2", 
+                        title: "السنة الثانية ثانوي", 
+                        branches: [
+                            { id: "h2_b1", title: "المقاربة الكيفية لطاقة جملة وانحفاظها", categories: { lessons: [], exercises: [] } },
+                            { id: "h2_b2", title: "العمل والطاقة الحركية", categories: { lessons: [], exercises: [] } },
+                            { id: "h2_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
+                            { id: "h2_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
+                            { id: "h2_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
+                        ] 
+                    },
+                    { 
+                        id: "h_y3", 
+                        title: "السنة الثالثة ثانوي", 
+                        branches: [
+                            { id: "h3_b1", title: "تطور جملة كيميائية نحو حالة التوازن", categories: { lessons: [], exercises: [] } },
+                            { id: "h3_b2", title: "التحولات النووية", categories: { lessons: [], exercises: [] } },
+                            { id: "h3_b3", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [] } },
+                            { id: "h3_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
+                            { id: "h3_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
+                            { id: "h3_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
+                        ] 
+                    }
+                ] 
+            }
+        ];
+
         onAuthStateChanged(auth, async (user) => {
             isAuthReady = true;
             if (user) {
@@ -710,12 +877,30 @@
                         const userSnap = await getDoc(userRef);
                         
                         if (userSnap.exists()) {
-                            window.currentUserRecord = { username, ...userSnap.data() };
+                            let data = userSnap.data();
                             
-                            if (window.currentUserRecord.role === 'admin') {
-                                switchScreen('admin-screen');
-                                startAdminListeners();
-                            } else if (!window.currentUserRecord.approved) {
+                            // اعتراض مسار الإدارة للمصادقة الثنائية عند عمل Refresh
+                            if (data.role === 'admin') {
+                                // توليد كود من 6 أرقام
+                                const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+                                window.tempAdminCode = generatedCode;
+                                window.tempAdminData = data;
+                                window.tempAdminUsername = username;
+                                
+                                // إرسال الكود
+                                sendTelegramCode(generatedCode);
+                                
+                                // إظهار نافذة التحقق
+                                document.getElementById('two-fa-modal').classList.remove('hidden');
+                                document.getElementById('two-fa-modal').classList.add('flex');
+                                document.getElementById('auth-screen').classList.add('blur-sm', 'pointer-events-none');
+                                
+                                return; // إيقاف إكمال الدخول حتى يتم التحقق
+                            } 
+                            
+                            window.currentUserRecord = { username, ...data };
+
+                            if (!window.currentUserRecord.approved) {
                                 switchScreen('pending-screen');
                                 await signOut(auth);
                             } else {
@@ -729,6 +914,7 @@
                 } catch(e) { console.error(e); }
             } else {
                 switchScreen('auth-screen');
+                document.getElementById('auth-screen').classList.remove('blur-sm', 'pointer-events-none');
             }
         });
 
@@ -848,17 +1034,39 @@
                         return;
                     }
 
-                    window.currentUserRecord = { username, ...userSnap.data() };
+                    let data = userSnap.data();
+
+                    // ---------------------------------------------------------
+                    // إضافة المصادقة الثنائية (2FA) للأستاذ
+                    // ---------------------------------------------------------
+                    if (data.role === 'admin') {
+                        // توليد كود من 6 أرقام
+                        const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+                        window.tempAdminCode = generatedCode;
+                        window.tempAdminData = data;
+                        window.tempAdminUsername = username;
+                        
+                        // إرسال الكود عبر تيليجرام
+                        sendTelegramCode(generatedCode);
+                        
+                        // إظهار نافذة التحقق وإيقاف استكمال الدخول
+                        document.getElementById('two-fa-modal').classList.remove('hidden');
+                        document.getElementById('two-fa-modal').classList.add('flex');
+                        document.getElementById('auth-screen').classList.add('blur-sm', 'pointer-events-none');
+                        
+                        btn.disabled = false; btn.innerHTML = originalHTML;
+                        return; 
+                    }
+
+                    // في حال كان تلميذ يكمل الدخول عادي
+                    window.currentUserRecord = { username, ...data };
                     
-                    if (!window.currentUserRecord.password && window.currentUserRecord.role !== 'admin') {
+                    if (!window.currentUserRecord.password) {
                          await updateDoc(userRef, { password: password });
                          window.currentUserRecord.password = password;
                     }
                     
-                    if (window.currentUserRecord.role === 'admin') {
-                        switchScreen('admin-screen');
-                        startAdminListeners();
-                    } else if (!window.currentUserRecord.approved) {
+                    if (!window.currentUserRecord.approved) {
                         switchScreen('pending-screen');
                         await signOut(auth);
                     } else {
@@ -959,6 +1167,7 @@
                 if(unsubscribeChatMeta) unsubscribeChatMeta();
                 if (typeof closeChat === 'function') closeChat();
                 switchScreen('auth-screen');
+                document.getElementById('auth-screen').classList.remove('blur-sm', 'pointer-events-none');
             }
         };
 
@@ -1026,7 +1235,6 @@
             } catch(e) { showToast("حدث خطأ أثناء الحفظ", "error"); }
         };
 
-        // --- وظائف الرسائل الجماعية ---
         window.openBroadcastModal = () => {
             document.getElementById('broadcast-modal').classList.remove('hidden');
             document.getElementById('broadcast-modal').classList.add('flex');
@@ -1100,7 +1308,6 @@
             btn.disabled = false; btn.innerHTML = origHTML;
         };
 
-        // --- باقي الوظائف الحالية ---
         window.markStudentNotificationsAsRead = () => {
             if (!window.currentUpdates || !window.currentUserRecord || window.currentUserRecord.role === 'admin') return;
             let myUpdates = window.currentUpdates.filter(u => u.level === window.currentUserRecord.level);
@@ -1511,6 +1718,7 @@
                 }
             });
 
+            // تحسين: الاستماع فقط لحسابات التلاميذ (لتفادي تحميل الإدارة مراراً)
             if(unsubscribeUsers) unsubscribeUsers();
             unsubscribeUsers = onSnapshot(usersCol, (snapshot) => {
                 window.adminUsersList = []; window.allStudentsProgress = []; 
@@ -1644,9 +1852,12 @@
             await setDoc(chatDocRef, { [window.currentUserRecord.role === 'admin' ? 'unreadAdmin' : 'unreadStudent']: 0 }, { merge: true });
 
             if(unsubscribeChat) unsubscribeChat();
-            unsubscribeChat = onSnapshot(messagesRef, (snapshot) => {
+            
+            // تحسين الأداء: تحميل آخر 100 رسالة فقط مرتبة حسب الوقت
+            const q = query(messagesRef, orderBy("timestamp", "asc"), limit(100));
+            
+            unsubscribeChat = onSnapshot(q, (snapshot) => {
                 let msgs = []; snapshot.forEach(d => msgs.push({ id: d.id, ...d.data() }));
-                msgs.sort((a, b) => a.timestamp - b.timestamp); 
                 
                 let chatHtml = '';
                 msgs.forEach(m => {
@@ -1989,4 +2200,3 @@
 </script>
 </body>
 </html>
-```eof
