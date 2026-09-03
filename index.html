@@ -561,7 +561,7 @@
                 document.getElementById('admin-content-section').classList.remove('hidden');
                 document.getElementById('admin-content-section').classList.add('block');
                 window.adminContentStep = 'parts';
-                renderProgramUI(window.currentSections, 'admin-program-view', true);
+                window.renderProgramUI(window.currentSections, 'admin-program-view', true);
             }
         };
 
@@ -1203,7 +1203,7 @@
                     showToast(`+${XP_PER_ITEM} XP ! أحسنت 🌟`);
                     updateProgressUI(window.currentSections);
                     if(document.getElementById('lesson-search').value.trim() === '') {
-                        renderProgramUI(window.currentSections, 'student-program-view', false);
+                        window.renderProgramUI(window.currentSections, 'student-program-view', false);
                     } else { window.executeStudentSearch(); }
                     await updateDoc(doc(usersCol, window.currentUserRecord.username), { clickedLinks: clickedLinks });
                 }
@@ -1235,7 +1235,7 @@
             const safeQuery = escapeHtml(searchInput); 
             const container = document.getElementById('student-program-view');
             
-            if (query === '') { renderProgramUI(window.currentSections, 'student-program-view', false); return; }
+            if (query === '') { window.renderProgramUI(window.currentSections, 'student-program-view', false); return; }
 
             let html = `<div class="bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl rounded-[2rem] border border-blue-200 dark:border-blue-800 p-6 shadow-lg animate-[fadeInTab_0.3s_ease]">
                             <h3 class="text-xl font-black text-blue-600 dark:text-blue-400 mb-6 flex items-center gap-2"><i class="ph-bold ph-magnifying-glass"></i> نتائج البحث عن: "${safeQuery}"</h3>
@@ -1499,7 +1499,7 @@
                     window.currentSections = data.sections; 
                     window.currentUpdates = data.latestUpdates || []; 
                     if (!document.getElementById('admin-content-section').classList.contains('hidden')) {
-                        renderProgramUI(window.currentSections, 'admin-program-view', true);
+                        window.renderProgramUI(window.currentSections, 'admin-program-view', true);
                     }
                 }
             });
@@ -1569,7 +1569,7 @@
                     window.currentUpdates = data.latestUpdates || [];
 
                     if(document.getElementById('lesson-search').value.trim() === '') { 
-                        renderProgramUI(window.currentSections, 'student-program-view', false); 
+                        window.renderProgramUI(window.currentSections, 'student-program-view', false); 
                     }
                     updateProgressUI(window.currentSections); 
                     renderLeaderboard(); 
@@ -1607,7 +1607,7 @@
                         window.currentUserRecord.phoneNumber = data.phoneNumber || ''; 
                         updateProgressUI(window.currentSections || []); 
                         
-                        if(document.getElementById('lesson-search').value.trim() === '') { renderProgramUI(window.currentSections || [], 'student-program-view', false); } 
+                        if(document.getElementById('lesson-search').value.trim() === '') { window.renderProgramUI(window.currentSections || [], 'student-program-view', false); } 
                         else { window.executeStudentSearch(); }
                     }
                 });
@@ -1746,7 +1746,8 @@
 
         const getEmptyStateHTML = (title) => `<div class="flex flex-col items-center justify-center p-6 text-center bg-white/50 dark:bg-slate-800/30 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 h-32"><i class="ph-fill ph-folder-open text-4xl text-slate-300 dark:text-slate-600 mb-2"></i><h3 class="text-sm font-black text-slate-500 dark:text-slate-400">لا يوجد ${title} حالياً</h3></div>`;
 
-        const renderProgramUI = (sections, containerId, isAdmin) => {
+        // تم إصلاح الإعلان عن الدالة هنا بربطها بالمتغير window
+        window.renderProgramUI = (sections, containerId, isAdmin) => {
             if(!sections) return; 
             window.currentSections = sections; 
             let html = '';
@@ -1762,18 +1763,18 @@
                     html += `<h3 class="text-2xl font-black text-slate-800 dark:text-white flex items-center gap-2"><div class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center text-xl shadow-inner"><i class="ph-fill ph-books"></i></div> اختيار الطور التعليمي</h3>`;
                 }
                 else if (window.adminContentStep === 'years') {
-                    html += `<button onclick="window.adminContentStep='parts'; renderProgramUI(window.currentSections, 'admin-program-view', true);" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-bold ph-arrow-right"></i> عودة للأطوار</button>`;
+                    html += `<button onclick="window.adminContentStep='parts'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-bold ph-arrow-right"></i> عودة للأطوار</button>`;
                     let part = sections.find(p => p.id === window.adminActivePart);
                     html += `<h3 class="text-2xl font-black text-slate-800 dark:text-white">إدارة سنوات: ${part.title}</h3>`;
                 }
                 else if (window.adminContentStep === 'branches') {
-                    html += `<button onclick="window.adminContentStep='years'; renderProgramUI(window.currentSections, 'admin-program-view', true);" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-bold ph-arrow-right"></i> عودة للسنوات</button>`;
+                    html += `<button onclick="window.adminContentStep='years'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-bold ph-arrow-right"></i> عودة للسنوات</button>`;
                     let part = sections.find(p => p.id === window.adminActivePart);
                     let year = part.years.find(y => y.id === window.adminActiveYear[part.id]);
                     html += `<h3 class="text-2xl font-black text-slate-800 dark:text-white">إدارة وحدات: ${year.title}</h3>`;
                 }
                 else if (window.adminContentStep === 'details') {
-                    html += `<button onclick="window.adminContentStep='branches'; renderProgramUI(window.currentSections, 'admin-program-view', true);" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-bold ph-arrow-right"></i> عودة للوحدات</button>`;
+                    html += `<button onclick="window.adminContentStep='branches'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-bold ph-arrow-right"></i> عودة للوحدات</button>`;
                     let part = sections.find(p => p.id === window.adminActivePart);
                     let year = part.years.find(y => y.id === window.adminActiveYear[part.id]);
                     let branch = year.branches.find(b => b.id === window.adminActiveBranch[year.id]);
@@ -1786,7 +1787,7 @@
                     sections.forEach((part, idx) => {
                         let color = gridColors[idx % 7];
                         let icon = part.id === 'part_middle' ? '<i class="ph-fill ph-student"></i>' : '<i class="ph-fill ph-graduation-cap"></i>';
-                        html += `<button onclick="window.adminActivePart='${part.id}'; window.adminContentStep='years'; renderProgramUI(window.currentSections, 'admin-program-view', true);" class="bg-gradient-to-br ${color} p-8 rounded-[2rem] shadow-lg hover:scale-[1.03] transition-all duration-300 flex flex-col items-center justify-center gap-4 text-center min-h-[220px]">
+                        html += `<button onclick="window.adminActivePart='${part.id}'; window.adminContentStep='years'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="bg-gradient-to-br ${color} p-8 rounded-[2rem] shadow-lg hover:scale-[1.03] transition-all duration-300 flex flex-col items-center justify-center gap-4 text-center min-h-[220px]">
                             <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center text-5xl shadow-inner mb-2">${icon}</div>
                             <h3 class="text-3xl font-black drop-shadow-sm">${part.title}</h3>
                         </button>`;
@@ -1798,7 +1799,7 @@
                     html += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-[fadeInTab_0.3s_ease]">`;
                     part.years.forEach((year, idx) => {
                         let color = gridColors[(idx + 2) % 7]; // لتنويع الألوان
-                        html += `<button onclick="window.adminActiveYear['${part.id}']='${year.id}'; window.adminContentStep='branches'; renderProgramUI(window.currentSections, 'admin-program-view', true);" class="bg-gradient-to-br ${color} p-6 rounded-[2rem] shadow-lg hover:scale-[1.03] transition-all duration-300 flex flex-col items-center justify-center gap-3 text-center min-h-[180px]">
+                        html += `<button onclick="window.adminActiveYear['${part.id}']='${year.id}'; window.adminContentStep='branches'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="bg-gradient-to-br ${color} p-6 rounded-[2rem] shadow-lg hover:scale-[1.03] transition-all duration-300 flex flex-col items-center justify-center gap-3 text-center min-h-[180px]">
                             <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-4xl shadow-inner"><i class="ph-fill ph-calendar-blank"></i></div>
                             <h3 class="text-2xl font-black drop-shadow-sm">${year.title}</h3>
                         </button>`;
@@ -1811,7 +1812,7 @@
                     html += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-[fadeInTab_0.3s_ease]">`;
                     year.branches.forEach((branch, idx) => {
                         let color = gridColors[idx % 7];
-                        html += `<button onclick="window.adminActiveBranch['${year.id}']='${branch.id}'; window.adminContentStep='details'; renderProgramUI(window.currentSections, 'admin-program-view', true);" class="bg-gradient-to-br ${color} p-6 rounded-[2rem] shadow-lg hover:scale-[1.03] transition-all duration-300 flex flex-col items-center justify-center gap-4 text-center min-h-[200px]">
+                        html += `<button onclick="window.adminActiveBranch['${year.id}']='${branch.id}'; window.adminContentStep='details'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="bg-gradient-to-br ${color} p-6 rounded-[2rem] shadow-lg hover:scale-[1.03] transition-all duration-300 flex flex-col items-center justify-center gap-4 text-center min-h-[200px]">
                             <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-4xl shadow-inner">${getBranchIcon(branch.title)}</div>
                             <h3 class="text-xl font-black drop-shadow-sm leading-snug">${branch.title}</h3>
                         </button>`;
@@ -1882,7 +1883,7 @@
                                 });
                                 let unitProg = branchLinksTotal === 0 ? 0 : Math.round((branchLinksClicked / branchLinksTotal) * 100);
                                 
-                                html += `<button onclick="window.studentActiveBranchTab='${branch.id}'; window.studentViewMode='details'; renderProgramUI(window.currentSections, 'student-program-view', false);" class="bg-gradient-to-br ${color} p-6 md:p-8 rounded-[2rem] shadow-lg hover:scale-[1.03] transition-all duration-300 flex flex-col items-center justify-center gap-4 text-center relative overflow-hidden group min-h-[220px]">
+                                html += `<button onclick="window.studentActiveBranchTab='${branch.id}'; window.studentViewMode='details'; window.renderProgramUI(window.currentSections, 'student-program-view', false);" class="bg-gradient-to-br ${color} p-6 md:p-8 rounded-[2rem] shadow-lg hover:scale-[1.03] transition-all duration-300 flex flex-col items-center justify-center gap-4 text-center relative overflow-hidden group min-h-[220px]">
                                     ${unitProg === 100 && branchLinksTotal > 0 ? '<div class="absolute top-4 right-4 bg-white/30 backdrop-blur-sm rounded-full p-2"><i class="ph-bold ph-check text-white text-xl"></i></div>' : ''}
                                     <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center text-5xl shadow-inner group-hover:scale-110 transition-transform">${getBranchIcon(branch.title)}</div>
                                     <h3 class="text-2xl font-black drop-shadow-sm leading-tight text-white">${branch.title}</h3>
@@ -1899,7 +1900,7 @@
                         } 
                         else if (window.studentViewMode === 'details') {
                             html += `<div class="mb-6 flex justify-between items-center animate-[fadeInTab_0.3s_ease]">
-                                <button onclick="window.studentViewMode='grid'; renderProgramUI(window.currentSections, 'student-program-view', false);" class="px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm"><i class="ph-bold ph-arrow-right"></i> عودة للوحدات</button>
+                                <button onclick="window.studentViewMode='grid'; window.renderProgramUI(window.currentSections, 'student-program-view', false);" class="px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm"><i class="ph-bold ph-arrow-right"></i> عودة للوحدات</button>
                             </div>`;
 
                             userYearData.branches.forEach(branch => {
