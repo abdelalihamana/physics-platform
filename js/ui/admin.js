@@ -1,6 +1,6 @@
+// ملف: js/ui/admin.js
+
 import { db, usersCol, programCol, chatsPath } from '../config/firebase.js';
-import { showToast, confirmAction } from '../utils/helpers.js';
-import { calculateProgressXP } from './student.js';
 import { doc, updateDoc, deleteDoc, setDoc, collection, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 const levelNames = {
@@ -15,7 +15,7 @@ export const openAdminSection = (section) => {
     if (section === 'accounts') {
         document.getElementById('admin-accounts-wrapper').classList.remove('hidden');
         document.getElementById('admin-accounts-wrapper').classList.add('animate-[fadeInTab_0.3s_ease]');
-        renderAdminTable();
+        if (window.renderAdminTable) window.renderAdminTable();
     } else if (section === 'content') {
         document.getElementById('admin-content-wrapper').classList.remove('hidden');
         document.getElementById('admin-content-wrapper').classList.add('animate-[fadeInTab_0.3s_ease]');
@@ -51,11 +51,9 @@ export const openAdminPart = (partId) => {
 export const returnToAdminParts = () => {
     window.adminActivePart = null;
     
-    // إخفاء حاوية المحتوى
     const contentWrapper = document.getElementById('admin-part-content-wrapper');
     if(contentWrapper) contentWrapper.classList.add('hidden');
     
-    // إظهار بطاقات الأطوار
     const partsMenu = document.getElementById('admin-parts-menu');
     if(partsMenu) {
         partsMenu.classList.remove('hidden');
@@ -79,7 +77,7 @@ export const returnToAdminGrid = (yearId) => {
     if(window.renderProgramUI) window.renderProgramUI(window.currentSections, 'admin-program-view', true);
 };
 
-export const executeAdminStudentSearch = () => { renderAdminTable(); };
+export const executeAdminStudentSearch = () => { if (window.renderAdminTable) window.renderAdminTable(); };
 
 export const filterMainStudents = (mainType) => {
     window.adminMainFilter = mainType;
@@ -94,6 +92,8 @@ export const filterMainStudents = (mainType) => {
     });
 
     const subContainer = document.getElementById('sub-filter-container');
+    if (!subContainer) return;
+    
     if (mainType === 'all') {
         subContainer.classList.add('hidden'); subContainer.classList.remove('flex');
     } else {
@@ -109,7 +109,7 @@ export const filterMainStudents = (mainType) => {
         }
         subContainer.innerHTML = html;
     }
-    renderAdminTable();
+    if (window.renderAdminTable) window.renderAdminTable();
 };
 
 export const filterSubStudents = (subType) => {
@@ -124,16 +124,16 @@ export const filterSubStudents = (subType) => {
             }
         });
     }
-    renderAdminTable();
+    if (window.renderAdminTable) window.renderAdminTable();
 };
 
 export const toggleSelectAll = () => { const state = document.getElementById('select-all-cb').checked; document.querySelectorAll('.student-cb').forEach(cb => cb.checked = state); };
 
 export const toggleUserStatus = async (uid, isApproved, phone) => {
     if (isApproved) {
-        if(await confirmAction("هل أنت متأكد من إلغاء تفعيل هذا الحساب؟")) {
+        if(window.confirmAction && await window.confirmAction("هل أنت متأكد من إلغاء تفعيل هذا الحساب؟")) {
             await updateDoc(doc(usersCol, uid), { approved: false });
-            showToast("تم إلغاء التفعيل");
+            if(window.showToast) window.showToast("تم إلغاء التفعيل");
         }
     } else {
         let waLink = null;
@@ -145,27 +145,31 @@ export const toggleUserStatus = async (uid, isApproved, phone) => {
         
         try {
             await updateDoc(doc(usersCol, uid), { approved: true });
-            showToast("تم تفعيل الحساب بنجاح ✅");
+            if(window.showToast) window.showToast("تم تفعيل الحساب بنجاح ✅");
         } catch(e) {
-            if(win) win.close(); showToast("حدث خطأ أثناء التفعيل", "error");
+            if(win) win.close(); if(window.showToast) window.showToast("حدث خطأ أثناء التفعيل", "error");
         }
     }
 };
 
 export const bulkAction = async (action) => {
     const checked = Array.from(document.querySelectorAll('.student-cb:checked')).map(cb => cb.value);
-    if(checked.length === 0) return showToast("يرجى تحديد تلميذ واحد على حداقل", "error");
+    if(checked.length === 0) {
+        if(window.showToast) window.showToast("يرجى تحديد تلميذ واحد على الأقل", "error");
+        return;
+    }
     
     const actionText = action === 'approve' ? 'تفعيل' : (action === 'deactivate' ? 'إلغاء تفعيل' : 'حذف نهائي لـ');
-    if(!await confirmAction(`هل أنت متأكد من ${actionText} ${checked.length} حساب(ات)؟`)) return;
+    if(window.confirmAction && !await window.confirmAction(`هل أنت متأكد من ${actionText} ${checked.length} حساب(ات)؟`)) return;
 
     for(let username of checked) {
         if(action === 'approve') { await updateDoc(doc(usersCol, username), { approved: true }); } 
         else if (action === 'deactivate') { await updateDoc(doc(usersCol, username), { approved: false }); } 
         else if (action === 'delete') { await deleteDoc(doc(usersCol, username)); }
     }
-    showToast(`تم ${actionText} الحسابات المحددة بنجاح 🚀`);
-    document.getElementById('select-all-cb').checked = false;
+    if(window.showToast) window.showToast(`تم ${actionText} الحسابات المحددة بنجاح 🚀`);
+    const cbAll = document.getElementById('select-all-cb');
+    if(cbAll) cbAll.checked = false;
 };
 
 export const renderAdminTable = () => {
@@ -198,7 +202,10 @@ export const renderAdminTable = () => {
         studentCount++; 
 
         let levelDisplay = data.level ? (levelNames[data.level] || data.level) : "غير محدد";
-        let prog = calculateProgressXP(data.level, data, window.currentSections);
+        let prog = { xp: 0, percent: 0 };
+        if (window.calculateProgressXP) {
+            prog = window.calculateProgressXP(data.level, data, window.currentSections);
+        }
         
         let waProgMsg = encodeURIComponent(`السلام عليكم ولي أمر التلميذ(ة) ${d.id}. نعلمكم من منصة المجتهد للعلوم الفيزيائية أن نسبة إنجاز ابنكم في الدروس هي ${prog.percent}% بمجموع نقاط ${prog.xp} XP. لأي استفسار يرجى مراسلتنا.`);
         let waProgLink = data.phoneNumber ? `https://wa.me/213${data.phoneNumber.substring(1)}?text=${waProgMsg}` : '#';
@@ -247,7 +254,9 @@ export const renderAdminTable = () => {
             </tr>`;
     });
     
-    document.getElementById('hover-total-students').innerText = studentCount;
+    const countEl = document.getElementById('hover-total-students');
+    if(countEl) countEl.innerText = studentCount;
+    
     const statsContainer = document.getElementById('header-stats-container');
     if(statsContainer) {
         statsContainer.innerHTML = '';
@@ -270,7 +279,10 @@ export const adminAddLink = async (pIdx, yIdx, bIdx, cat, branchId) => {
     let title = document.getElementById(`title_${branchId}_${cat}`).value.trim(); 
     let url = document.getElementById(`url_${branchId}_${cat}`).value.trim();
     
-    if(!title || !url) return showToast("يرجى إدخال العنوان والرابط", "error");
+    if(!title || !url) {
+        if(window.showToast) window.showToast("يرجى إدخال العنوان والرابط", "error");
+        return;
+    }
     if(!url.startsWith('http')) url = 'https://' + url;
     
     const docRef = doc(programCol, 'main'); 
@@ -297,44 +309,59 @@ export const adminAddLink = async (pIdx, yIdx, bIdx, cat, branchId) => {
     if (updates.length > 50) updates = updates.slice(updates.length - 50);
 
     await updateDoc(docRef, { sections: sections, latestUpdates: updates }); 
-    showToast("تمت الإضافة بنجاح وتنبيه التلاميذ 📚");
+    if(window.showToast) window.showToast("تمت الإضافة بنجاح وتنبيه التلاميذ 📚");
 };
 
 export const adminDeleteLink = async (pIdx, yIdx, bIdx, cat, lIdx) => {
-    if(await confirmAction("هل أنت متأكد من مسح هذا الرابط نهائياً؟")) {
+    if(window.confirmAction && await window.confirmAction("هل أنت متأكد من مسح هذا الرابط نهائياً؟")) {
         const docRef = doc(programCol, 'main'); let sections = window.currentSections;
         sections[pIdx].years[yIdx].branches[bIdx].categories[cat].splice(lIdx, 1);
-        await updateDoc(docRef, { sections }); showToast("تم مسح الرابط");
+        await updateDoc(docRef, { sections }); 
+        if(window.showToast) window.showToast("تم مسح الرابط");
     }
 };
 
 export const adminEditLinkModal = (pIdx, yIdx, bIdx, cat, lIdx) => {
     let currentLink = window.currentSections[pIdx].years[yIdx].branches[bIdx].categories[cat][lIdx];
-    document.getElementById('edit-link-title').value = currentLink.title; document.getElementById('edit-link-url').value = currentLink.url;
+    document.getElementById('edit-link-title').value = currentLink.title; 
+    document.getElementById('edit-link-url').value = currentLink.url;
     window.currentEditParams = { pIdx, yIdx, bIdx, cat, lIdx };
-    const modal = document.getElementById('edit-modal'); modal.classList.remove('hidden'); modal.classList.add('flex');
+    const modal = document.getElementById('edit-modal'); 
+    modal.classList.remove('hidden'); modal.classList.add('flex');
 };
 
-export const closeEditModal = () => { document.getElementById('edit-modal').classList.add('hidden'); document.getElementById('edit-modal').classList.remove('flex'); window.currentEditParams = null; };
+export const closeEditModal = () => { 
+    const modal = document.getElementById('edit-modal');
+    modal.classList.add('hidden'); modal.classList.remove('flex'); 
+    window.currentEditParams = null; 
+};
 
 export const saveEditedLink = async () => {
-    let newTitle = document.getElementById('edit-link-title').value.trim(); let newUrl = document.getElementById('edit-link-url').value.trim();
-    if(!newTitle || !newUrl) return showToast("يرجى إدخال العنوان والرابط", "error"); if(!newUrl.startsWith('http')) newUrl = 'https://' + newUrl;
+    let newTitle = document.getElementById('edit-link-title').value.trim(); 
+    let newUrl = document.getElementById('edit-link-url').value.trim();
+    if(!newTitle || !newUrl) {
+        if(window.showToast) window.showToast("يرجى إدخال العنوان والرابط", "error");
+        return;
+    }
+    if(!newUrl.startsWith('http')) newUrl = 'https://' + newUrl;
+    
     if(window.currentEditParams) {
         let { pIdx, yIdx, bIdx, cat, lIdx } = window.currentEditParams; let sections = window.currentSections;
         sections[pIdx].years[yIdx].branches[bIdx].categories[cat][lIdx] = { title: newTitle, url: newUrl };
-        await updateDoc(doc(programCol, 'main'), { sections }); showToast("تم التعديل بنجاح ✏️"); closeEditModal();
+        await updateDoc(doc(programCol, 'main'), { sections }); 
+        if(window.showToast) window.showToast("تم التعديل بنجاح ✏️"); 
+        closeEditModal();
     }
 };
 
 export const openBulkChatModal = () => {
-    document.getElementById('bulk-chat-modal').classList.remove('hidden');
-    document.getElementById('bulk-chat-modal').classList.add('flex');
+    const modal = document.getElementById('bulk-chat-modal');
+    modal.classList.remove('hidden'); modal.classList.add('flex');
 };
 
 export const closeBulkChatModal = () => {
-    document.getElementById('bulk-chat-modal').classList.add('hidden');
-    document.getElementById('bulk-chat-modal').classList.remove('flex');
+    const modal = document.getElementById('bulk-chat-modal');
+    modal.classList.add('hidden'); modal.classList.remove('flex');
     document.getElementById('bulk-chat-level').value = '';
     document.getElementById('bulk-chat-input').value = '';
 };
@@ -343,7 +370,10 @@ export const sendBulkChatMessage = async () => {
     const level = document.getElementById('bulk-chat-level').value;
     const text = document.getElementById('bulk-chat-input').value.trim();
 
-    if (!level || !text) return showToast("يرجى اختيار المستوى وكتابة نص الرسالة", "error");
+    if (!level || !text) {
+        if(window.showToast) window.showToast("يرجى اختيار المستوى وكتابة نص الرسالة", "error");
+        return;
+    }
 
     const btn = document.getElementById('send-bulk-msg-btn');
     const origHtml = btn.innerHTML;
@@ -351,31 +381,28 @@ export const sendBulkChatMessage = async () => {
     btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-2xl"></i> جاري التوزيع...';
 
     try {
-        // جلب قائمة التلاميذ المفعلين الذين ينتمون للمستوى المحدد
         const targetStudents = window.adminUsersList.filter(u => u.data.level === level && u.data.approved === true);
 
         if (targetStudents.length === 0) {
             btn.disabled = false; btn.innerHTML = origHtml;
-            return showToast("عذراً، لا يوجد تلاميذ مفعلين في هذا المستوى حالياً.", "error");
+            if(window.showToast) window.showToast("عذراً، لا يوجد تلاميذ مفعلين في هذا المستوى حالياً.", "error");
+            return;
         }
 
         const timestamp = Date.now();
         let successCount = 0;
 
-        // إرسال الرسالة لكل تلميذ عبر Promise.all (توزيع سريع متزامن)
         const promises = targetStudents.map(async (student) => {
             const chatRoomId = student.id;
             const messagesRef = collection(db, chatsPath, chatRoomId, 'messages');
             const chatDocRef = doc(db, chatsPath, chatRoomId);
 
-            // إضافة رسالة عادية للدردشة تبدو وكأن الأستاذ كتبها خصيصاً له
             const msgPromise = setDoc(doc(messagesRef, (timestamp + Math.floor(Math.random() * 1000)).toString()), {
                 sender: 'admin',
                 text: text,
                 timestamp: timestamp
             });
 
-            // تحديث عداد الإشعارات عند التلميذ
             const unreadPromise = setDoc(chatDocRef, { unreadStudent: increment(1) }, { merge: true });
 
             await Promise.all([msgPromise, unreadPromise]);
@@ -384,12 +411,12 @@ export const sendBulkChatMessage = async () => {
 
         await Promise.all(promises);
 
-        showToast(`تم إرسال الرسالة إلى ${successCount} تلميذ بنجاح 📣`, "success");
+        if(window.showToast) window.showToast(`تم إرسال الرسالة إلى ${successCount} تلميذ بنجاح 📣`, "success");
         closeBulkChatModal();
 
     } catch (error) {
         console.error("Bulk Message Error", error);
-        showToast("حدث خطأ أثناء الإرسال الجماعي.", "error");
+        if(window.showToast) window.showToast("حدث خطأ أثناء الإرسال الجماعي.", "error");
     }
 
     btn.disabled = false; btn.innerHTML = origHtml;
