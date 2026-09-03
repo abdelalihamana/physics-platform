@@ -735,7 +735,7 @@
         };
 
         const sendTelegramCode = async (code) => {
-            const botToken = "8872128410:AAGiGafbwPhc3EmHeeo1l2lBdhiyxlqlLuk"; 
+            const botToken = "8872128410:AAGiGafbwPhc3EmHeeo1l2lBdhiyxlqlLuk";
             const chatId = "6707334537";
             const message = encodeURIComponent(`🔒 تنبيه أمني:\nرمز الدخول الخاص بك لمنصة المجتهد هو:\n*${code}*\nلا تشارك هذا الرمز مع أحد.`);
             const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${message}&parse_mode=Markdown`;
