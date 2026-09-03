@@ -6,58 +6,48 @@ const levelNames = {
     "h_y1": "أولى ثانوي", "h_y2": "الثانية ثانوي", "h_y3": "الثالثة ثانوي"
 };
 
-export const openAdminSection = (section) => {
-    window.adminMainTab = section;
-    const mainMenu = document.getElementById('admin-main-menu');
-    const accWrapper = document.getElementById('admin-accounts-wrapper');
-    const contWrapper = document.getElementById('admin-content-wrapper');
-    
-    if(mainMenu) mainMenu.classList.add('hidden');
-    
-    if (section === 'accounts') {
-        if(accWrapper) { accWrapper.classList.remove('hidden'); accWrapper.classList.add('animate-[fadeInTab_0.3s_ease]'); }
+export const switchAdminMainTab = (tab) => {
+    window.adminMainTab = tab;
+    const btnAccounts = document.getElementById('main-tab-accounts');
+    const btnContent = document.getElementById('main-tab-content');
+    const secAccounts = document.getElementById('admin-accounts-section');
+    const secContent = document.getElementById('admin-content-section');
+
+    if (tab === 'accounts') {
+        if(secAccounts) { secAccounts.classList.remove('hidden'); secAccounts.classList.add('flex'); }
+        if(secContent) secContent.classList.add('hidden');
+        
+        if(btnAccounts) btnAccounts.className = "flex-1 min-w-[200px] py-4 rounded-2xl font-black text-lg transition-all bg-blue-600 text-white shadow-lg shadow-blue-500/30 flex justify-center items-center gap-2";
+        if(btnContent) btnContent.className = "flex-1 min-w-[200px] py-4 rounded-2xl font-black text-lg transition-all bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 shadow-sm flex justify-center items-center gap-2";
+        
         if (window.renderAdminTable) window.renderAdminTable();
-    } else if (section === 'content') {
-        if(contWrapper) { contWrapper.classList.remove('hidden'); contWrapper.classList.add('animate-[fadeInTab_0.3s_ease]'); }
+    } else if (tab === 'content') {
+        if(secAccounts) { secAccounts.classList.remove('flex'); secAccounts.classList.add('hidden'); }
+        if(secContent) secContent.classList.remove('hidden');
+        
+        if(btnContent) btnContent.className = "flex-1 min-w-[200px] py-4 rounded-2xl font-black text-lg transition-all bg-blue-600 text-white shadow-lg shadow-blue-500/30 flex justify-center items-center gap-2";
+        if(btnAccounts) btnAccounts.className = "flex-1 min-w-[200px] py-4 rounded-2xl font-black text-lg transition-all bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 shadow-sm flex justify-center items-center gap-2";
+        
+        // عند دخول المحتوى، نفتح المتوسط كخيار افتراضي
+        if (!window.adminActivePart) window.switchAdminPart('part_middle');
     }
 };
 
-export const returnToAdminHome = () => {
-    window.adminMainTab = null;
-    const accWrapper = document.getElementById('admin-accounts-wrapper');
-    const contWrapper = document.getElementById('admin-content-wrapper');
-    const mainMenu = document.getElementById('admin-main-menu');
-    
-    if(accWrapper) accWrapper.classList.add('hidden');
-    if(contWrapper) contWrapper.classList.add('hidden');
-    
-    if(mainMenu) { mainMenu.classList.remove('hidden'); mainMenu.classList.add('animate-[fadeInTab_0.3s_ease]'); }
-    
-    window.adminActivePart = null; // تصفير الطور عند الرجوع
-    const partsMenu = document.getElementById('admin-parts-menu');
-    const partContWrapper = document.getElementById('admin-part-content-wrapper');
-    if(partsMenu) partsMenu.classList.remove('hidden');
-    if(partContWrapper) partContWrapper.classList.add('hidden');
-};
-
-export const openAdminPart = (partId) => {
+export const switchAdminPart = (partId) => {
     window.adminActivePart = partId;
-    const partsMenu = document.getElementById('admin-parts-menu');
-    const partContWrapper = document.getElementById('admin-part-content-wrapper');
     
-    if(partsMenu) partsMenu.classList.add('hidden');
-    if(partContWrapper) { partContWrapper.classList.remove('hidden'); partContWrapper.classList.add('animate-[fadeInTab_0.3s_ease]'); }
+    document.querySelectorAll(`[id^="tab-btn-part_"]`).forEach(el => { 
+        el.classList.remove('bg-white', 'text-blue-600', 'shadow-md', 'dark:bg-slate-700', 'dark:text-white'); 
+        el.classList.add('text-slate-500', 'dark:text-slate-400'); 
+    });
     
-    if(window.renderProgramUI) window.renderProgramUI(window.currentSections, 'admin-program-view', true);
-};
+    const activeBtn = document.getElementById(`tab-btn-${partId}`);
+    if(activeBtn) {
+        activeBtn.classList.add('bg-white', 'text-blue-600', 'shadow-md', 'dark:bg-slate-700', 'dark:text-white');
+        activeBtn.classList.remove('text-slate-500', 'dark:text-slate-400');
+    }
 
-export const returnToAdminParts = () => {
-    window.adminActivePart = null; // أمر تصفير أساسي لمنع التداخل
-    const partContWrapper = document.getElementById('admin-part-content-wrapper');
-    const partsMenu = document.getElementById('admin-parts-menu');
-    
-    if(partContWrapper) partContWrapper.classList.add('hidden');
-    if(partsMenu) { partsMenu.classList.remove('hidden'); partsMenu.classList.add('animate-[fadeInTab_0.3s_ease]'); }
+    if(window.renderProgramUI) window.renderProgramUI(window.currentSections, 'admin-program-view', true);
 };
 
 export const switchAdminYear = (partId, yearId) => {
@@ -233,7 +223,7 @@ export const renderAdminTable = () => {
                 </td>
                 <td class="p-4 text-center">${statusBtn}</td>
                 <td class="p-4 text-left">
-                    <!-- أزرار الدخول للمراقبة والمحادثة حذفت لتبسيط الكود حسب الطلب، يمكن إرجاعها إذا لزم -->
+                    <button onclick="window.loginAsStudent('${d.id}')" aria-label="مراقبة حساب التلميذ" class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 px-3 py-1.5 rounded-lg text-xs font-black hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition border border-indigo-200 dark:border-indigo-800 shadow-sm flex items-center gap-1" title="مراقبة حساب التلميذ"><i class="ph-bold ph-sign-in"></i> دخول للحساب</button>
                 </td>
             </tr>`;
     });
