@@ -1,19 +1,11 @@
 // ملف: js/auth/auth.js
 
-// 1. استيراد الإعدادات والدوال المساعدة
 import { auth, db, usersCol, chatsPath } from '../config/firebase.js';
-import { showToast, confirmAction } from '../utils/helpers.js';
-
-// استيراد دوال Firebase المخصصة للمصادقة وقاعدة البيانات
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, collection, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-// متغيرات الحالة العالمية (Global State)
 window.isRegistering = false;
-window.currentUserRecord = null;
-window.originalAdminRecord = null; 
 
-// 2. دالة التبديل بين تسجيل الدخول وإنشاء حساب
 export const toggleAuthMode = () => {
     window.isRegistering = !window.isRegistering;
     document.getElementById('auth-title').innerText = window.isRegistering ? "حساب جديد" : "منصة المجتهد";
@@ -35,10 +27,11 @@ export const toggleAuthMode = () => {
     }
 };
 
-// 3. دالة معالجة تسجيل الدخول / إنشاء الحساب
 export const handleAuth = async () => {
-    // التحقق من اتصال قاعدة البيانات
-    if (typeof window.isAuthReady !== 'undefined' && !window.isAuthReady) return showToast("يتم الاتصال بالسحابة... يرجى الانتظار", "error");
+    if (typeof window.isAuthReady !== 'undefined' && !window.isAuthReady) {
+        if(window.showToast) window.showToast("يتم الاتصال بالسحابة... يرجى الانتظار", "error");
+        return;
+    }
     
     const username = document.getElementById('username').value.trim().toLowerCase();
     const password = document.getElementById('password').value.trim();
@@ -46,11 +39,20 @@ export const handleAuth = async () => {
     const parentName = document.getElementById('parent-name').value.trim();
     const phoneNumber = document.getElementById('phone-number').value.trim();
 
-    if (!username || !password) return showToast("يرجى ملء اسم المستخدم وكلمة المرور", "error");
+    if (!username || !password) {
+        if(window.showToast) window.showToast("يرجى ملء اسم المستخدم وكلمة المرور", "error");
+        return;
+    }
     if (window.isRegistering) {
-        if (!level || !parentName || !phoneNumber) return showToast("يرجى تعبئة جميع الحقول بدقة", "error");
+        if (!level || !parentName || !phoneNumber) {
+            if(window.showToast) window.showToast("يرجى تعبئة جميع الحقول بدقة", "error");
+            return;
+        }
         const phoneRegex = /^(05|06|07)\d{8}$/;
-        if(!phoneRegex.test(phoneNumber)) return showToast("رقم الهاتف غير صحيح! يجب أن يتكون من 10 أرقام ويبدأ بـ 05، 06، أو 07", "error");
+        if(!phoneRegex.test(phoneNumber)) {
+            if(window.showToast) window.showToast("رقم الهاتف غير صحيح! يجب أن يتكون من 10 أرقام ويبدأ بـ 05، 06، أو 07", "error");
+            return;
+        }
     }
 
     const btn = document.getElementById('auth-action-btn');
@@ -64,7 +66,7 @@ export const handleAuth = async () => {
         if (window.isRegistering) {
             const userSnap = await getDoc(userRef);
             if (userSnap.exists()) {
-                showToast("اسم المستخدم مستخدم مسبقاً، اختر اسماً آخر", "error");
+                if(window.showToast) window.showToast("اسم المستخدم مستخدم مسبقاً، اختر اسماً آخر", "error");
             } else {
                 await createUserWithEmailAndPassword(auth, pseudoEmail, password);
                 
@@ -88,8 +90,9 @@ export const handleAuth = async () => {
             const userSnap = await getDoc(userRef);
             
             if (!userSnap.exists()) {
-                showToast("حدث خطأ: الحساب موجود لكن البيانات مفقودة.", "error");
+                if(window.showToast) window.showToast("حدث خطأ: الحساب موجود لكن البيانات مفقودة.", "error");
                 await signOut(auth);
+                btn.disabled = false; btn.innerHTML = originalHTML;
                 return;
             }
 
@@ -100,29 +103,26 @@ export const handleAuth = async () => {
                  window.currentUserRecord.password = password;
             }
             
-            // سيتم التعامل مع توجيه المستخدم (Routing) في ملف app.js الرئيسي
-            // لذلك نطلق حدثاً (Event) نعلم فيه التطبيق بنجاح الدخول
             window.dispatchEvent(new CustomEvent('authSuccess', { detail: window.currentUserRecord }));
         }
     } catch (err) { 
         console.error(err);
         if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
-            showToast("بيانات الدخول غير صحيحة", "error");
+            if(window.showToast) window.showToast("بيانات الدخول غير صحيحة", "error");
         } else if (err.code === 'auth/email-already-in-use') {
-            showToast("اسم المستخدم مستخدم مسبقاً.", "error");
+            if(window.showToast) window.showToast("اسم المستخدم مستخدم مسبقاً.", "error");
         } else if (err.code === 'auth/network-request-failed') {
-            showToast("لا يوجد اتصال بالإنترنت! يرجى التحقق من الشبكة.", "error");
+            if(window.showToast) window.showToast("لا يوجد اتصال بالإنترنت! يرجى التحقق من الشبكة.", "error");
         } else {
-            showToast("حدث خطأ في الاتصال، يرجى المحاولة لاحقاً.", "error");
+            if(window.showToast) window.showToast("حدث خطأ في الاتصال، يرجى المحاولة لاحقاً.", "error");
         }
     }
     
     btn.disabled = false; btn.innerHTML = originalHTML;
 };
 
-// 4. دالة تسجيل الخروج
 export const logout = async () => {
-    if(await confirmAction("هل أنت متأكد أنك تريد تسجيل الخروج من حسابك؟")) {
+    if(window.confirmAction && await window.confirmAction("هل أنت متأكد أنك تريد تسجيل الخروج من حسابك؟")) {
         try {
             await signOut(auth);
         } catch(e) { console.error("Logout error", e); }
@@ -139,12 +139,10 @@ export const logout = async () => {
         document.getElementById('student-logout-btn').classList.remove('hidden');
         document.getElementById('student-notif-btn').classList.remove('hidden');
 
-        // إطلاق حدث للملفات الأخرى لتنظيف المستمعين
         window.dispatchEvent(new Event('userLoggedOut'));
     }
 };
 
-// 5. دوال الإعدادات (تغيير كلمة المرور والهاتف)
 export const openSettings = () => {
     if(!window.currentUserRecord) return;
     document.getElementById('settings-username').value = window.currentUserRecord.username;
@@ -186,16 +184,21 @@ export const saveSettingsData = async () => {
         } catch(e) {
             console.error("Password update error", e);
             if (e.code === 'auth/requires-recent-login') {
-                return showToast("يرجى تسجيل الخروج والدخول مجدداً لتغيير كلمة المرور", "error");
+                if(window.showToast) window.showToast("يرجى تسجيل الخروج والدخول مجدداً لتغيير كلمة المرور", "error");
+                return;
             }
-            return showToast("حدث خطأ أثناء تغيير كلمة المرور في نظام الحماية", "error");
+            if(window.showToast) window.showToast("حدث خطأ أثناء تغيير كلمة المرور في نظام الحماية", "error");
+            return;
         }
     }
 
     if(window.currentUserRecord.role !== 'admin') {
         const newPhone = phoneInput.value.trim();
         const phoneRegex = /^(05|06|07)\d{8}$/;
-        if(newPhone && !phoneRegex.test(newPhone)) return showToast("رقم الهاتف غير صحيح! يجب أن يبدأ بـ 05، 06، أو 07", "error");
+        if(newPhone && !phoneRegex.test(newPhone)) {
+            if(window.showToast) window.showToast("رقم الهاتف غير صحيح! يجب أن يبدأ بـ 05، 06، أو 07", "error");
+            return;
+        }
         if(newPhone) updates.phoneNumber = newPhone;
     }
 
@@ -206,33 +209,34 @@ export const saveSettingsData = async () => {
         if(updates.password) window.currentUserRecord.password = updates.password;
         if(updates.phoneNumber) window.currentUserRecord.phoneNumber = updates.phoneNumber;
         
-        showToast("تم تحديث الإعدادات بنجاح 💾");
+        if(window.showToast) window.showToast("تم تحديث الإعدادات بنجاح 💾");
         closeSettings();
-    } catch(e) { showToast("حدث خطأ أثناء الحفظ", "error"); }
+    } catch(e) { if(window.showToast) window.showToast("حدث خطأ أثناء الحفظ", "error"); }
 };
 
-// 6. استرجاع كلمة المرور
 export const requestPasswordReset = async () => {
     const username = document.getElementById('username').value.trim();
-    if (!username) return showToast("يرجى إدخال اسم المستخدم أولاً لطلب استرجاع كلمة المرور", "error");
+    if (!username) {
+        if(window.showToast) window.showToast("يرجى إدخال اسم المستخدم أولاً لطلب استرجاع كلمة المرور", "error");
+        return;
+    }
 
-    if(await confirmAction(`هل أنت متأكد من إرسال طلب استرجاع كلمة المرور للحساب "${username}" للأستاذ؟`)) {
+    if(window.confirmAction && await window.confirmAction(`هل أنت متأكد من إرسال طلب استرجاع كلمة المرور للحساب "${username}" للأستاذ؟`)) {
         try {
             const userRef = doc(usersCol, username);
             const userSnap = await getDoc(userRef);
 
             if (!userSnap.exists()) {
-                showToast("حساب المستخدم غير موجود.", "error");
+                if(window.showToast) window.showToast("حساب المستخدم غير موجود.", "error");
                 return;
             }
 
             const userData = userSnap.data();
             if (userData.role === 'admin') {
-                showToast("لا يمكن استخدام هذه الميزة لحساب الإدارة.", "error");
+                if(window.showToast) window.showToast("لا يمكن استخدام هذه الميزة لحساب الإدارة.", "error");
                 return;
             }
 
-            // خريطة المستويات كبديل للقاموس في الملف الرئيسي
             const levelNames = { "m_y1": "الأولى متوسط", "m_y2": "الثانية متوسط", "m_y3": "الثالثة متوسط", "m_y4": "الرابعة متوسط", "h_y1": "أولى ثانوي", "h_y2": "الثانية ثانوي", "h_y3": "الثالثة ثانوي" };
             const levelDisplay = levelNames[userData.level] || "مستوى غير محدد";
             
@@ -245,11 +249,11 @@ export const requestPasswordReset = async () => {
             await setDoc(doc(messagesRef, Date.now().toString()), { sender: 'student', text: resetMessage, timestamp: Date.now(), isSystemMessage: true });
             await setDoc(chatDocRef, { unreadAdmin: increment(1) }, { merge: true });
 
-            showToast("تم إرسال طلب استرجاع كلمة المرور للأستاذ بنجاح. سيتم التواصل معك.", "success");
+            if(window.showToast) window.showToast("تم إرسال طلب استرجاع كلمة المرور للأستاذ بنجاح. سيتم التواصل معك.", "success");
 
         } catch (err) {
             console.error(err);
-            showToast("حدث خطأ أثناء إرسال الطلب، يرجى المحاولة لاحقاً.", "error");
+            if(window.showToast) window.showToast("حدث خطأ أثناء إرسال الطلب، يرجى المحاولة لاحقاً.", "error");
         }
     }
 };
