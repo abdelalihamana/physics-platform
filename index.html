@@ -487,6 +487,32 @@
                 </div>
             </header>
 
+            <!-- عنصر مؤقت بومودورو الجديد (Pomodoro Timer Widget) -->
+            <div class="mb-8 bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 rounded-[2.5rem] shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="flex items-center gap-4 relative z-10">
+                    <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-3xl shadow-inner backdrop-blur-md">
+                        <i class="ph-fill ph-timer"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-black tracking-wide" id="pomodoro-status-title">وقت التركيز والدراسة</h3>
+                        <p class="text-blue-100 font-bold text-sm mt-0.5">45 دقيقة دراسة / 15 دقيقة راحة</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-6 relative z-10 flex-wrap justify-center">
+                    <div class="text-4xl md:text-5xl font-black tracking-widest font-mono bg-black/20 px-6 py-2.5 rounded-2xl shadow-inner border border-white/10" id="pomodoro-timer-display">45:00</div>
+                    <div class="flex gap-2">
+                        <button onclick="togglePomodoro()" id="pomodoro-toggle-btn" class="bg-white text-blue-700 hover:bg-blue-50 px-6 py-3 rounded-xl font-black text-lg transition shadow-md flex items-center gap-2">
+                            <i class="ph-fill ph-play"></i> بدء
+                        </button>
+                        <button onclick="resetPomodoro()" class="bg-white/20 hover:bg-white/30 text-white px-4 py-3 rounded-xl font-black text-lg transition shadow-md" title="إعادة ضبط">
+                            <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <div class="flex flex-col md:flex-row gap-6 mb-8 items-center">
                 <div class="w-full md:w-1/2 relative group">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-bold ph-magnifying-glass"></i></div>
@@ -584,6 +610,70 @@
         window.tempAdminData = null;
         window.tempAdminUsername = null;
 
+        // إعدادات مؤقت بومودورو
+        let pomodoroTime = 45 * 60; // 45 دقيقة دراسة بالثواني
+        let pomodoroInterval = null;
+        let isPomodoroRunning = false;
+        let isStudySession = true; // true = دراسة (45د), false = راحة (15د)
+
+        window.togglePomodoro = () => {
+            const btn = document.getElementById('pomodoro-toggle-btn');
+            if (isPomodoroRunning) {
+                clearInterval(pomodoroInterval);
+                isPomodoroRunning = false;
+                btn.innerHTML = '<i class="ph-fill ph-play"></i> استئناف';
+                btn.className = "bg-white text-blue-700 hover:bg-blue-50 px-6 py-3 rounded-xl font-black text-lg transition shadow-md flex items-center gap-2";
+            } else {
+                isPomodoroRunning = true;
+                btn.innerHTML = '<i class="ph-fill ph-pause"></i> إيقاف مؤقت';
+                btn.className = "bg-amber-400 text-slate-900 hover:bg-amber-500 px-6 py-3 rounded-xl font-black text-lg transition shadow-md flex items-center gap-2";
+                
+                pomodoroInterval = setInterval(() => {
+                    if (pomodoroTime > 0) {
+                        pomodoroTime--;
+                        updatePomodoroDisplay();
+                    } else {
+                        clearInterval(pomodoroInterval);
+                        isPomodoroRunning = false;
+                        if (isStudySession) {
+                            showToast("انتهت جلسة الدراسة! وقت الراحة الآن ☕ (15 دقيقة)", "success");
+                            window.fireConfetti();
+                            pomodoroTime = 15 * 60;
+                            isStudySession = false;
+                            document.getElementById('pomodoro-status-title').innerText = "وقت الراحة والاسترخاء";
+                        } else {
+                            showToast("انتهت استراحة الراحة! فلنرجع للتركيز والدراسة 🚀", "success");
+                            pomodoroTime = 45 * 60;
+                            isStudySession = true;
+                            document.getElementById('pomodoro-status-title').innerText = "وقت التركيز والدراسة";
+                        }
+                        document.getElementById('pomodoro-toggle-btn').innerHTML = '<i class="ph-fill ph-play"></i> بدء';
+                        document.getElementById('pomodoro-toggle-btn').className = "bg-white text-blue-700 hover:bg-blue-50 px-6 py-3 rounded-xl font-black text-lg transition shadow-md flex items-center gap-2";
+                        updatePomodoroDisplay();
+                    }
+                }, 1000);
+            }
+        };
+
+        window.resetPomodoro = () => {
+            clearInterval(pomodoroInterval);
+            isPomodoroRunning = false;
+            isStudySession = true;
+            pomodoroTime = 45 * 60;
+            document.getElementById('pomodoro-status-title').innerText = "وقت التركيز والدراسة";
+            document.getElementById('pomodoro-toggle-btn').innerHTML = '<i class="ph-fill ph-play"></i> بدء';
+            document.getElementById('pomodoro-toggle-btn').className = "bg-white text-blue-700 hover:bg-blue-50 px-6 py-3 rounded-xl font-black text-lg transition shadow-md flex items-center gap-2";
+            updatePomodoroDisplay();
+        };
+
+        const updatePomodoroDisplay = () => {
+            const minutes = Math.floor(pomodoroTime / 60);
+            const seconds = pomodoroTime % 60;
+            const displayStr = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            const timerEl = document.getElementById('pomodoro-timer-display');
+            if (timerEl) timerEl.innerText = displayStr;
+        };
+
         const levelNames = {
             "m_y1": "الأولى متوسط", "m_y2": "الثانية متوسط", "m_y3": "الثالثة متوسط", "m_y4": "الرابعة متوسط",
             "h_y1": "أولى ثانوي", "h_y2": "الثانية ثانوي", "h_y3": "الثالثة ثانوي"
@@ -599,7 +689,6 @@
             'from-purple-500 to-fuchsia-600 shadow-purple-500/40 text-white'
         ];
 
-        // دالة تحديد الأوسمة بناءً على نقاط الخبرة
         const getStudentBadge = (xp) => {
             if (xp >= 500) return { name: 'عالم (أينشتاين)', icon: '<i class="ph-fill ph-atom"></i>', cls: 'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-400 border-purple-200 dark:border-purple-800' };
             if (xp >= 200) return { name: 'باحث', icon: '<i class="ph-fill ph-microscope"></i>', cls: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800' };
@@ -607,7 +696,6 @@
             return { name: 'مبتدئ', icon: '<i class="ph-fill ph-student"></i>', cls: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700' };
         };
 
-        // دالة تحديث شعلة الحماس (Daily Streaks)
         const checkAndUpdateStreak = async (userRef, userData) => {
             if (userData.role === 'admin') return;
 
@@ -1765,7 +1853,7 @@
                 const colors = ['bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800', 
                                 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800', 
                                 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800', 
-                                'bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-800'];
+                                'bg-purple-50 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-800'];
                 Object.keys(levelStats).sort().forEach((lvl, i) => {
                     let c = colors[i % colors.length];
                     statsContainer.innerHTML += `
