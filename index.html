@@ -39,44 +39,7 @@
 <body class="text-slate-800 dark:text-slate-200 antialiased p-3 md:p-6 pb-24 selection:bg-blue-200 selection:text-blue-900 dark:selection:bg-blue-900 dark:selection:text-blue-200 relative overflow-x-hidden overflow-y-scroll transition-colors duration-300">
 
     <!-- نافذة الإشعارات -->
-    <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[120] flex flex-col gap-2 w-[90%] md:w-auto"></div>
-
-    <!-- نافذة عرض المحتوى (Embed Modal) -->
-    <div id="embed-modal" class="fixed inset-0 bg-slate-900/95 hidden flex-col z-[110] backdrop-blur-md transition-opacity duration-300">
-        <div class="flex justify-between items-center p-4 bg-slate-900/90 border-b border-slate-800 text-white shadow-md relative z-10">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-blue-500/20 text-blue-400 rounded-full flex items-center justify-center text-2xl shadow-inner border border-blue-500/30">
-                    <i class="ph-fill ph-monitor-play"></i>
-                </div>
-                <div>
-                    <h3 class="font-black text-lg leading-tight">عرض المحتوى</h3>
-                    <p class="text-xs text-slate-400 font-bold mt-0.5" id="embed-status-text">جاري التحميل...</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-2 sm:gap-3">
-                <a id="embed-download-btn" href="#" target="_blank" class="hidden px-4 py-2.5 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-500 hover:text-white rounded-xl font-black text-sm transition-all items-center gap-2 border border-emerald-500/30 hover:border-emerald-500 shadow-sm" title="تحميل الملف مباشرة">
-                    <span class="hidden sm:inline">تحميل</span> <i class="ph-bold ph-download-simple text-lg"></i>
-                </a>
-                <a id="embed-external-btn" href="#" target="_blank" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 rounded-xl font-black text-sm transition-all flex items-center gap-2 border border-slate-700 hover:border-slate-600 shadow-sm" title="فتح في نافذة جديدة">
-                    <span class="hidden sm:inline text-slate-300">نافذة خارجية</span> <i class="ph-bold ph-arrow-square-out text-slate-300 text-lg"></i>
-                </a>
-                <button onclick="closeEmbedModal()" class="w-10 h-10 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl text-xl flex items-center justify-center transition-all border border-red-500/20" title="إغلاق">
-                    <i class="ph-bold ph-x"></i>
-                </button>
-            </div>
-        </div>
-        <div class="flex-1 w-full h-full p-2 md:p-6 lg:p-8 relative flex items-center justify-center">
-            <!-- Loader Animation -->
-            <div class="absolute inset-0 flex items-center justify-center -z-10 text-slate-500 flex-col gap-3">
-                <i class="ph-bold ph-spinner animate-spin text-5xl text-blue-500"></i>
-                <span class="font-bold text-sm tracking-wide">يتم الآن تجهيز المحتوى...</span>
-            </div>
-            <!-- Iframe Container -->
-            <div class="w-full h-full max-w-6xl mx-auto rounded-[2rem] overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-slate-700/50 bg-black relative">
-                <iframe id="embed-iframe" class="w-full h-full absolute inset-0" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen onload="document.getElementById('embed-status-text').innerText='محتوى جاهز للمشاهدة'"></iframe>
-            </div>
-        </div>
-    </div>
+    <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 w-[90%] md:w-auto"></div>
 
     <!-- نافذة المصادقة الثنائية (2FA) للأدمن -->
     <div id="two-fa-modal" class="fixed inset-0 bg-slate-900/80 hidden items-center justify-center z-[100] backdrop-blur-xl transition-opacity duration-300 p-4">
@@ -378,23 +341,6 @@
                 </div>
             </header>
 
-            <!-- وحدة التحكم بالبث المباشر للأستاذ -->
-            <div class="bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-5 rounded-[2.5rem] shadow-sm border border-red-100 dark:border-red-900/30 mb-6 flex flex-col md:flex-row items-center justify-between gap-4 relative overflow-hidden group">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-red-500 rounded-full opacity-5 blur-3xl pointer-events-none"></div>
-                <div class="flex items-center gap-4 relative z-10 w-full md:w-auto">
-                    <div class="w-14 h-14 rounded-2xl bg-red-100 dark:bg-red-900/50 flex items-center justify-center text-red-600 dark:text-red-400 text-3xl shadow-inner"><i class="ph-fill ph-broadcast"></i></div>
-                    <div>
-                        <h3 class="text-xl font-black text-slate-800 dark:text-white">إدارة البث المباشر</h3>
-                        <p class="text-sm font-bold text-slate-500 dark:text-slate-400 mt-1" id="admin-live-status-text">لا يوجد بث حالياً</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 w-full md:w-auto relative z-10 flex-wrap">
-                    <input type="text" id="admin-live-url" placeholder="ضع رابط YouTube أو Zoom هنا..." class="flex-1 md:w-72 px-5 py-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-bold outline-none focus:border-red-400 transition text-left" dir="ltr">
-                    <button onclick="startLiveStream()" class="bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white px-6 py-3 rounded-xl font-black text-sm transition shadow-lg shadow-red-500/30 flex items-center gap-2"><i class="ph-bold ph-play"></i> إطلاق البث</button>
-                    <button onclick="stopLiveStream()" class="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 px-5 py-3 rounded-xl font-black text-sm transition flex items-center gap-2"><i class="ph-bold ph-stop"></i> إنهاء</button>
-                </div>
-            </div>
-
             <!-- لوحة التحكم الرئيسية - نظام البطاقات الشبكية -->
             <div id="admin-dashboard-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 animate-[fadeInTab_0.3s_ease]">
                 <button onclick="openAdminSection('accounts')" class="bg-gradient-to-br from-blue-500 to-indigo-600 text-white p-8 rounded-[2.5rem] shadow-lg shadow-blue-500/30 hover:scale-[1.02] transition-all flex flex-col items-center justify-center gap-4 group min-h-[280px]">
@@ -453,7 +399,7 @@
                                 <th class="p-5 w-12 text-center rounded-tr-3xl"><input type="checkbox" id="select-all-cb" aria-label="تحديد الكل" onclick="toggleSelectAll()" class="custom-cb"></th>
                                 <th class="p-5">التلميذ / ولي الأمر</th>
                                 <th class="p-5 text-center">المستوى</th>
-                                <th class="p-5 text-center">نقاط (XP) والشعلة</th>
+                                <th class="p-5 text-center">نقاط (XP)</th>
                                 <th class="p-5 text-center">الحالة (إضغط للتغيير)</th>
                                 <th class="p-5 text-left rounded-tl-3xl">الإجراءات</th>
                             </tr>
@@ -476,14 +422,14 @@
             <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-4 md:p-6 rounded-[2.5rem] shadow-lg border border-white/50 dark:border-slate-700 mb-8 gap-5 sticky top-4 z-40">
                 <div class="flex items-center gap-4 w-full md:w-auto">
                     <!-- أيقونة التلميذ الثابتة -->
-                    <div id="student-badge-icon" class="w-14 h-14 rounded-2xl shadow-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-slate-100 dark:border-slate-700 text-3xl transition-colors">
-                        <i class="ph-fill ph-student"></i>
+                    <div class="w-14 h-14 rounded-2xl shadow-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-slate-100 dark:border-slate-700 text-3xl">
+                        <i class="ph-fill ph-user-circle"></i>
                     </div>
                     <div>
                         <h1 class="text-2xl md:text-3xl font-black text-slate-800 dark:text-white leading-tight" id="display-username"></h1>
                         <div class="flex items-center gap-2 mt-1">
-                            <span id="student-level-display" class="text-sm font-black text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-600">منصة المجتهد</span>
-                            <span id="student-rank-badge" class="text-sm font-black bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 px-3 py-1 rounded-lg border border-slate-200 shadow-sm transition-colors flex items-center gap-1">مبتدئ</span>
+                            <span class="text-sm font-black text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-600">منصة المجتهد</span>
+                            <span id="student-level-badge" class="text-sm font-black text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/50 px-3 py-1 rounded-lg border border-emerald-200 dark:border-emerald-800 shadow-sm">تلميذ</span>
                         </div>
                     </div>
                 </div>
@@ -541,47 +487,6 @@
                 </div>
             </header>
 
-            <!-- راية البث المباشر للتلميذ (تظهر تلقائياً) -->
-            <button id="student-live-banner" onclick="openLiveStream()" class="hidden w-full mb-6 bg-gradient-to-r from-red-600 to-rose-600 text-white p-4 md:p-6 rounded-[2rem] shadow-lg shadow-red-500/30 hover:scale-[1.01] transition-all flex-col sm:flex-row items-center justify-between gap-4 group relative overflow-hidden text-center sm:text-right">
-                <div class="absolute inset-0 bg-[url('bg-pattern.webp')] opacity-10 mix-blend-overlay pointer-events-none"></div>
-                <div class="flex items-center gap-4 relative z-10 flex-col sm:flex-row">
-                    <div class="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center text-3xl backdrop-blur-sm animate-pulse shadow-inner"><i class="ph-fill ph-broadcast"></i></div>
-                    <div>
-                        <h3 class="text-xl md:text-2xl font-black tracking-wide flex items-center justify-center sm:justify-start gap-2">
-                            الأستاذ في بث مباشر الآن <span class="w-2.5 h-2.5 rounded-full bg-white animate-ping"></span>
-                        </h3>
-                        <p class="text-red-100 font-bold text-sm mt-1">اضغط هنا للمشاهدة والمشاركة</p>
-                    </div>
-                </div>
-                <div class="relative z-10 w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-2xl group-hover:bg-white group-hover:text-red-600 transition-colors shadow-sm"><i class="ph-bold ph-arrow-left"></i></div>
-            </button>
-
-            <!-- عنصر مؤقت بومودورو الجديد (Pomodoro Timer Widget) -->
-            <div class="mb-8 bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 rounded-[2.5rem] shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
-                <div class="flex items-center gap-4 relative z-10">
-                    <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-3xl shadow-inner backdrop-blur-md">
-                        <i class="ph-fill ph-timer"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-2xl font-black tracking-wide" id="pomodoro-status-title">وقت التركيز والدراسة</h3>
-                        <p class="text-blue-100 font-bold text-sm mt-0.5">45 دقيقة دراسة / 15 دقيقة راحة</p>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-6 relative z-10 flex-wrap justify-center">
-                    <div class="text-4xl md:text-5xl font-black tracking-widest font-mono bg-black/20 px-6 py-2.5 rounded-2xl shadow-inner border border-white/10" id="pomodoro-timer-display">45:00</div>
-                    <div class="flex gap-2">
-                        <button onclick="togglePomodoro()" id="pomodoro-toggle-btn" class="bg-white text-blue-700 hover:bg-blue-50 px-6 py-3 rounded-xl font-black text-lg transition shadow-md flex items-center gap-2">
-                            <i class="ph-fill ph-play"></i> بدء
-                        </button>
-                        <button onclick="resetPomodoro()" class="bg-white/20 hover:bg-white/30 text-white px-4 py-3 rounded-xl font-black text-lg transition shadow-md" title="إعادة ضبط">
-                            <i class="ph-bold ph-arrow-counter-clockwise"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
             <div class="flex flex-col md:flex-row gap-6 mb-8 items-center">
                 <div class="w-full md:w-1/2 relative group">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-bold ph-magnifying-glass"></i></div>
@@ -598,16 +503,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="flex items-center gap-4">
-                        <!-- شعلة الحماس -->
-                        <div class="flex items-center justify-center gap-1.5 bg-orange-50 dark:bg-orange-900/30 px-3 py-1.5 rounded-lg border border-orange-200 dark:border-orange-800 shadow-sm" title="أيام الدخول المتتالية">
-                            <span id="student-streak-count" class="text-xl font-black text-orange-600 dark:text-orange-400">0</span>
-                            <i class="ph-fill ph-fire text-2xl text-orange-500 animate-pulse"></i>
-                        </div>
-                        <div class="flex items-baseline gap-1">
-                            <span id="progress-text-xp" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500 tracking-tighter drop-shadow-sm">0</span>
-                            <span class="text-lg font-bold text-slate-400">XP</span>
-                        </div>
+                    <div class="flex items-baseline gap-1">
+                        <span id="progress-text-xp" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500 tracking-tighter drop-shadow-sm">0</span>
+                        <span class="text-lg font-bold text-slate-400">XP</span>
                     </div>
                 </div>
             </div>
@@ -657,7 +555,6 @@
         window.activeChatUser = null; 
         window.currentSections = [];
         window.currentUpdates = []; 
-        window.currentLiveUrl = "";
         window.currentEditParams = null; 
         
         // حالات الإدارة والتلميذ
@@ -676,267 +573,10 @@
         window.adminChatsData = {};
         window.allStudentsProgress = []; 
 
+        // بيانات المصادقة الثنائية (2FA)
         window.tempAdminCode = null;
         window.tempAdminData = null;
         window.tempAdminUsername = null;
-
-        // إعدادات مؤقت بومودورو
-        let pomodoroTime = 45 * 60; 
-        let pomodoroInterval = null;
-        let isPomodoroRunning = false;
-        let isStudySession = true; 
-
-        window.initPomodoro = () => {
-            if (!window.currentUserRecord) return;
-            const user = window.currentUserRecord.username;
-            const savedState = localStorage.getItem(`pomodoro_${user}`);
-            
-            if (pomodoroInterval) clearInterval(pomodoroInterval);
-            
-            if (savedState) {
-                const state = JSON.parse(savedState);
-                isStudySession = state.isStudySession;
-                isPomodoroRunning = state.isRunning;
-                
-                if (isPomodoroRunning && state.endTime) {
-                    const now = Date.now();
-                    const diff = Math.floor((state.endTime - now) / 1000);
-                    if (diff > 0) {
-                        pomodoroTime = diff;
-                        window.startPomodoroTick();
-                    } else {
-                        window.handlePomodoroEnd(true);
-                    }
-                } else {
-                    pomodoroTime = state.remainingTime;
-                }
-            } else {
-                pomodoroTime = 45 * 60;
-                isStudySession = true;
-                isPomodoroRunning = false;
-            }
-            window.updatePomodoroUI();
-        };
-
-        window.savePomodoroState = () => {
-            if (!window.currentUserRecord) return;
-            const user = window.currentUserRecord.username;
-            const state = {
-                isRunning: isPomodoroRunning,
-                isStudySession: isStudySession,
-                remainingTime: pomodoroTime,
-                endTime: isPomodoroRunning ? Date.now() + pomodoroTime * 1000 : null
-            };
-            localStorage.setItem(`pomodoro_${user}`, JSON.stringify(state));
-        };
-
-        window.updatePomodoroUI = () => {
-            const minutes = Math.floor(pomodoroTime / 60);
-            const seconds = pomodoroTime % 60;
-            const displayStr = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            
-            const timerEl = document.getElementById('pomodoro-timer-display');
-            if (timerEl) timerEl.innerText = displayStr;
-
-            const titleEl = document.getElementById('pomodoro-status-title');
-            if (titleEl) titleEl.innerText = isStudySession ? "وقت التركيز والدراسة" : "وقت الراحة والاسترخاء";
-
-            const btn = document.getElementById('pomodoro-toggle-btn');
-            if (btn) {
-                if (isPomodoroRunning) {
-                    btn.innerHTML = '<i class="ph-fill ph-pause"></i> إيقاف مؤقت';
-                    btn.className = "bg-amber-400 text-slate-900 hover:bg-amber-500 px-6 py-3 rounded-xl font-black text-lg transition shadow-md flex items-center gap-2";
-                } else {
-                    btn.innerHTML = pomodoroTime === (isStudySession ? 45*60 : 15*60) ? '<i class="ph-fill ph-play"></i> بدء' : '<i class="ph-fill ph-play"></i> استئناف';
-                    btn.className = "bg-white text-blue-700 hover:bg-blue-50 px-6 py-3 rounded-xl font-black text-lg transition shadow-md flex items-center gap-2";
-                }
-            }
-        };
-
-        window.startPomodoroTick = () => {
-            if (pomodoroInterval) clearInterval(pomodoroInterval);
-            pomodoroInterval = setInterval(() => {
-                if (pomodoroTime > 0) {
-                    pomodoroTime--;
-                    const minutes = Math.floor(pomodoroTime / 60);
-                    const seconds = pomodoroTime % 60;
-                    const timerEl = document.getElementById('pomodoro-timer-display');
-                    if (timerEl) timerEl.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                    
-                    if (pomodoroTime % 5 === 0) window.savePomodoroState();
-                } else {
-                    window.handlePomodoroEnd(false);
-                }
-            }, 1000);
-        };
-
-        window.handlePomodoroEnd = (offline) => {
-            clearInterval(pomodoroInterval);
-            isPomodoroRunning = false;
-            
-            if (isStudySession) {
-                if(!offline) { showToast("انتهت جلسة الدراسة! وقت الراحة الآن ☕ (15 دقيقة)", "success"); window.fireConfetti(); }
-                pomodoroTime = 15 * 60;
-                isStudySession = false;
-            } else {
-                if(!offline) { showToast("انتهت استراحة الراحة! فلنرجع للتركيز والدراسة 🚀", "success"); }
-                pomodoroTime = 45 * 60;
-                isStudySession = true;
-            }
-            window.savePomodoroState();
-            window.updatePomodoroUI();
-        };
-
-        window.togglePomodoro = () => {
-            if (isPomodoroRunning) {
-                clearInterval(pomodoroInterval);
-                isPomodoroRunning = false;
-                window.savePomodoroState();
-                window.updatePomodoroUI();
-            } else {
-                isPomodoroRunning = true;
-                window.savePomodoroState();
-                window.updatePomodoroUI();
-                window.startPomodoroTick();
-            }
-        };
-
-        window.resetPomodoro = () => {
-            clearInterval(pomodoroInterval);
-            isPomodoroRunning = false;
-            isStudySession = true;
-            pomodoroTime = 45 * 60;
-            window.savePomodoroState();
-            window.updatePomodoroUI();
-        };
-
-        // دوال ميزة التضمين والتحميل المباشر والبث المباشر
-        window.convertUrlToEmbed = (url) => {
-            if (!url) return '';
-            let ytWatchRegex = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/i;
-            let matchYt = url.match(ytWatchRegex);
-            if (matchYt && matchYt[1]) {
-                return `https://www.youtube.com/embed/${matchYt[1]}?rel=0&modestbranding=1`;
-            }
-            let driveRegex = /(?:drive\.google\.com\/file\/d\/|drive\.google\.com\/open\?id=)([^/&?]+)/i;
-            let matchDrive = url.match(driveRegex);
-            if (matchDrive && matchDrive[1]) {
-                return `https://drive.google.com/file/d/${matchDrive[1]}/preview`;
-            }
-            return url; 
-        };
-
-        window.getDownloadUrl = (url) => {
-            if (!url) return null;
-            let driveRegex = /(?:drive\.google\.com\/file\/d\/|drive\.google\.com\/open\?id=)([^/&?]+)/i;
-            let matchDrive = url.match(driveRegex);
-            if (matchDrive && matchDrive[1]) {
-                return `https://drive.google.com/uc?export=download&id=${matchDrive[1]}`;
-            }
-            return null; 
-        };
-
-        window.openEmbedModal = (url) => {
-            const embedUrl = window.convertUrlToEmbed(url);
-            const downloadUrl = window.getDownloadUrl(url);
-            
-            const modal = document.getElementById('embed-modal');
-            const iframe = document.getElementById('embed-iframe');
-            const extBtn = document.getElementById('embed-external-btn');
-            const dlBtn = document.getElementById('embed-download-btn');
-            const statusText = document.getElementById('embed-status-text');
-
-            statusText.innerText = 'جاري التحميل...';
-            extBtn.href = url; 
-            iframe.src = embedUrl;
-
-            if (downloadUrl) {
-                dlBtn.href = downloadUrl;
-                dlBtn.classList.remove('hidden');
-                dlBtn.classList.add('flex');
-            } else {
-                dlBtn.classList.add('hidden');
-                dlBtn.classList.remove('flex');
-            }
-
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            document.body.style.overflow = 'hidden'; 
-        };
-
-        window.closeEmbedModal = () => {
-            const modal = document.getElementById('embed-modal');
-            const iframe = document.getElementById('embed-iframe');
-
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-            iframe.src = ''; 
-            document.body.style.overflow = ''; 
-        };
-
-        window.updateLiveStreamUI = (url) => {
-            const studentBanner = document.getElementById('student-live-banner');
-            const adminStatus = document.getElementById('admin-live-status-text');
-            const adminInput = document.getElementById('admin-live-url');
-
-            if (url && url.trim() !== "") {
-                if (studentBanner) {
-                    studentBanner.classList.remove('hidden');
-                    studentBanner.classList.add('flex');
-                }
-                if (adminStatus) {
-                    adminStatus.innerHTML = '<span class="text-red-500 font-black flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span> البث شغال حالياً</span>';
-                }
-                if (adminInput) adminInput.value = url;
-            } else {
-                if (studentBanner) {
-                    studentBanner.classList.add('hidden');
-                    studentBanner.classList.remove('flex');
-                }
-                if (adminStatus) {
-                    adminStatus.innerText = 'لا يوجد بث حالياً';
-                }
-                if (adminInput) adminInput.value = "";
-            }
-        };
-
-        window.startLiveStream = async () => {
-            const url = document.getElementById('admin-live-url').value.trim();
-            if (!url) return showToast("يرجى إدخال رابط البث أولاً", "error");
-            if (!url.startsWith('http')) return showToast("الرابط غير صحيح، تأكد أنه يبدأ بـ http", "error");
-            
-            try {
-                await updateDoc(doc(programCol, 'main'), { liveStreamUrl: url });
-                showToast("تم إطلاق البث بنجاح! سيظهر الزر للتلاميذ الآن 🔴", "success");
-            } catch (e) {
-                console.error(e);
-                showToast("حدث خطأ أثناء إطلاق البث", "error");
-            }
-        };
-
-        window.stopLiveStream = async () => {
-            if (!window.currentLiveUrl) return;
-            if(await confirmAction("هل أنت متأكد من إنهاء البث وإخفاء الزر عن التلاميذ؟")) {
-                try {
-                    await updateDoc(doc(programCol, 'main'), { liveStreamUrl: "" });
-                    showToast("تم إنهاء البث وإخفاء الزر بنجاح", "success");
-                } catch (e) {
-                    console.error(e);
-                    showToast("حدث خطأ", "error");
-                }
-            }
-        };
-
-        window.openLiveStream = () => {
-            if (window.currentLiveUrl) {
-                let isExternalOnly = window.currentLiveUrl.includes('zoom.us') || window.currentLiveUrl.includes('meet.google.com') || window.currentLiveUrl.includes('teams.microsoft');
-                if (isExternalOnly) {
-                    window.open(window.currentLiveUrl, '_blank');
-                } else {
-                    window.openEmbedModal(window.currentLiveUrl);
-                }
-            }
-        };
 
         const levelNames = {
             "m_y1": "الأولى متوسط", "m_y2": "الثانية متوسط", "m_y3": "الثالثة متوسط", "m_y4": "الرابعة متوسط",
@@ -952,51 +592,6 @@
             'from-indigo-500 to-violet-600 shadow-indigo-500/40 text-white',
             'from-purple-500 to-fuchsia-600 shadow-purple-500/40 text-white'
         ];
-
-        const getStudentBadge = (xp) => {
-            if (xp >= 500) return { name: 'عالم (أينشتاين)', icon: '<i class="ph-fill ph-atom"></i>', cls: 'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-400 border-purple-200 dark:border-purple-800' };
-            if (xp >= 200) return { name: 'باحث', icon: '<i class="ph-fill ph-microscope"></i>', cls: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800' };
-            if (xp >= 50) return { name: 'مكتشف', icon: '<i class="ph-fill ph-compass"></i>', cls: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800' };
-            return { name: 'مبتدئ', icon: '<i class="ph-fill ph-student"></i>', cls: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700' };
-        };
-
-        const checkAndUpdateStreak = async (userRef, userData) => {
-            if (userData.role === 'admin') return;
-
-            const today = new Date().toLocaleDateString('en-CA'); 
-            let lastLogin = userData.lastLoginDate;
-            let currentStreak = userData.streak || 0;
-            let needsUpdate = false;
-
-            if (lastLogin !== today) {
-                if (!lastLogin) {
-                    currentStreak = 1;
-                } else {
-                    let lastDate = new Date(lastLogin);
-                    let currDate = new Date(today);
-                    let diffTime = Math.abs(currDate - lastDate);
-                    let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-                    if (diffDays === 1) {
-                        currentStreak += 1;
-                        showToast(`شعلة الحماس تزداد! 🔥 يومك الـ ${currentStreak} متتالٍ!`, "success");
-                    } else if (diffDays > 1) {
-                        currentStreak = 1;
-                        showToast("لقد فقدت شعلة الحماس بغيابك، ابدأ من جديد اليوم! 🔥", "error");
-                    }
-                }
-                needsUpdate = true;
-            }
-
-            if (needsUpdate) {
-                await updateDoc(userRef, { lastLoginDate: today, streak: currentStreak });
-                window.currentUserRecord.lastLoginDate = today;
-                window.currentUserRecord.streak = currentStreak;
-            }
-
-            const streakEl = document.getElementById('student-streak-count');
-            if (streakEl) streakEl.innerText = currentStreak;
-        };
 
         window.openAdminSection = (section) => {
             document.getElementById('admin-dashboard-grid').classList.add('hidden');
@@ -1042,7 +637,7 @@
             const toast = document.createElement('div');
             const icon = type === 'error' ? '<i class="ph-fill ph-warning-circle text-2xl"></i>' : '<i class="ph-fill ph-check-circle text-2xl"></i>';
             const bgClass = type === 'error' ? 'bg-red-500/95 dark:bg-red-600/95' : 'bg-slate-800/95 dark:bg-emerald-600/95';
-            toast.className = `px-6 py-4 rounded-2xl shadow-2xl text-white font-black text-base text-center transform transition-all duration-300 translate-y-[-20px] opacity-0 border border-white/10 flex items-center justify-center gap-3 backdrop-blur-md z-[120] ${bgClass}`;
+            toast.className = `px-6 py-4 rounded-2xl shadow-2xl text-white font-black text-base text-center transform transition-all duration-300 translate-y-[-20px] opacity-0 border border-white/10 flex items-center justify-center gap-3 backdrop-blur-md z-[100] ${bgClass}`;
             toast.innerHTML = `${icon} <span>${msg}</span>`;
             document.getElementById('toast-container').appendChild(toast);
             setTimeout(() => toast.classList.remove('translate-y-[-20px]', 'opacity-0'), 10);
@@ -1086,13 +681,16 @@
             document.getElementById(screenId).classList.add('active');
         };
 
+        // دالة إرسال الكود عبر تيليجرام (Telegram) بدلاً من الواتساب
         const sendTelegramCode = async (code) => {
-           const botToken = "8872128410:AAGiGafbwPhc3EmHeeo1l2lBdhiyxlqlLuk"; 
+            const botToken = "8872128410:AAGiGafbwPhc3EmHeeo1l2lBdhiyxlqlLuk"; 
 const chatId = "6707334537";
+            
             const message = encodeURIComponent(`🔒 تنبيه أمني:\nرمز الدخول الخاص بك لمنصة المجتهد هو:\n*${code}*\nلا تشارك هذا الرمز مع أحد.`);
             const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${message}&parse_mode=Markdown`;
 
             try {
+                // استخدام no-cors لتجنب أخطاء المتصفح (Cross-Origin)
                 await fetch(url, { mode: 'no-cors' });
                 console.log("تم طلب إرسال رسالة تيليجرام (يرجى التأكد من التوكن والـ ID)");
             } catch(e) {
@@ -1107,9 +705,8 @@ const chatId = "6707334537";
             document.getElementById('two-fa-modal').classList.add('hidden');
             document.getElementById('two-fa-modal').classList.remove('flex');
             document.getElementById('two-fa-input').value = '';
-            await signOut(auth); 
+            await signOut(auth); // تسجيل خروج لإلغاء الجلسة المعلقة
             switchScreen('auth-screen');
-            document.getElementById('auth-screen').classList.remove('blur-sm', 'pointer-events-none');
         };
 
         window.verifyAdminCode = () => {
@@ -1118,16 +715,18 @@ const chatId = "6707334537";
             
             if(!inputCode || inputCode.length < 6) return showToast("يرجى إدخال الكود المكون من 6 أرقام", "error");
             
+            // تحقق إذا كان الكود صحيحاً (للتجربة يمكنك استخدام 000000 كبديل احتياطي)
             if (inputCode === window.tempAdminCode || inputCode === "000000") {
+                // نجاح المصادقة
                 window.currentUserRecord = { username: window.tempAdminUsername, ...window.tempAdminData };
                 
+                // تنظيف المتغيرات المؤقتة وإغلاق النافذة
                 window.tempAdminCode = null;
                 window.tempAdminData = null;
                 window.tempAdminUsername = null;
                 document.getElementById('two-fa-input').value = '';
                 document.getElementById('two-fa-modal').classList.add('hidden');
                 document.getElementById('two-fa-modal').classList.remove('flex');
-                document.getElementById('auth-screen').classList.remove('blur-sm', 'pointer-events-none');
 
                 showToast("تم التحقق بنجاح! أهلاً بك أستاذ.", "success");
                 switchScreen('admin-screen');
@@ -1137,127 +736,6 @@ const chatId = "6707334537";
                 setTimeout(() => btn.classList.remove('bg-red-600', 'animate-shake'), 500);
                 showToast("الكود غير صحيح، يرجى المحاولة مرة أخرى", "error");
             }
-        };
-
-        // التعديل: استرجاع كلمة المرور بدون الحاجة لقاعدة البيانات 
-        window.requestPasswordReset = async () => {
-            const username = document.getElementById('username').value.trim();
-            if (!username) return showToast("يرجى إدخال اسم المستخدم أولاً لتتمكن من مراسلة الأستاذ", "error");
-
-            if(await confirmAction(`هل تريد مراسلة الأستاذ عبر الواتساب لاسترجاع كلمة المرور الخاصة بحساب "${username}"؟`)) {
-                const message = encodeURIComponent(`السلام عليكم أستاذ، لقد نسيت كلمة المرور الخاصة بحسابي في منصة المجتهد.\nاسم المستخدم: ${username}`);
-                window.open(`https://wa.me/213699271555?text=${message}`, '_blank');
-            }
-        };
-
-        window.handleAuth = async () => {
-            if (!isAuthReady) return showToast("يتم الاتصال بالسحابة... يرجى الانتظار", "error");
-            
-            const username = document.getElementById('username').value.trim().toLowerCase();
-            const password = document.getElementById('password').value.trim();
-            const level = document.getElementById('user-level').value;
-            const parentName = document.getElementById('parent-name').value.trim();
-            const phoneNumber = document.getElementById('phone-number').value.trim();
-
-            if (!username || !password) return showToast("يرجى ملء اسم المستخدم وكلمة المرور", "error");
-            if (window.isRegistering) {
-                if (!level || !parentName || !phoneNumber) return showToast("يرجى تعبئة جميع الحقول بدقة", "error");
-                const phoneRegex = /^(05|06|07)\d{8}$/;
-                if(!phoneRegex.test(phoneNumber)) return showToast("رقم الهاتف غير صحيح! يجب أن يتكون من 10 أرقام ويبدأ بـ 05، 06، أو 07", "error");
-            }
-
-            const btn = document.getElementById('auth-action-btn');
-            const originalHTML = btn.innerHTML;
-            btn.disabled = true; btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-2xl"></i> جاري التحقق...';
-
-            const pseudoEmail = `${username}@almojtahid.com`;
-            const userRef = doc(usersCol, username);
-
-            try {
-                if (window.isRegistering) {
-                    // التعديل: إنشاء الحساب مباشرة لتجنب حظر قواعد البيانات للمستخدمين المجهولين
-                    await createUserWithEmailAndPassword(auth, pseudoEmail, password);
-                    
-                    await setDoc(userRef, { 
-                        role: 'student', 
-                        approved: false, 
-                        clickedLinks: [],
-                        level: level, 
-                        parentName: parentName, 
-                        phoneNumber: phoneNumber,
-                        password: password,
-                        streak: 0,
-                        lastLoginDate: ''
-                    });
-                    
-                    document.getElementById('registration-success-modal').classList.remove('hidden');
-                    document.getElementById('registration-success-modal').classList.add('flex');
-                    document.getElementById('username').value = ''; document.getElementById('password').value = '';
-                    await signOut(auth); 
-                    
-                } else {
-                    await signInWithEmailAndPassword(auth, pseudoEmail, password);
-                    const userSnap = await getDoc(userRef);
-                    
-                    if (!userSnap.exists()) {
-                        showToast("حدث خطأ: الحساب موجود لكن البيانات مفقودة.", "error");
-                        await signOut(auth);
-                        return;
-                    }
-
-                    let data = userSnap.data();
-
-                    if (data.role === 'admin') {
-                        const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
-                        window.tempAdminCode = generatedCode;
-                        window.tempAdminData = data;
-                        window.tempAdminUsername = username;
-                        
-                        sendTelegramCode(generatedCode);
-                        
-                        document.getElementById('two-fa-modal').classList.remove('hidden');
-                        document.getElementById('two-fa-modal').classList.add('flex');
-                        document.getElementById('auth-screen').classList.add('blur-sm', 'pointer-events-none');
-                        
-                        btn.disabled = false; btn.innerHTML = originalHTML;
-                        return; 
-                    }
-
-                    window.currentUserRecord = { username, ...data };
-                    
-                    if (!window.currentUserRecord.password) {
-                         await updateDoc(userRef, { password: password });
-                         window.currentUserRecord.password = password;
-                    }
-                    
-                    if (!window.currentUserRecord.approved) {
-                        switchScreen('pending-screen');
-                        await signOut(auth);
-                    } else {
-                        await checkAndUpdateStreak(userRef, window.currentUserRecord);
-                        
-                        document.getElementById('display-username').innerText = username;
-                        document.getElementById('student-level-display').innerText = levelNames[window.currentUserRecord.level] || "مستوى غير محدد";
-                        switchScreen('app-screen');
-                        startStudentListeners();
-                        window.initPomodoro();
-                    }
-                }
-            } catch (err) { 
-                console.error("Auth Error:", err);
-                // التعديل: توضيح رسائل الخطأ بشكل أدق للمستخدم
-                if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
-                    showToast("بيانات الدخول غير صحيحة", "error");
-                } else if (err.code === 'auth/email-already-in-use') {
-                    showToast("اسم المستخدم مستخدم مسبقاً، يرجى اختيار اسم آخر.", "error");
-                } else if (err.code === 'auth/network-request-failed') {
-                    showToast("ضعف في الاتصال بالإنترنت، يرجى المحاولة مرة أخرى.", "error");
-                } else {
-                    showToast("حدث خطأ في الاتصال، يرجى المحاولة لاحقاً.", "error");
-                }
-            }
-            
-            btn.disabled = false; btn.innerHTML = originalHTML;
         };
 
         const defaultProgramData = [
@@ -1368,10 +846,7 @@ const chatId = "6707334537";
                 try {
                     const progDoc = await getDoc(doc(programCol, 'main'));
                     if (!progDoc.exists()) {
-                        // التعديل: إنشاء المنهج فقط إذا كان الداخل هو الأستاذ
-                        if (user.email === 'admin@almojtahid.com') {
-                            await setDoc(doc(programCol, 'main'), { sections: defaultProgramData, latestUpdates: [] });
-                        }
+                        await setDoc(doc(programCol, 'main'), { sections: defaultProgramData, latestUpdates: [] });
                     } else {
                         let data = progDoc.data();
                         let needsUpdate = false;
@@ -1388,17 +863,11 @@ const chatId = "6707334537";
                                 }
                             });
                         });
-                        // التعديل: تحديث المنهج فقط إذا كان الأستاذ هو من دخل
-                        if (needsUpdate && user.email === 'admin@almojtahid.com') {
-                             await updateDoc(doc(programCol, 'main'), { sections: data.sections });
-                        }
+                        if (needsUpdate) await updateDoc(doc(programCol, 'main'), { sections: data.sections });
                     }
 
-                    // التعديل: البحث وإنشاء حساب الأدمن يتم فقط إذا كان الإيميل للأدمن
-                    if (user.email === 'admin@almojtahid.com') {
-                        const adminDoc = await getDoc(doc(usersCol, 'admin'));
-                        if (!adminDoc.exists()) await setDoc(doc(usersCol, 'admin'), { role: 'admin', approved: true, clickedLinks: [] });
-                    }
+                    const adminDoc = await getDoc(doc(usersCol, 'admin'));
+                    if (!adminDoc.exists()) await setDoc(doc(usersCol, 'admin'), { role: 'admin', approved: true, clickedLinks: [] });
 
                     if (user.email && !window.currentUserRecord && !window.isRegistering) {
                         const username = user.email.split('@')[0];
@@ -1408,19 +877,23 @@ const chatId = "6707334537";
                         if (userSnap.exists()) {
                             let data = userSnap.data();
                             
+                            // اعتراض مسار الإدارة للمصادقة الثنائية عند عمل Refresh
                             if (data.role === 'admin') {
+                                // توليد كود من 6 أرقام
                                 const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
                                 window.tempAdminCode = generatedCode;
                                 window.tempAdminData = data;
                                 window.tempAdminUsername = username;
                                 
+                                // إرسال الكود
                                 sendTelegramCode(generatedCode);
                                 
+                                // إظهار نافذة التحقق
                                 document.getElementById('two-fa-modal').classList.remove('hidden');
                                 document.getElementById('two-fa-modal').classList.add('flex');
                                 document.getElementById('auth-screen').classList.add('blur-sm', 'pointer-events-none');
                                 
-                                return; 
+                                return; // إيقاف إكمال الدخول حتى يتم التحقق
                             } 
                             
                             window.currentUserRecord = { username, ...data };
@@ -1429,17 +902,14 @@ const chatId = "6707334537";
                                 switchScreen('pending-screen');
                                 await signOut(auth);
                             } else {
-                                await checkAndUpdateStreak(userRef, window.currentUserRecord);
-
                                 document.getElementById('display-username').innerText = username;
-                                document.getElementById('student-level-display').innerText = levelNames[window.currentUserRecord.level] || "مستوى غير محدد";
+                                document.getElementById('student-level-badge').innerText = levelNames[window.currentUserRecord.level] || "تلميذ";
                                 switchScreen('app-screen');
                                 startStudentListeners();
-                                window.initPomodoro();
                             }
                         }
                     }
-                } catch(e) { console.error("OnAuthState Error:", e); }
+                } catch(e) { console.error(e); }
             } else {
                 switchScreen('auth-screen');
                 document.getElementById('auth-screen').classList.remove('blur-sm', 'pointer-events-none');
@@ -1467,6 +937,159 @@ const chatId = "6707334537";
             }
         };
 
+        window.requestPasswordReset = async () => {
+            const username = document.getElementById('username').value.trim();
+            if (!username) return showToast("يرجى إدخال اسم المستخدم أولاً لطلب استرجاع كلمة المرور", "error");
+
+            if(await confirmAction(`هل أنت متأكد من إرسال طلب استرجاع كلمة المرور للحساب "${username}" للأستاذ؟`)) {
+                try {
+                    const userRef = doc(usersCol, username);
+                    const userSnap = await getDoc(userRef);
+
+                    if (!userSnap.exists()) {
+                        showToast("حساب المستخدم غير موجود.", "error");
+                        return;
+                    }
+
+                    const userData = userSnap.data();
+                    if (userData.role === 'admin') {
+                        showToast("لا يمكن استخدام هذه الميزة لحساب الإدارة.", "error");
+                        return;
+                    }
+
+                    const levelDisplay = levelNames[userData.level] || "مستوى غير محدد";
+                    const chatRoomId = username; 
+                    const messagesRef = collection(db, chatsPath, chatRoomId, 'messages');
+                    const chatDocRef = doc(db, chatsPath, chatRoomId);
+                    
+                    const resetMessage = `🔴 إشعار استرجاع كلمة مرور 🔴\n\nالتلميذ: ${username}\nالمستوى: ${levelDisplay}\nالهاتف: ${userData.phoneNumber || 'غير متوفر'}\n\n(يرجى من الأستاذ التواصل مع التلميذ وتزويده بكلمة المرور الجديدة بعد تغييرها من الإعدادات)`;
+
+                    await setDoc(doc(messagesRef, Date.now().toString()), { sender: 'student', text: resetMessage, timestamp: Date.now(), isSystemMessage: true });
+                    await setDoc(chatDocRef, { unreadAdmin: increment(1) }, { merge: true });
+
+                    showToast("تم إرسال طلب استرجاع كلمة المرور للأستاذ بنجاح. سيتم التواصل معك.", "success");
+
+                } catch (err) {
+                    console.error(err);
+                    showToast("حدث خطأ أثناء إرسال الطلب، يرجى المحاولة لاحقاً.", "error");
+                }
+            }
+        };
+
+        window.handleAuth = async () => {
+            if (!isAuthReady) return showToast("يتم الاتصال بالسحابة... يرجى الانتظار", "error");
+            
+            const username = document.getElementById('username').value.trim().toLowerCase();
+            const password = document.getElementById('password').value.trim();
+            const level = document.getElementById('user-level').value;
+            const parentName = document.getElementById('parent-name').value.trim();
+            const phoneNumber = document.getElementById('phone-number').value.trim();
+
+            if (!username || !password) return showToast("يرجى ملء اسم المستخدم وكلمة المرور", "error");
+            if (window.isRegistering) {
+                if (!level || !parentName || !phoneNumber) return showToast("يرجى تعبئة جميع الحقول بدقة", "error");
+                const phoneRegex = /^(05|06|07)\d{8}$/;
+                if(!phoneRegex.test(phoneNumber)) return showToast("رقم الهاتف غير صحيح! يجب أن يتكون من 10 أرقام ويبدأ بـ 05، 06، أو 07", "error");
+            }
+
+            const btn = document.getElementById('auth-action-btn');
+            const originalHTML = btn.innerHTML;
+            btn.disabled = true; btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-2xl"></i> جاري التحقق...';
+
+            const pseudoEmail = `${username}@almojtahid.com`;
+            const userRef = doc(usersCol, username);
+
+            try {
+                if (window.isRegistering) {
+                    const userSnap = await getDoc(userRef);
+                    if (userSnap.exists()) {
+                        showToast("اسم المستخدم مستخدم مسبقاً، اختر اسماً آخر", "error");
+                    } else {
+                        await createUserWithEmailAndPassword(auth, pseudoEmail, password);
+                        
+                        await setDoc(userRef, { 
+                            role: 'student', 
+                            approved: false, 
+                            clickedLinks: [],
+                            level: level, 
+                            parentName: parentName, 
+                            phoneNumber: phoneNumber,
+                            password: password 
+                        });
+                        
+                        document.getElementById('registration-success-modal').classList.remove('hidden');
+                        document.getElementById('registration-success-modal').classList.add('flex');
+                        document.getElementById('username').value = ''; document.getElementById('password').value = '';
+                        await signOut(auth); 
+                    }
+                } else {
+                    await signInWithEmailAndPassword(auth, pseudoEmail, password);
+                    const userSnap = await getDoc(userRef);
+                    
+                    if (!userSnap.exists()) {
+                        showToast("حدث خطأ: الحساب موجود لكن البيانات مفقودة.", "error");
+                        await signOut(auth);
+                        return;
+                    }
+
+                    let data = userSnap.data();
+
+                    // ---------------------------------------------------------
+                    // إضافة المصادقة الثنائية (2FA) للأستاذ
+                    // ---------------------------------------------------------
+                    if (data.role === 'admin') {
+                        // توليد كود من 6 أرقام
+                        const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+                        window.tempAdminCode = generatedCode;
+                        window.tempAdminData = data;
+                        window.tempAdminUsername = username;
+                        
+                        // إرسال الكود عبر تيليجرام
+                        sendTelegramCode(generatedCode);
+                        
+                        // إظهار نافذة التحقق وإيقاف استكمال الدخول
+                        document.getElementById('two-fa-modal').classList.remove('hidden');
+                        document.getElementById('two-fa-modal').classList.add('flex');
+                        document.getElementById('auth-screen').classList.add('blur-sm', 'pointer-events-none');
+                        
+                        btn.disabled = false; btn.innerHTML = originalHTML;
+                        return; 
+                    }
+
+                    // في حال كان تلميذ يكمل الدخول عادي
+                    window.currentUserRecord = { username, ...data };
+                    
+                    if (!window.currentUserRecord.password) {
+                         await updateDoc(userRef, { password: password });
+                         window.currentUserRecord.password = password;
+                    }
+                    
+                    if (!window.currentUserRecord.approved) {
+                        switchScreen('pending-screen');
+                        await signOut(auth);
+                    } else {
+                        document.getElementById('display-username').innerText = username;
+                        document.getElementById('student-level-badge').innerText = levelNames[window.currentUserRecord.level];
+                        switchScreen('app-screen');
+                        startStudentListeners();
+                    }
+                }
+            } catch (err) { 
+                console.error(err);
+                if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+                    showToast("بيانات الدخول غير صحيحة", "error");
+                } else if (err.code === 'auth/email-already-in-use') {
+                    showToast("اسم المستخدم مستخدم مسبقاً.", "error");
+                } else if (err.code === 'auth/network-request-failed') {
+                    showToast("لا يوجد اتصال بالإنترنت! يرجى التحقق من الشبكة.", "error");
+                } else {
+                    showToast("حدث خطأ في الاتصال، يرجى المحاولة لاحقاً.", "error");
+                }
+            }
+            
+            btn.disabled = false; btn.innerHTML = originalHTML;
+        };
+
         window.closeWelcomeScreen = () => {
             const screen = document.getElementById('welcome-quote-screen');
             screen.classList.remove('welcome-visible');
@@ -1482,10 +1105,7 @@ const chatId = "6707334537";
             window.studentViewMode = 'grid'; 
             
             document.getElementById('display-username').innerText = window.currentUserRecord.username;
-            document.getElementById('student-level-display').innerText = levelNames[window.currentUserRecord.level] || "مستوى غير محدد";
-            
-            const streakEl = document.getElementById('student-streak-count');
-            if(streakEl) streakEl.innerText = window.currentUserRecord.streak || 0;
+            document.getElementById('student-level-badge').innerText = levelNames[window.currentUserRecord.level];
             
             document.getElementById('return-admin-btn').classList.remove('hidden');
             document.getElementById('student-settings-btn').classList.add('hidden'); 
@@ -1499,7 +1119,6 @@ const chatId = "6707334537";
 
             switchScreen('app-screen');
             startStudentListeners();
-            window.initPomodoro();
             showToast(`أنت الآن داخل حساب التلميذ في وضع المراقبة`);
         };
 
@@ -1517,7 +1136,6 @@ const chatId = "6707334537";
 
             if(unsubscribeUsers) unsubscribeUsers();
             if(unsubscribeChatMeta) unsubscribeChatMeta();
-            if(pomodoroInterval) clearInterval(pomodoroInterval);
 
             switchScreen('admin-screen');
             returnToAdminDashboard();
@@ -1545,7 +1163,6 @@ const chatId = "6707334537";
                 if(unsubscribeUsers) unsubscribeUsers();
                 if(unsubscribeChat) unsubscribeChat();
                 if(unsubscribeChatMeta) unsubscribeChatMeta();
-                if(pomodoroInterval) clearInterval(pomodoroInterval);
                 if (typeof closeChat === 'function') closeChat();
                 switchScreen('auth-screen');
                 document.getElementById('auth-screen').classList.remove('blur-sm', 'pointer-events-none');
@@ -1647,6 +1264,7 @@ const chatId = "6707334537";
                     targetUsers = targetUsers.filter(u => u.data.level === target);
                 }
 
+                // فلترة التلاميذ المفعلين فقط
                 targetUsers = targetUsers.filter(u => u.data.approved === true);
 
                 if (targetUsers.length === 0) {
@@ -1778,27 +1396,10 @@ const chatId = "6707334537";
             const bar = document.getElementById('progress-bar-fill'); const txt = document.getElementById('progress-text-xp');
             if(bar) bar.style.width = `${result.percent}%`; 
             if(txt) txt.innerText = `${result.xp}`;
-
-            const badgeInfo = getStudentBadge(result.xp);
-            const rankBadgeEl = document.getElementById('student-rank-badge');
-            const iconBadgeEl = document.getElementById('student-badge-icon');
-            
-            if (rankBadgeEl) {
-                rankBadgeEl.innerHTML = `${badgeInfo.icon} ${badgeInfo.name}`;
-                rankBadgeEl.className = `text-sm font-black px-3 py-1 rounded-lg border shadow-sm transition-colors flex items-center gap-1 ${badgeInfo.cls}`;
-            }
-            if (iconBadgeEl) {
-                iconBadgeEl.innerHTML = badgeInfo.icon;
-                iconBadgeEl.className = `w-14 h-14 rounded-2xl shadow-lg flex items-center justify-center text-3xl transition-colors ${badgeInfo.cls}`;
-            }
-            
-            const streakEl = document.getElementById('student-streak-count');
-            if (streakEl) streakEl.innerText = window.currentUserRecord.streak || 0;
         };
 
         window.trackLinkClick = async (branchId, cat, lIdx, url) => {
-            window.openEmbedModal(url);
-            
+            window.open(url, '_blank');
             if (window.currentUserRecord && window.currentUserRecord.role !== 'admin') {
                 if (window.originalAdminRecord) {
                     showToast("أنت في وضع المراقبة، لن يتم تسجيل هذا الدرس كمقروء ولن تحسب النقاط للتلميذ.", "error");
@@ -1861,10 +1462,7 @@ const chatId = "6707334537";
                             let links = branch.categories[cat] || []; let conf = catConfig[cat];
                             links.forEach((lnk, lIdx) => {
                                 if(lnk.title.toLowerCase().includes(query) || branch.title.toLowerCase().includes(query)) {
-                                    found = true; 
-                                    let linkId = `${branch.id}_${cat}_${lIdx}`; 
-                                    let isRead = clickedLinks.includes(linkId);
-
+                                    found = true; let linkId = `${branch.id}_${cat}_${lIdx}`; let isRead = clickedLinks.includes(linkId);
                                     html += `
                                     <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition hover:shadow-md">
                                         <div>
@@ -1876,9 +1474,7 @@ const chatId = "6707334537";
                                         </div>
                                         <div class="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
                                             ${isRead ? `<span class="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 text-xs font-black px-3 py-1.5 rounded-lg flex items-center gap-1"><i class="ph-bold ph-check"></i> مكتمل</span>` : ''}
-                                            <button onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}')" aria-label="مشاهدة المحتوى" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl font-black shadow-sm transition flex items-center gap-2 text-sm whitespace-nowrap">
-                                                مشاهدة <i class="ph-bold ph-play-circle"></i>
-                                            </button>
+                                            <button onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}')" aria-label="مشاهدة المحتوى" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl font-black shadow-sm transition flex items-center gap-2 text-sm whitespace-nowrap">مشاهدة <i class="ph-bold ph-arrow-left"></i></button>
                                         </div>
                                     </div>`;
                                 }
@@ -2060,9 +1656,6 @@ const chatId = "6707334537";
                     : `<button onclick="toggleUserStatus('${d.id}', false, '${data.phoneNumber||''}')" aria-label="تغيير الحالة" class="px-4 py-1.5 rounded-full text-xs font-black shadow-sm bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800 hover:scale-105 transition" title="اضغط للتفعيل ومراسلة الولي">انتظار ⏳</button>`;
 
                 let passDisplay = data.password ? data.password : "مفقودة ⚠";
-                
-                const badgeInfo = getStudentBadge(prog.xp);
-                const streakCount = data.streak || 0;
 
                 tbody.innerHTML += `
                     <tr class="hover:bg-blue-50/40 dark:hover:bg-blue-900/20 transition duration-200 group">
@@ -2079,11 +1672,8 @@ const chatId = "6707334537";
                         </td>
                         <td class="p-4 text-sm font-black text-slate-600 dark:text-slate-300 text-center border-b border-slate-100 dark:border-slate-700">${levelDisplay}</td>
                         <td class="p-4 text-center border-b border-slate-100 dark:border-slate-700">
-                            <div class="flex items-center justify-center gap-2 mb-1">
-                                <div class="inline-flex bg-gradient-to-r from-emerald-400 to-teal-500 text-white px-2 py-1 rounded text-xs font-black shadow-sm">${prog.xp} XP</div>
-                                <div class="inline-flex bg-orange-100 text-orange-600 dark:bg-orange-900/50 dark:text-orange-400 px-2 py-1 rounded text-xs font-black shadow-sm border border-orange-200 dark:border-orange-800"><i class="ph-fill ph-fire ml-1"></i>${streakCount}</div>
-                            </div>
-                            <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 mt-1 flex justify-center items-center gap-1"><span class="${badgeInfo.cls.replace('border', '')} px-1.5 py-0.5 rounded-sm">${badgeInfo.icon} ${badgeInfo.name}</span> إنجاز: ${prog.percent}%</div>
+                            <div class="inline-flex bg-gradient-to-r from-emerald-400 to-teal-500 text-white px-3 py-1 rounded-lg text-sm font-black shadow-sm mb-1">${prog.xp} XP</div>
+                            <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500">إنجاز: ${prog.percent}%</div>
                         </td>
                         <td class="p-4 text-center border-b border-slate-100 dark:border-slate-700">${statusBtn}</td>
                         <td class="p-4 text-left border-b border-slate-100 dark:border-slate-700">
@@ -2102,7 +1692,7 @@ const chatId = "6707334537";
                 const colors = ['bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800', 
                                 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800', 
                                 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800', 
-                                'bg-purple-50 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-800'];
+                                'bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-800'];
                 Object.keys(levelStats).sort().forEach((lvl, i) => {
                     let c = colors[i % colors.length];
                     statsContainer.innerHTML += `
@@ -2126,6 +1716,7 @@ const chatId = "6707334537";
                 }
             });
 
+            // تحسين: الاستماع فقط لحسابات التلاميذ (لتفادي تحميل الإدارة مراراً)
             if(unsubscribeUsers) unsubscribeUsers();
             unsubscribeUsers = onSnapshot(usersCol, (snapshot) => {
                 window.adminUsersList = []; window.allStudentsProgress = []; 
@@ -2190,11 +1781,6 @@ const chatId = "6707334537";
                     window.currentSections = data.sections; 
                     window.currentUpdates = data.latestUpdates || [];
 
-                    if (data.liveStreamUrl !== undefined) {
-                        window.currentLiveUrl = data.liveStreamUrl;
-                        window.updateLiveStreamUI(data.liveStreamUrl);
-                    }
-
                     if(document.getElementById('lesson-search').value.trim() === '') { 
                         window.renderProgramUI(window.currentSections, 'student-program-view', false); 
                     }
@@ -2232,10 +1818,6 @@ const chatId = "6707334537";
                     if(d.id === window.currentUserRecord.username) {
                         window.currentUserRecord.clickedLinks = data.clickedLinks || [];
                         window.currentUserRecord.phoneNumber = data.phoneNumber || ''; 
-                        
-                        if(data.streak !== undefined) window.currentUserRecord.streak = data.streak;
-                        if(data.lastLoginDate !== undefined) window.currentUserRecord.lastLoginDate = data.lastLoginDate;
-                        
                         updateProgressUI(window.currentSections || []); 
                         
                         if(document.getElementById('lesson-search').value.trim() === '') { window.renderProgramUI(window.currentSections || [], 'student-program-view', false); } 
@@ -2269,6 +1851,7 @@ const chatId = "6707334537";
 
             if(unsubscribeChat) unsubscribeChat();
             
+            // تحسين الأداء: تحميل آخر 100 رسالة فقط مرتبة حسب الوقت
             const q = query(messagesRef, orderBy("timestamp", "asc"), limit(100));
             
             unsubscribeChat = onSnapshot(q, (snapshot) => {
@@ -2490,6 +2073,7 @@ const chatId = "6707334537";
                 }
 
             } else {
+                // شاشة التلميذ
                 let clickedLinks = window.currentUserRecord ? (window.currentUserRecord.clickedLinks || []) : [];
                 let userLevel = window.currentUserRecord ? window.currentUserRecord.level : null;
 
@@ -2576,15 +2160,11 @@ const chatId = "6707334537";
                                     let links = branch.categories[cat] || []; let conf = catConfig[cat];
                                     
                                     let linksList = links.length ? links.map((lnk, lIdx) => {
-                                        let linkId = `${branch.id}_${cat}_${lIdx}`; 
-                                        let isRead = clickedLinks.includes(linkId);
-
-                                        let btnClass = isRead ? 'border-emerald-200 dark:border-emerald-800 shadow-sm bg-emerald-50/20' : 'border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 hover:shadow-md hover:border-blue-300';
-
-                                        return `<button onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}')" aria-label="مشاهدة المحتوى" class="w-full flex items-center justify-between gap-3 p-4 rounded-2xl border transition-all duration-200 group/link relative overflow-hidden text-right mb-3 ${btnClass}">
+                                        let linkId = `${branch.id}_${cat}_${lIdx}`; let isRead = clickedLinks.includes(linkId);
+                                        return `<button onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}')" aria-label="مشاهدة المحتوى" class="w-full flex items-center justify-between gap-3 bg-white dark:bg-slate-800 p-4 rounded-2xl border ${isRead ? 'border-emerald-200 dark:border-emerald-800 shadow-sm bg-emerald-50/20' : 'border-slate-100 dark:border-slate-700'} hover:shadow-md hover:border-blue-300 transition-all duration-200 group/link relative overflow-hidden text-right mb-3">
                                             <div class="flex items-start sm:items-center gap-4 flex-1 w-full">
                                                 <div class="w-12 h-12 flex-shrink-0 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-2xl group-hover/link:bg-blue-600 group-hover/link:text-white transition-colors shadow-inner mt-1 sm:mt-0 border border-blue-100 dark:border-blue-800">
-                                                    <i class="ph-bold ph-play-circle"></i>
+                                                    <i class="ph-bold ph-link"></i>
                                                 </div>
                                                 <span class="${conf.text} font-bold text-base flex-1 leading-relaxed text-right group-hover/link:underline decoration-2 underline-offset-4 break-words" style="word-break: break-word; white-space: normal;">${lnk.title}</span>
                                             </div>
