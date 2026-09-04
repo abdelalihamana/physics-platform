@@ -616,42 +616,119 @@
         let isPomodoroRunning = false;
         let isStudySession = true; // true = دراسة (45د), false = راحة (15د)
 
-        window.togglePomodoro = () => {
+        // دوال مؤقت بومودورو
+        window.initPomodoro = () => {
+            if (!window.currentUserRecord) return;
+            const user = window.currentUserRecord.username;
+            const savedState = localStorage.getItem(`pomodoro_${user}`);
+            
+            if (pomodoroInterval) clearInterval(pomodoroInterval);
+            
+            if (savedState) {
+                const state = JSON.parse(savedState);
+                isStudySession = state.isStudySession;
+                isPomodoroRunning = state.isRunning;
+                
+                if (isPomodoroRunning && state.endTime) {
+                    const now = Date.now();
+                    const diff = Math.floor((state.endTime - now) / 1000);
+                    if (diff > 0) {
+                        pomodoroTime = diff;
+                        window.startPomodoroTick();
+                    } else {
+                        window.handlePomodoroEnd(true);
+                    }
+                } else {
+                    pomodoroTime = state.remainingTime;
+                }
+            } else {
+                pomodoroTime = 45 * 60;
+                isStudySession = true;
+                isPomodoroRunning = false;
+            }
+            window.updatePomodoroUI();
+        };
+
+        window.savePomodoroState = () => {
+            if (!window.currentUserRecord) return;
+            const user = window.currentUserRecord.username;
+            const state = {
+                isRunning: isPomodoroRunning,
+                isStudySession: isStudySession,
+                remainingTime: pomodoroTime,
+                endTime: isPomodoroRunning ? Date.now() + pomodoroTime * 1000 : null
+            };
+            localStorage.setItem(`pomodoro_${user}`, JSON.stringify(state));
+        };
+
+        window.updatePomodoroUI = () => {
+            const minutes = Math.floor(pomodoroTime / 60);
+            const seconds = pomodoroTime % 60;
+            const displayStr = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            const timerEl = document.getElementById('pomodoro-timer-display');
+            if (timerEl) timerEl.innerText = displayStr;
+
+            const titleEl = document.getElementById('pomodoro-status-title');
+            if (titleEl) titleEl.innerText = isStudySession ? "وقت التركيز والدراسة" : "وقت الراحة والاسترخاء";
+
             const btn = document.getElementById('pomodoro-toggle-btn');
+            if (btn) {
+                if (isPomodoroRunning) {
+                    btn.innerHTML = '<i class="ph-fill ph-pause"></i> إيقاف مؤقت';
+                    btn.className = "bg-amber-400 text-slate-900 hover:bg-amber-500 px-6 py-3 rounded-xl font-black text-lg transition shadow-md flex items-center gap-2";
+                } else {
+                    btn.innerHTML = pomodoroTime === (isStudySession ? 45*60 : 15*60) ? '<i class="ph-fill ph-play"></i> بدء' : '<i class="ph-fill ph-play"></i> استئناف';
+                    btn.className = "bg-white text-blue-700 hover:bg-blue-50 px-6 py-3 rounded-xl font-black text-lg transition shadow-md flex items-center gap-2";
+                }
+            }
+        };
+
+        window.startPomodoroTick = () => {
+            if (pomodoroInterval) clearInterval(pomodoroInterval);
+            pomodoroInterval = setInterval(() => {
+                if (pomodoroTime > 0) {
+                    pomodoroTime--;
+                    const minutes = Math.floor(pomodoroTime / 60);
+                    const seconds = pomodoroTime % 60;
+                    const timerEl = document.getElementById('pomodoro-timer-display');
+                    if (timerEl) timerEl.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    
+                    if (pomodoroTime % 5 === 0) window.savePomodoroState();
+                } else {
+                    window.handlePomodoroEnd(false);
+                }
+            }, 1000);
+        };
+
+        window.handlePomodoroEnd = (offline) => {
+            clearInterval(pomodoroInterval);
+            isPomodoroRunning = false;
+            
+            if (isStudySession) {
+                if(!offline) { showToast("انتهت جلسة الدراسة! وقت الراحة الآن ☕ (15 دقيقة)", "success"); window.fireConfetti(); }
+                pomodoroTime = 15 * 60;
+                isStudySession = false;
+            } else {
+                if(!offline) { showToast("انتهت استراحة الراحة! فلنرجع للتركيز والدراسة 🚀", "success"); }
+                pomodoroTime = 45 * 60;
+                isStudySession = true;
+            }
+            window.savePomodoroState();
+            window.updatePomodoroUI();
+        };
+
+        window.togglePomodoro = () => {
             if (isPomodoroRunning) {
                 clearInterval(pomodoroInterval);
                 isPomodoroRunning = false;
-                btn.innerHTML = '<i class="ph-fill ph-play"></i> استئناف';
-                btn.className = "bg-white text-blue-700 hover:bg-blue-50 px-6 py-3 rounded-xl font-black text-lg transition shadow-md flex items-center gap-2";
+                window.savePomodoroState();
+                window.updatePomodoroUI();
             } else {
                 isPomodoroRunning = true;
-                btn.innerHTML = '<i class="ph-fill ph-pause"></i> إيقاف مؤقت';
-                btn.className = "bg-amber-400 text-slate-900 hover:bg-amber-500 px-6 py-3 rounded-xl font-black text-lg transition shadow-md flex items-center gap-2";
-                
-                pomodoroInterval = setInterval(() => {
-                    if (pomodoroTime > 0) {
-                        pomodoroTime--;
-                        updatePomodoroDisplay();
-                    } else {
-                        clearInterval(pomodoroInterval);
-                        isPomodoroRunning = false;
-                        if (isStudySession) {
-                            showToast("انتهت جلسة الدراسة! وقت الراحة الآن ☕ (15 دقيقة)", "success");
-                            window.fireConfetti();
-                            pomodoroTime = 15 * 60;
-                            isStudySession = false;
-                            document.getElementById('pomodoro-status-title').innerText = "وقت الراحة والاسترخاء";
-                        } else {
-                            showToast("انتهت استراحة الراحة! فلنرجع للتركيز والدراسة 🚀", "success");
-                            pomodoroTime = 45 * 60;
-                            isStudySession = true;
-                            document.getElementById('pomodoro-status-title').innerText = "وقت التركيز والدراسة";
-                        }
-                        document.getElementById('pomodoro-toggle-btn').innerHTML = '<i class="ph-fill ph-play"></i> بدء';
-                        document.getElementById('pomodoro-toggle-btn').className = "bg-white text-blue-700 hover:bg-blue-50 px-6 py-3 rounded-xl font-black text-lg transition shadow-md flex items-center gap-2";
-                        updatePomodoroDisplay();
-                    }
-                }, 1000);
+                window.savePomodoroState();
+                window.updatePomodoroUI();
+                window.startPomodoroTick();
             }
         };
 
@@ -660,18 +737,8 @@
             isPomodoroRunning = false;
             isStudySession = true;
             pomodoroTime = 45 * 60;
-            document.getElementById('pomodoro-status-title').innerText = "وقت التركيز والدراسة";
-            document.getElementById('pomodoro-toggle-btn').innerHTML = '<i class="ph-fill ph-play"></i> بدء';
-            document.getElementById('pomodoro-toggle-btn').className = "bg-white text-blue-700 hover:bg-blue-50 px-6 py-3 rounded-xl font-black text-lg transition shadow-md flex items-center gap-2";
-            updatePomodoroDisplay();
-        };
-
-        const updatePomodoroDisplay = () => {
-            const minutes = Math.floor(pomodoroTime / 60);
-            const seconds = pomodoroTime % 60;
-            const displayStr = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            const timerEl = document.getElementById('pomodoro-timer-display');
-            if (timerEl) timerEl.innerText = displayStr;
+            window.savePomodoroState();
+            window.updatePomodoroUI();
         };
 
         const levelNames = {
@@ -823,7 +890,7 @@
         };
 
         const sendTelegramCode = async (code) => {
-            const botToken = "8872128410:AAGiGafbwPhc3EmHeeo1l2lBdhiyxlqlLuk";
+            const botToken = "8872128410:AAGiGafbwPhc3EmHeeo1l2lBdhiyxlqlLuk"; 
             const chatId = "6707334537";
             const message = encodeURIComponent(`🔒 تنبيه أمني:\nرمز الدخول الخاص بك لمنصة المجتهد هو:\n*${code}*\nلا تشارك هذا الرمز مع أحد.`);
             const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${message}&parse_mode=Markdown`;
@@ -1041,6 +1108,7 @@
                                 document.getElementById('student-level-display').innerText = levelNames[window.currentUserRecord.level] || "مستوى غير محدد";
                                 switchScreen('app-screen');
                                 startStudentListeners();
+                                window.initPomodoro();
                             }
                         }
                     }
@@ -1204,6 +1272,7 @@
                         document.getElementById('student-level-display').innerText = levelNames[window.currentUserRecord.level] || "مستوى غير محدد";
                         switchScreen('app-screen');
                         startStudentListeners();
+                        window.initPomodoro();
                     }
                 }
             } catch (err) { 
@@ -1254,6 +1323,7 @@
 
             switchScreen('app-screen');
             startStudentListeners();
+            window.initPomodoro();
             showToast(`أنت الآن داخل حساب التلميذ في وضع المراقبة`);
         };
 
@@ -1271,6 +1341,7 @@
 
             if(unsubscribeUsers) unsubscribeUsers();
             if(unsubscribeChatMeta) unsubscribeChatMeta();
+            if(pomodoroInterval) clearInterval(pomodoroInterval);
 
             switchScreen('admin-screen');
             returnToAdminDashboard();
@@ -1298,6 +1369,7 @@
                 if(unsubscribeUsers) unsubscribeUsers();
                 if(unsubscribeChat) unsubscribeChat();
                 if(unsubscribeChatMeta) unsubscribeChatMeta();
+                if(pomodoroInterval) clearInterval(pomodoroInterval);
                 if (typeof closeChat === 'function') closeChat();
                 switchScreen('auth-screen');
                 document.getElementById('auth-screen').classList.remove('blur-sm', 'pointer-events-none');
@@ -2236,7 +2308,6 @@
                 }
 
             } else {
-                // شاشة التلميذ - بدون قفل تدريجي
                 let clickedLinks = window.currentUserRecord ? (window.currentUserRecord.clickedLinks || []) : [];
                 let userLevel = window.currentUserRecord ? window.currentUserRecord.level : null;
 
