@@ -39,7 +39,41 @@
 <body class="text-slate-800 dark:text-slate-200 antialiased p-3 md:p-6 pb-24 selection:bg-blue-200 selection:text-blue-900 dark:selection:bg-blue-900 dark:selection:text-blue-200 relative overflow-x-hidden overflow-y-scroll transition-colors duration-300">
 
     <!-- نافذة الإشعارات -->
-    <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 w-[90%] md:w-auto"></div>
+    <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[120] flex flex-col gap-2 w-[90%] md:w-auto"></div>
+
+    <!-- نافذة عرض المحتوى (Embed Modal) -->
+    <div id="embed-modal" class="fixed inset-0 bg-slate-900/95 hidden flex-col z-[110] backdrop-blur-md transition-opacity duration-300">
+        <div class="flex justify-between items-center p-4 bg-slate-900/90 border-b border-slate-800 text-white shadow-md relative z-10">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-500/20 text-blue-400 rounded-full flex items-center justify-center text-2xl shadow-inner border border-blue-500/30">
+                    <i class="ph-fill ph-monitor-play"></i>
+                </div>
+                <div>
+                    <h3 class="font-black text-lg leading-tight">عرض المحتوى</h3>
+                    <p class="text-xs text-slate-400 font-bold mt-0.5" id="embed-status-text">جاري التحميل...</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <a id="embed-external-btn" href="#" target="_blank" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 rounded-xl font-black text-sm transition-all flex items-center gap-2 border border-slate-700 hover:border-slate-600 shadow-sm" title="فتح في نافذة جديدة">
+                    <span class="hidden sm:inline text-slate-300">نافذة خارجية</span> <i class="ph-bold ph-arrow-square-out text-slate-300 text-lg"></i>
+                </a>
+                <button onclick="closeEmbedModal()" class="w-10 h-10 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl text-xl flex items-center justify-center transition-all border border-red-500/20" title="إغلاق">
+                    <i class="ph-bold ph-x"></i>
+                </button>
+            </div>
+        </div>
+        <div class="flex-1 w-full h-full p-2 md:p-6 lg:p-8 relative flex items-center justify-center">
+            <!-- Loader Animation -->
+            <div class="absolute inset-0 flex items-center justify-center -z-10 text-slate-500 flex-col gap-3">
+                <i class="ph-bold ph-spinner animate-spin text-5xl text-blue-500"></i>
+                <span class="font-bold text-sm tracking-wide">يتم الآن تجهيز المحتوى...</span>
+            </div>
+            <!-- Iframe Container -->
+            <div class="w-full h-full max-w-6xl mx-auto rounded-[2rem] overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-slate-700/50 bg-black relative">
+                <iframe id="embed-iframe" class="w-full h-full absolute inset-0" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen onload="document.getElementById('embed-status-text').innerText='محتوى جاهز للمشاهدة'"></iframe>
+            </div>
+        </div>
+    </div>
 
     <!-- نافذة المصادقة الثنائية (2FA) للأدمن -->
     <div id="two-fa-modal" class="fixed inset-0 bg-slate-900/80 hidden items-center justify-center z-[100] backdrop-blur-xl transition-opacity duration-300 p-4">
@@ -741,6 +775,53 @@
             window.updatePomodoroUI();
         };
 
+        // دوال ميزة التضمين (Embed)
+        window.convertUrlToEmbed = (url) => {
+            if (!url) return '';
+            
+            // يوتيوب
+            let ytWatchRegex = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/i;
+            let matchYt = url.match(ytWatchRegex);
+            if (matchYt && matchYt[1]) {
+                return `https://www.youtube.com/embed/${matchYt[1]}?rel=0&modestbranding=1`;
+            }
+            
+            // جوجل درايف
+            let driveRegex = /drive\.google\.com\/file\/d\/([^/]+)\/view/i;
+            let matchDrive = url.match(driveRegex);
+            if (matchDrive && matchDrive[1]) {
+                return `https://drive.google.com/file/d/${matchDrive[1]}/preview`;
+            }
+
+            return url; // إرجاع الرابط كما هو إذا لم يتطابق مع القواعد السابقة (مثل Phet)
+        };
+
+        window.openEmbedModal = (url) => {
+            const embedUrl = window.convertUrlToEmbed(url);
+            const modal = document.getElementById('embed-modal');
+            const iframe = document.getElementById('embed-iframe');
+            const extBtn = document.getElementById('embed-external-btn');
+            const statusText = document.getElementById('embed-status-text');
+
+            statusText.innerText = 'جاري التحميل...';
+            extBtn.href = url; // زر الخروج يفتح الرابط الأصلي
+            iframe.src = embedUrl;
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden'; // منع التمرير في الخلفية
+        };
+
+        window.closeEmbedModal = () => {
+            const modal = document.getElementById('embed-modal');
+            const iframe = document.getElementById('embed-iframe');
+
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            iframe.src = ''; // مسح الرابط لإيقاف الفيديو/الصوت
+            document.body.style.overflow = ''; // استعادة التمرير
+        };
+
         const levelNames = {
             "m_y1": "الأولى متوسط", "m_y2": "الثانية متوسط", "m_y3": "الثالثة متوسط", "m_y4": "الرابعة متوسط",
             "h_y1": "أولى ثانوي", "h_y2": "الثانية ثانوي", "h_y3": "الثالثة ثانوي"
@@ -845,7 +926,7 @@
             const toast = document.createElement('div');
             const icon = type === 'error' ? '<i class="ph-fill ph-warning-circle text-2xl"></i>' : '<i class="ph-fill ph-check-circle text-2xl"></i>';
             const bgClass = type === 'error' ? 'bg-red-500/95 dark:bg-red-600/95' : 'bg-slate-800/95 dark:bg-emerald-600/95';
-            toast.className = `px-6 py-4 rounded-2xl shadow-2xl text-white font-black text-base text-center transform transition-all duration-300 translate-y-[-20px] opacity-0 border border-white/10 flex items-center justify-center gap-3 backdrop-blur-md z-[100] ${bgClass}`;
+            toast.className = `px-6 py-4 rounded-2xl shadow-2xl text-white font-black text-base text-center transform transition-all duration-300 translate-y-[-20px] opacity-0 border border-white/10 flex items-center justify-center gap-3 backdrop-blur-md z-[120] ${bgClass}`;
             toast.innerHTML = `${icon} <span>${msg}</span>`;
             document.getElementById('toast-container').appendChild(toast);
             setTimeout(() => toast.classList.remove('translate-y-[-20px]', 'opacity-0'), 10);
@@ -890,8 +971,8 @@
         };
 
         const sendTelegramCode = async (code) => {
-            const botToken = "8872128410:AAGiGafbwPhc3EmHeeo1l2lBdhiyxlqlLuk"; 
-            const chatId = "6707334537";
+            const botToken = "YOUR_TELEGRAM_BOT_TOKEN";
+            const chatId = "YOUR_CHAT_ID";
             const message = encodeURIComponent(`🔒 تنبيه أمني:\nرمز الدخول الخاص بك لمنصة المجتهد هو:\n*${code}*\nلا تشارك هذا الرمز مع أحد.`);
             const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${message}&parse_mode=Markdown`;
 
@@ -1621,7 +1702,8 @@
         };
 
         window.trackLinkClick = async (branchId, cat, lIdx, url) => {
-            window.open(url, '_blank');
+            window.openEmbedModal(url);
+            
             if (window.currentUserRecord && window.currentUserRecord.role !== 'admin') {
                 if (window.originalAdminRecord) {
                     showToast("أنت في وضع المراقبة، لن يتم تسجيل هذا الدرس كمقروء ولن تحسب النقاط للتلميذ.", "error");
@@ -2399,10 +2481,11 @@
 
                                         let btnClass = isRead ? 'border-emerald-200 dark:border-emerald-800 shadow-sm bg-emerald-50/20' : 'border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 hover:shadow-md hover:border-blue-300';
 
+                                        // التعديل هنا: استدعاء trackLinkClick لفتح النافذة المنبثقة
                                         return `<button onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}')" aria-label="مشاهدة المحتوى" class="w-full flex items-center justify-between gap-3 p-4 rounded-2xl border transition-all duration-200 group/link relative overflow-hidden text-right mb-3 ${btnClass}">
                                             <div class="flex items-start sm:items-center gap-4 flex-1 w-full">
                                                 <div class="w-12 h-12 flex-shrink-0 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-2xl group-hover/link:bg-blue-600 group-hover/link:text-white transition-colors shadow-inner mt-1 sm:mt-0 border border-blue-100 dark:border-blue-800">
-                                                    <i class="ph-bold ph-link"></i>
+                                                    <i class="ph-bold ph-play-circle"></i>
                                                 </div>
                                                 <span class="${conf.text} font-bold text-base flex-1 leading-relaxed text-right group-hover/link:underline decoration-2 underline-offset-4 break-words" style="word-break: break-word; white-space: normal;">${lnk.title}</span>
                                             </div>
