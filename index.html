@@ -473,7 +473,7 @@
         <!-- شاشة التلميذ -->
         <!-- ===================================== -->
         <div id="app-screen" class="screen">
-            <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-4 md:p-6 rounded-[2.5rem] shadow-lg border border-white/50 dark:border-slate-700 mb-6 gap-5 sticky top-4 z-40">
+            <header class="flex flex-col md:flex-row justify-between items-center bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-4 md:p-6 rounded-[2.5rem] shadow-lg border border-white/50 dark:border-slate-700 mb-8 gap-5 sticky top-4 z-40">
                 <div class="flex items-center gap-4 w-full md:w-auto">
                     <!-- أيقونة التلميذ الثابتة -->
                     <div id="student-badge-icon" class="w-14 h-14 rounded-2xl shadow-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-slate-100 dark:border-slate-700 text-3xl transition-colors">
@@ -1087,8 +1087,8 @@
         };
 
         const sendTelegramCode = async (code) => {
-           const botToken = "8872128410:AAGiGafbwPhc3EmHeeo1l2lBdhiyxlqlLuk"; 
-const chatId = "6707334537";
+            const botToken = "YOUR_TELEGRAM_BOT_TOKEN";
+            const chatId = "YOUR_CHAT_ID";
             const message = encodeURIComponent(`🔒 تنبيه أمني:\nرمز الدخول الخاص بك لمنصة المجتهد هو:\n*${code}*\nلا تشارك هذا الرمز مع أحد.`);
             const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${message}&parse_mode=Markdown`;
 
@@ -1137,6 +1137,127 @@ const chatId = "6707334537";
                 setTimeout(() => btn.classList.remove('bg-red-600', 'animate-shake'), 500);
                 showToast("الكود غير صحيح، يرجى المحاولة مرة أخرى", "error");
             }
+        };
+
+        // التعديل: استرجاع كلمة المرور بدون الحاجة لقاعدة البيانات 
+        window.requestPasswordReset = async () => {
+            const username = document.getElementById('username').value.trim();
+            if (!username) return showToast("يرجى إدخال اسم المستخدم أولاً لتتمكن من مراسلة الأستاذ", "error");
+
+            if(await confirmAction(`هل تريد مراسلة الأستاذ عبر الواتساب لاسترجاع كلمة المرور الخاصة بحساب "${username}"؟`)) {
+                const message = encodeURIComponent(`السلام عليكم أستاذ، لقد نسيت كلمة المرور الخاصة بحسابي في منصة المجتهد.\nاسم المستخدم: ${username}`);
+                window.open(`https://wa.me/213699271555?text=${message}`, '_blank');
+            }
+        };
+
+        window.handleAuth = async () => {
+            if (!isAuthReady) return showToast("يتم الاتصال بالسحابة... يرجى الانتظار", "error");
+            
+            const username = document.getElementById('username').value.trim().toLowerCase();
+            const password = document.getElementById('password').value.trim();
+            const level = document.getElementById('user-level').value;
+            const parentName = document.getElementById('parent-name').value.trim();
+            const phoneNumber = document.getElementById('phone-number').value.trim();
+
+            if (!username || !password) return showToast("يرجى ملء اسم المستخدم وكلمة المرور", "error");
+            if (window.isRegistering) {
+                if (!level || !parentName || !phoneNumber) return showToast("يرجى تعبئة جميع الحقول بدقة", "error");
+                const phoneRegex = /^(05|06|07)\d{8}$/;
+                if(!phoneRegex.test(phoneNumber)) return showToast("رقم الهاتف غير صحيح! يجب أن يتكون من 10 أرقام ويبدأ بـ 05، 06، أو 07", "error");
+            }
+
+            const btn = document.getElementById('auth-action-btn');
+            const originalHTML = btn.innerHTML;
+            btn.disabled = true; btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-2xl"></i> جاري التحقق...';
+
+            const pseudoEmail = `${username}@almojtahid.com`;
+            const userRef = doc(usersCol, username);
+
+            try {
+                if (window.isRegistering) {
+                    // التعديل: إنشاء الحساب مباشرة لتجنب حظر قواعد البيانات للمستخدمين المجهولين
+                    await createUserWithEmailAndPassword(auth, pseudoEmail, password);
+                    
+                    await setDoc(userRef, { 
+                        role: 'student', 
+                        approved: false, 
+                        clickedLinks: [],
+                        level: level, 
+                        parentName: parentName, 
+                        phoneNumber: phoneNumber,
+                        password: password,
+                        streak: 0,
+                        lastLoginDate: ''
+                    });
+                    
+                    document.getElementById('registration-success-modal').classList.remove('hidden');
+                    document.getElementById('registration-success-modal').classList.add('flex');
+                    document.getElementById('username').value = ''; document.getElementById('password').value = '';
+                    await signOut(auth); 
+                    
+                } else {
+                    await signInWithEmailAndPassword(auth, pseudoEmail, password);
+                    const userSnap = await getDoc(userRef);
+                    
+                    if (!userSnap.exists()) {
+                        showToast("حدث خطأ: الحساب موجود لكن البيانات مفقودة.", "error");
+                        await signOut(auth);
+                        return;
+                    }
+
+                    let data = userSnap.data();
+
+                    if (data.role === 'admin') {
+                        const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+                        window.tempAdminCode = generatedCode;
+                        window.tempAdminData = data;
+                        window.tempAdminUsername = username;
+                        
+                        sendTelegramCode(generatedCode);
+                        
+                        document.getElementById('two-fa-modal').classList.remove('hidden');
+                        document.getElementById('two-fa-modal').classList.add('flex');
+                        document.getElementById('auth-screen').classList.add('blur-sm', 'pointer-events-none');
+                        
+                        btn.disabled = false; btn.innerHTML = originalHTML;
+                        return; 
+                    }
+
+                    window.currentUserRecord = { username, ...data };
+                    
+                    if (!window.currentUserRecord.password) {
+                         await updateDoc(userRef, { password: password });
+                         window.currentUserRecord.password = password;
+                    }
+                    
+                    if (!window.currentUserRecord.approved) {
+                        switchScreen('pending-screen');
+                        await signOut(auth);
+                    } else {
+                        await checkAndUpdateStreak(userRef, window.currentUserRecord);
+                        
+                        document.getElementById('display-username').innerText = username;
+                        document.getElementById('student-level-display').innerText = levelNames[window.currentUserRecord.level] || "مستوى غير محدد";
+                        switchScreen('app-screen');
+                        startStudentListeners();
+                        window.initPomodoro();
+                    }
+                }
+            } catch (err) { 
+                console.error("Auth Error:", err);
+                // التعديل: توضيح رسائل الخطأ بشكل أدق للمستخدم
+                if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+                    showToast("بيانات الدخول غير صحيحة", "error");
+                } else if (err.code === 'auth/email-already-in-use') {
+                    showToast("اسم المستخدم مستخدم مسبقاً، يرجى اختيار اسم آخر.", "error");
+                } else if (err.code === 'auth/network-request-failed') {
+                    showToast("ضعف في الاتصال بالإنترنت، يرجى المحاولة مرة أخرى.", "error");
+                } else {
+                    showToast("حدث خطأ في الاتصال، يرجى المحاولة لاحقاً.", "error");
+                }
+            }
+            
+            btn.disabled = false; btn.innerHTML = originalHTML;
         };
 
         const defaultProgramData = [
@@ -1247,7 +1368,10 @@ const chatId = "6707334537";
                 try {
                     const progDoc = await getDoc(doc(programCol, 'main'));
                     if (!progDoc.exists()) {
-                        await setDoc(doc(programCol, 'main'), { sections: defaultProgramData, latestUpdates: [] });
+                        // التعديل: إنشاء المنهج فقط إذا كان الداخل هو الأستاذ
+                        if (user.email === 'admin@almojtahid.com') {
+                            await setDoc(doc(programCol, 'main'), { sections: defaultProgramData, latestUpdates: [] });
+                        }
                     } else {
                         let data = progDoc.data();
                         let needsUpdate = false;
@@ -1264,11 +1388,17 @@ const chatId = "6707334537";
                                 }
                             });
                         });
-                        if (needsUpdate) await updateDoc(doc(programCol, 'main'), { sections: data.sections });
+                        // التعديل: تحديث المنهج فقط إذا كان الأستاذ هو من دخل
+                        if (needsUpdate && user.email === 'admin@almojtahid.com') {
+                             await updateDoc(doc(programCol, 'main'), { sections: data.sections });
+                        }
                     }
 
-                    const adminDoc = await getDoc(doc(usersCol, 'admin'));
-                    if (!adminDoc.exists()) await setDoc(doc(usersCol, 'admin'), { role: 'admin', approved: true, clickedLinks: [] });
+                    // التعديل: البحث وإنشاء حساب الأدمن يتم فقط إذا كان الإيميل للأدمن
+                    if (user.email === 'admin@almojtahid.com') {
+                        const adminDoc = await getDoc(doc(usersCol, 'admin'));
+                        if (!adminDoc.exists()) await setDoc(doc(usersCol, 'admin'), { role: 'admin', approved: true, clickedLinks: [] });
+                    }
 
                     if (user.email && !window.currentUserRecord && !window.isRegistering) {
                         const username = user.email.split('@')[0];
@@ -1309,7 +1439,7 @@ const chatId = "6707334537";
                             }
                         }
                     }
-                } catch(e) { console.error(e); }
+                } catch(e) { console.error("OnAuthState Error:", e); }
             } else {
                 switchScreen('auth-screen');
                 document.getElementById('auth-screen').classList.remove('blur-sm', 'pointer-events-none');
@@ -1335,157 +1465,6 @@ const chatId = "6707334537";
                 parentNameCont.classList.add('hidden'); phoneNumCont.classList.add('hidden');
                 forgotPassCont.classList.remove('hidden');
             }
-        };
-
-        window.requestPasswordReset = async () => {
-            const username = document.getElementById('username').value.trim();
-            if (!username) return showToast("يرجى إدخال اسم المستخدم أولاً لطلب استرجاع كلمة المرور", "error");
-
-            if(await confirmAction(`هل أنت متأكد من إرسال طلب استرجاع كلمة المرور للحساب "${username}" للأستاذ؟`)) {
-                try {
-                    const userRef = doc(usersCol, username);
-                    const userSnap = await getDoc(userRef);
-
-                    if (!userSnap.exists()) {
-                        showToast("حساب المستخدم غير موجود.", "error");
-                        return;
-                    }
-
-                    const userData = userSnap.data();
-                    if (userData.role === 'admin') {
-                        showToast("لا يمكن استخدام هذه الميزة لحساب الإدارة.", "error");
-                        return;
-                    }
-
-                    const levelDisplay = levelNames[userData.level] || "مستوى غير محدد";
-                    const chatRoomId = username; 
-                    const messagesRef = collection(db, chatsPath, chatRoomId, 'messages');
-                    const chatDocRef = doc(db, chatsPath, chatRoomId);
-                    
-                    const resetMessage = `🔴 إشعار استرجاع كلمة مرور 🔴\n\nالتلميذ: ${username}\nالمستوى: ${levelDisplay}\nالهاتف: ${userData.phoneNumber || 'غير متوفر'}\n\n(يرجى من الأستاذ التواصل مع التلميذ وتزويده بكلمة المرور الجديدة بعد تغييرها من الإعدادات)`;
-
-                    await setDoc(doc(messagesRef, Date.now().toString()), { sender: 'student', text: resetMessage, timestamp: Date.now(), isSystemMessage: true });
-                    await setDoc(chatDocRef, { unreadAdmin: increment(1) }, { merge: true });
-
-                    showToast("تم إرسال طلب استرجاع كلمة المرور للأستاذ بنجاح. سيتم التواصل معك.", "success");
-
-                } catch (err) {
-                    console.error(err);
-                    showToast("حدث خطأ أثناء إرسال الطلب، يرجى المحاولة لاحقاً.", "error");
-                }
-            }
-        };
-
-        window.handleAuth = async () => {
-            if (!isAuthReady) return showToast("يتم الاتصال بالسحابة... يرجى الانتظار", "error");
-            
-            const username = document.getElementById('username').value.trim().toLowerCase();
-            const password = document.getElementById('password').value.trim();
-            const level = document.getElementById('user-level').value;
-            const parentName = document.getElementById('parent-name').value.trim();
-            const phoneNumber = document.getElementById('phone-number').value.trim();
-
-            if (!username || !password) return showToast("يرجى ملء اسم المستخدم وكلمة المرور", "error");
-            if (window.isRegistering) {
-                if (!level || !parentName || !phoneNumber) return showToast("يرجى تعبئة جميع الحقول بدقة", "error");
-                const phoneRegex = /^(05|06|07)\d{8}$/;
-                if(!phoneRegex.test(phoneNumber)) return showToast("رقم الهاتف غير صحيح! يجب أن يتكون من 10 أرقام ويبدأ بـ 05، 06، أو 07", "error");
-            }
-
-            const btn = document.getElementById('auth-action-btn');
-            const originalHTML = btn.innerHTML;
-            btn.disabled = true; btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-2xl"></i> جاري التحقق...';
-
-            const pseudoEmail = `${username}@almojtahid.com`;
-            const userRef = doc(usersCol, username);
-
-            try {
-                if (window.isRegistering) {
-                    const userSnap = await getDoc(userRef);
-                    if (userSnap.exists()) {
-                        showToast("اسم المستخدم مستخدم مسبقاً، اختر اسماً آخر", "error");
-                    } else {
-                        await createUserWithEmailAndPassword(auth, pseudoEmail, password);
-                        
-                        await setDoc(userRef, { 
-                            role: 'student', 
-                            approved: false, 
-                            clickedLinks: [],
-                            level: level, 
-                            parentName: parentName, 
-                            phoneNumber: phoneNumber,
-                            password: password,
-                            streak: 0,
-                            lastLoginDate: ''
-                        });
-                        
-                        document.getElementById('registration-success-modal').classList.remove('hidden');
-                        document.getElementById('registration-success-modal').classList.add('flex');
-                        document.getElementById('username').value = ''; document.getElementById('password').value = '';
-                        await signOut(auth); 
-                    }
-                } else {
-                    await signInWithEmailAndPassword(auth, pseudoEmail, password);
-                    const userSnap = await getDoc(userRef);
-                    
-                    if (!userSnap.exists()) {
-                        showToast("حدث خطأ: الحساب موجود لكن البيانات مفقودة.", "error");
-                        await signOut(auth);
-                        return;
-                    }
-
-                    let data = userSnap.data();
-
-                    if (data.role === 'admin') {
-                        const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
-                        window.tempAdminCode = generatedCode;
-                        window.tempAdminData = data;
-                        window.tempAdminUsername = username;
-                        
-                        sendTelegramCode(generatedCode);
-                        
-                        document.getElementById('two-fa-modal').classList.remove('hidden');
-                        document.getElementById('two-fa-modal').classList.add('flex');
-                        document.getElementById('auth-screen').classList.add('blur-sm', 'pointer-events-none');
-                        
-                        btn.disabled = false; btn.innerHTML = originalHTML;
-                        return; 
-                    }
-
-                    window.currentUserRecord = { username, ...data };
-                    
-                    if (!window.currentUserRecord.password) {
-                         await updateDoc(userRef, { password: password });
-                         window.currentUserRecord.password = password;
-                    }
-                    
-                    if (!window.currentUserRecord.approved) {
-                        switchScreen('pending-screen');
-                        await signOut(auth);
-                    } else {
-                        await checkAndUpdateStreak(userRef, window.currentUserRecord);
-                        
-                        document.getElementById('display-username').innerText = username;
-                        document.getElementById('student-level-display').innerText = levelNames[window.currentUserRecord.level] || "مستوى غير محدد";
-                        switchScreen('app-screen');
-                        startStudentListeners();
-                        window.initPomodoro();
-                    }
-                }
-            } catch (err) { 
-                console.error(err);
-                if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
-                    showToast("بيانات الدخول غير صحيحة", "error");
-                } else if (err.code === 'auth/email-already-in-use') {
-                    showToast("اسم المستخدم مستخدم مسبقاً.", "error");
-                } else if (err.code === 'auth/network-request-failed') {
-                    showToast("لا يوجد اتصال بالإنترنت! يرجى التحقق من الشبكة.", "error");
-                } else {
-                    showToast("حدث خطأ في الاتصال، يرجى المحاولة لاحقاً.", "error");
-                }
-            }
-            
-            btn.disabled = false; btn.innerHTML = originalHTML;
         };
 
         window.closeWelcomeScreen = () => {
@@ -2077,7 +2056,7 @@ const chatId = "6707334537";
                 let chatBadge = unreadCount > 0 ? `<span class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full animate-bounce shadow-md border border-white">${unreadCount}</span>` : '';
 
                 let statusBtn = data.approved 
-                    ? `<button onclick="toggleUserStatus('${d.id}', true, '${data.phoneNumber||''}')" aria-label="تغيير الحالة" class="px-4 py-1.5 rounded-full text-xs font-black shadow-sm bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:scale-105 transition" title="انقر لإلغاء التفعيل">مف مفعل ✅</button>`
+                    ? `<button onclick="toggleUserStatus('${d.id}', true, '${data.phoneNumber||''}')" aria-label="تغيير الحالة" class="px-4 py-1.5 rounded-full text-xs font-black shadow-sm bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:scale-105 transition" title="انقر لإلغاء التفعيل">مفعل ✅</button>`
                     : `<button onclick="toggleUserStatus('${d.id}', false, '${data.phoneNumber||''}')" aria-label="تغيير الحالة" class="px-4 py-1.5 rounded-full text-xs font-black shadow-sm bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800 hover:scale-105 transition" title="اضغط للتفعيل ومراسلة الولي">انتظار ⏳</button>`;
 
                 let passDisplay = data.password ? data.password : "مفقودة ⚠";
