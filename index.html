@@ -339,6 +339,22 @@
                 </div>
                 <div class="flex items-center gap-3 w-full md:w-auto justify-end flex-wrap relative">
                     
+                    <!-- إحصائيات الإدارة العائمة -->
+                    <div class="relative group z-50">
+                        <button onclick="loadAdminStats()" class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-blue-600 dark:text-blue-400 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" aria-label="إحصائيات التلاميذ" title="إحصائيات التلاميذ">
+                            <i class="ph-fill ph-chart-bar"></i>
+                        </button>
+                        <div class="absolute top-full left-0 mt-3 w-[280px] md:w-[300px] bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl border border-slate-100 dark:border-slate-700 p-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-3 cursor-default z-[70]">
+                            <h4 class="font-black text-slate-800 dark:text-white border-b border-slate-100 dark:border-slate-700 pb-3 mb-4 flex items-center justify-between">
+                                <span class="flex items-center gap-2"><i class="ph-fill ph-users"></i> إحصائيات المنصة</span>
+                                <span id="hover-total-students" class="bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400 px-3 py-1 rounded-lg text-sm shadow-inner font-black">0</span>
+                            </h4>
+                            <div id="header-stats-container" class="grid grid-cols-2 gap-3 max-h-[300px] overflow-y-auto pr-1">
+                                <div class="col-span-2 text-center text-sm font-bold text-slate-500 py-2">اضغط على الأيقونة لتحديث الإحصائيات</div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- إشعارات الأستاذ -->
                     <div class="relative group z-50">
                         <button class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-blue-600 dark:text-blue-400 text-2xl shadow-sm border border-slate-200 dark:border-slate-600 relative" aria-label="الإشعارات والرسائل" title="الإشعارات والرسائل">
@@ -621,8 +637,8 @@
     <!-- Firebase SDK Setup -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, deleteDoc, increment, writeBatch, query, limit, limitToLast, orderBy, getDocs, where, startAfter, startAt, endBefore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, deleteDoc, increment, writeBatch, query, limit, limitToLast, orderBy, getDocs, where, startAfter, startAt, endBefore, documentId, getCountFromServer } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDuuYHwmSW0UV1TO3gDGyETrvOimE7iGLs",
@@ -1592,10 +1608,19 @@
                     updates.password = newPass; 
                 } catch(e) {
                     console.error("Password update error", e);
-                    if (e.code === 'auth/requires-recent-login') {
-                        return showToast("يرجى تسجيل الخروج والدخول مجدداً لتغيير كلمة المرور", "error");
+                    if (e.code === 'auth/requires-recent-login' && window.currentUserRecord.password) {
+                        // حل مشكلة تغيير كلمة المرور بإعادة المصادقة التلقائية
+                        try {
+                            const credential = EmailAuthProvider.credential(auth.currentUser.email, window.currentUserRecord.password);
+                            await reauthenticateWithCredential(auth.currentUser, credential);
+                            await updatePassword(auth.currentUser, newPass);
+                            updates.password = newPass;
+                        } catch (reauthErr) {
+                            return showToast("يرجى تسجيل الخروج والدخول مجدداً لتغيير كلمة المرور", "error");
+                        }
+                    } else {
+                        return showToast("حدث خطأ أثناء تغيير كلمة المرور في نظام الحماية", "error");
                     }
-                    return showToast("حدث خطأ أثناء تغيير كلمة المرور في نظام الحماية", "error");
                 }
             }
 
@@ -1979,8 +2004,7 @@
             const actionText = action === 'approve' ? 'تفعيل' : (action === 'deactivate' ? 'إلغاء تفعيل' : 'حذف نهائي لـ');
             if(!await confirmAction(`هل أنت متأكد من ${actionText} ${checked.length} حساب(ات)؟`)) return;
 
-            const btnHTML = document.getElementById('select-all-cb').parentElement.innerHTML;
-            document.getElementById('select-all-cb').parentElement.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i>';
+            showToast("جاري تنفيذ الإجراء، يرجى الانتظار...", "success");
 
             for(let username of checked) {
                 if(action === 'approve') { await updateDoc(doc(usersCol, username), { approved: true }); } 
@@ -1992,7 +2016,6 @@
             window.loadAdminPage('init'); // تحديث سريع
         };
 
-        // تم التعديل: جلب ترتيب المتفوقين بناءً على بيانات المستند (تقليل القراءات)
         window.loadLeaderboard = async () => {
              if(!window.currentUserRecord || window.currentUserRecord.role === 'admin') return;
              
@@ -2016,7 +2039,8 @@
             const container = document.getElementById('leaderboard-container');
             container.innerHTML = '';
             
-            let levelMates = window.allStudentsProgress.sort((a, b) => b.xp - a.xp);
+            // تحديد أفضل 10 تلاميذ فقط
+            let levelMates = window.allStudentsProgress.sort((a, b) => b.xp - a.xp).slice(0, 10);
             
             if(levelMates.length === 0) { container.innerHTML = `<div class="flex flex-col items-center justify-center p-6 opacity-50"><i class="ph-fill ph-ghost text-5xl mb-2"></i><div class="text-slate-500 dark:text-slate-400 font-bold text-center">لا يوجد منافسون بعد.. كن أنت المتصدر!</div></div>`; return; }
 
@@ -2139,18 +2163,19 @@
             tbody.innerHTML = '<tr><td colspan="6" class="text-center p-10"><i class="ph-bold ph-spinner animate-spin text-3xl text-blue-500"></i> جاري التحميل...</td></tr>';
             
             const pageSize = 50; 
-            let queryConstraints = [where('role', '==', 'student'), orderBy('__name__')]; // ترتيب حسب اليوزرنيم
+            let queryConstraints = [where('role', '==', 'student')];
 
             const searchQuery = document.getElementById('admin-student-search').value.trim();
             if (searchQuery) {
-                // تفعيل البحث المباشر في قاعدة البيانات بدلاً من التصفح المكتبي
-                queryConstraints = [
-                    where('role', '==', 'student'),
-                    where('__name__', '>=', searchQuery.toLowerCase()), 
-                    where('__name__', '<=', searchQuery.toLowerCase() + '\uf8ff'),
-                    orderBy('__name__')
-                ];
-                direction = 'init'; // إعادة تعيين الصفحة عند البحث
+                // تصحيح البحث باستخدام documentId
+                queryConstraints.push(
+                    where(documentId(), '>=', searchQuery.toLowerCase()), 
+                    where(documentId(), '<=', searchQuery.toLowerCase() + '\uf8ff'),
+                    orderBy(documentId())
+                );
+                direction = 'init'; 
+            } else {
+                queryConstraints.push(orderBy(documentId())); // الترتيب الافتراضي
             }
 
             if (direction === 'next' && window.adminLastVisible) {
@@ -2194,7 +2219,9 @@
         };
 
         const startAdminListeners = () => {
-            // تم التعديل: الاستماع لمجموعة المستندات المجزأة (programCol) بدلاً من main
+            // جلب الإحصائيات عند الدخول
+            window.loadAdminStats();
+
             unsubscribeProgram = onSnapshot(programCol, (snapshot) => {
                 let mid = null, hi = null, meta = null;
                 snapshot.forEach(d => {
@@ -2258,6 +2285,39 @@
                     }
                 }
             });
+        };
+
+        // دالة جلب الإحصائيات الفعالة (بدون تكلفة باهظة)
+        window.loadAdminStats = async () => {
+            const container = document.getElementById('header-stats-container');
+            if(!container) return;
+            container.innerHTML = '<div class="col-span-2 text-center text-sm font-bold text-slate-500 py-4"><i class="ph-bold ph-spinner animate-spin text-2xl mb-2"></i><br>جاري جلب الإحصائيات...</div>';
+            
+            try {
+                const levels = ["m_y1", "m_y2", "m_y3", "m_y4", "h_y1", "h_y2", "h_y3"];
+                let total = 0;
+                const colors = ['bg-blue-50 text-blue-700 border-blue-200', 'bg-emerald-50 text-emerald-700 border-emerald-200', 'bg-amber-50 text-amber-700 border-amber-200', 'bg-purple-50 text-purple-700 border-purple-200'];
+                
+                // حساب عدد التلاميذ لكل مستوى باستخدام Aggregation Query (سريعة جداً وتكلفتها معدومة تقريباً)
+                let fetchPromises = levels.map(async (lvl, i) => {
+                    const q = query(usersCol, where('role', '==', 'student'), where('level', '==', lvl));
+                    const snapshot = await getCountFromServer(q);
+                    const count = snapshot.data().count;
+                    if(count > 0) {
+                        total += count;
+                        let c = colors[i % colors.length];
+                        return `<div class="p-3 rounded-xl border flex justify-between items-center text-center shadow-sm ${c} dark:bg-slate-700/50 dark:border-slate-600 dark:text-white"><span class="text-xs font-black">${levelNames[lvl]}</span><span class="text-lg font-black">${count}</span></div>`;
+                    }
+                    return '';
+                });
+
+                const results = await Promise.all(fetchPromises);
+                document.getElementById('hover-total-students').innerText = total;
+                container.innerHTML = results.join('') || '<div class="col-span-2 text-center text-sm font-bold text-slate-500">لا يوجد تلاميذ حالياً</div>';
+            } catch(e) {
+                console.error("Stats Error:", e);
+                container.innerHTML = '<div class="col-span-2 text-center text-red-500 text-sm font-bold">خطأ في جلب البيانات</div>';
+            }
         };
 
         const startStudentListeners = () => {
