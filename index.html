@@ -786,8 +786,8 @@
                 return `https://www.youtube.com/embed/${matchYt[1]}?rel=0&modestbranding=1`;
             }
             
-            // جوجل درايف
-            let driveRegex = /drive\.google\.com\/file\/d\/([^/]+)\/view/i;
+            // جوجل درايف (تحسين للتعرف على جميع أنواع الروابط)
+            let driveRegex = /(?:drive\.google\.com\/file\/d\/|drive\.google\.com\/open\?id=)([^/&?]+)/i;
             let matchDrive = url.match(driveRegex);
             if (matchDrive && matchDrive[1]) {
                 return `https://drive.google.com/file/d/${matchDrive[1]}/preview`;
@@ -2481,7 +2481,6 @@
 
                                         let btnClass = isRead ? 'border-emerald-200 dark:border-emerald-800 shadow-sm bg-emerald-50/20' : 'border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 hover:shadow-md hover:border-blue-300';
 
-                                        // التعديل هنا: استدعاء trackLinkClick لفتح النافذة المنبثقة
                                         return `<button onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}')" aria-label="مشاهدة المحتوى" class="w-full flex items-center justify-between gap-3 p-4 rounded-2xl border transition-all duration-200 group/link relative overflow-hidden text-right mb-3 ${btnClass}">
                                             <div class="flex items-start sm:items-center gap-4 flex-1 w-full">
                                                 <div class="w-12 h-12 flex-shrink-0 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-2xl group-hover/link:bg-blue-600 group-hover/link:text-white transition-colors shadow-inner mt-1 sm:mt-0 border border-blue-100 dark:border-blue-800">
