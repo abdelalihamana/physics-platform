@@ -653,6 +653,7 @@
         let unsubscribeUsers = null;
         let unsubscribeChat = null;
         let unsubscribeChatMeta = null;
+        let unsubscribeResets = null;
         
         window.activeChatUser = null; 
         window.currentSections = [];
@@ -660,25 +661,27 @@
         window.currentLiveUrl = "";
         window.currentEditParams = null; 
         
-        // حالات الإدارة والتلميذ
+        // المتغيرات العالمية للوحة الإدارة والتنبيهات
         window.adminContentStep = 'parts'; 
         window.adminActivePart = null;
         window.adminActiveYear = {}; 
         window.adminActiveBranch = {}; 
-
         window.studentViewMode = 'grid'; 
         window.studentActiveBranchTab = null;
-        
         window.adminMainFilter = 'all'; 
         window.adminSubFilter = 'all'; 
-        
         window.adminUsersList = [];
         window.adminChatsData = {};
         window.allStudentsProgress = []; 
-
         window.tempAdminCode = null;
         window.tempAdminData = null;
         window.tempAdminUsername = null;
+        
+        // متغيرات التذاكر والتنبيهات المجمعة
+        window.activePasswordResets = {};
+        window.totalUnreadChats = 0;
+        window.totalResets = 0;
+        window.adminChatNotifs = [];
 
         // إعدادات مؤقت بومودورو
         let pomodoroTime = 45 * 60; 
@@ -1087,8 +1090,8 @@
         };
 
         const sendTelegramCode = async (code) => {
-           const botToken = "8872128410:AAGiGafbwPhc3EmHeeo1l2lBdhiyxlqlLuk"; 
-const chatId = "6707334537";
+            const botToken = "YOUR_TELEGRAM_BOT_TOKEN";
+            const chatId = "YOUR_CHAT_ID";
             const message = encodeURIComponent(`🔒 تنبيه أمني:\nرمز الدخول الخاص بك لمنصة المجتهد هو:\n*${code}*\nلا تشارك هذا الرمز مع أحد.`);
             const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${message}&parse_mode=Markdown`;
 
@@ -1139,14 +1142,21 @@ const chatId = "6707334537";
             }
         };
 
-        // التعديل: استرجاع كلمة المرور بدون الحاجة لقاعدة البيانات 
+        // دالة إنشاء تذكرة استرجاع كلمة المرور بدون الحاجة لقراءة قاعدة البيانات 
         window.requestPasswordReset = async () => {
-            const username = document.getElementById('username').value.trim();
-            if (!username) return showToast("يرجى إدخال اسم المستخدم أولاً لتتمكن من مراسلة الأستاذ", "error");
+            const username = document.getElementById('username').value.trim().toLowerCase();
+            if (!username) return showToast("يرجى كتابة اسم المستخدم أولاً لطلب استرجاع كلمة المرور", "error");
 
-            if(await confirmAction(`هل تريد مراسلة الأستاذ عبر الواتساب لاسترجاع كلمة المرور الخاصة بحساب "${username}"؟`)) {
-                const message = encodeURIComponent(`السلام عليكم أستاذ، لقد نسيت كلمة المرور الخاصة بحسابي في منصة المجتهد.\nاسم المستخدم: ${username}`);
-                window.open(`https://wa.me/213699271555?text=${message}`, '_blank');
+            if(await confirmAction(`هل أنت متأكد من إرسال طلب استرجاع كلمة المرور للحساب "${username}" للأستاذ؟`)) {
+                try {
+                    // إنشاء تذكرة مباشرة (مسموح بها في قواعد الأمان الجديدة)
+                    const resetRef = doc(db, 'physics_db', 'public', 'password_resets', username);
+                    await setDoc(resetRef, { requestedAt: Date.now(), active: true }, { merge: true });
+                    showToast("تم إرسال الطلب للأستاذ بنجاح! سيقوم بمراجعة طلبك وإرسالها لك.", "success");
+                } catch (err) {
+                    console.error(err);
+                    showToast("حدث خطأ أثناء إرسال الطلب، تأكد من اتصالك بالإنترنت.", "error");
+                }
             }
         };
 
@@ -1260,213 +1270,6 @@ const chatId = "6707334537";
             btn.disabled = false; btn.innerHTML = originalHTML;
         };
 
-        const defaultProgramData = [
-            { 
-                id: "part_middle", 
-                title: "التعليم المتوسط", 
-                color: "blue", 
-                years: [
-                    { 
-                        id: "m_y1", 
-                        title: "السنة الأولى متوسط", 
-                        branches: [
-                            { id: "m1_b1", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [] } },
-                            { id: "m1_b2", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [] } },
-                            { id: "m1_b3", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [] } },
-                            { id: "m1_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
-                            { id: "m1_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
-                            { id: "m1_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
-                        ] 
-                    },
-                    { 
-                        id: "m_y2", 
-                        title: "السنة الثانية متوسط", 
-                        branches: [
-                            { id: "m2_b1", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [] } },
-                            { id: "m2_b2", title: "الظواهر الميكانيكية", categories: { lessons: [], exercises: [] } },
-                            { id: "m2_b3", title: "الظواهر الكهرومغناطيسية", categories: { lessons: [], exercises: [] } },
-                            { id: "m2_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
-                            { id: "m2_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
-                            { id: "m2_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
-                        ] 
-                    },
-                    { 
-                        id: "m_y3", 
-                        title: "السنة الثالثة متوسط", 
-                        branches: [
-                            { id: "m3_b1", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [] } },
-                            { id: "m3_b2", title: "الطاقة", categories: { lessons: [], exercises: [] } },
-                            { id: "m3_b3", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [] } },
-                            { id: "m3_b4", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [] } },
-                            { id: "m3_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
-                            { id: "m3_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
-                            { id: "m3_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
-                        ] 
-                    },
-                    { 
-                        id: "m_y4", 
-                        title: "السنة الرابعة متوسط", 
-                        branches: [
-                            { id: "m4_b1", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [] } },
-                            { id: "m4_b2", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [] } },
-                            { id: "m4_b3", title: "الظواهر الميكانيكية", categories: { lessons: [], exercises: [] } },
-                            { id: "m4_b4", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [] } },
-                            { id: "m4_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
-                            { id: "m4_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
-                            { id: "m4_s3", title: "الفصل 3", categories: { terms: [], exams: [] } },
-                            { id: "m4_b5", title: "شهادتك 🎓", categories: { past_exams: [], mock_exams: [] } }
-                        ] 
-                    }
-                ] 
-            },
-            { 
-                id: "part_high", 
-                title: "التعليم الثانوي", 
-                color: "indigo", 
-                years: [
-                    { 
-                        id: "h_y1", 
-                        title: "السنة أولى ثانوي", 
-                        branches: [
-                            { id: "h1_b1", title: "بنية وهندسة أفراد بعض الأنواع الكيميائية", categories: { lessons: [], exercises: [] } },
-                            { id: "h1_b2", title: "القوة والحركات المستقيمة", categories: { lessons: [], exercises: [] } },
-                            { id: "h1_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
-                            { id: "h1_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
-                            { id: "h1_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
-                        ] 
-                    },
-                    { 
-                        id: "h_y2", 
-                        title: "السنة الثانية ثانوي", 
-                        branches: [
-                            { id: "h2_b1", title: "المقاربة الكيفية لطاقة جملة وانحفاظها", categories: { lessons: [], exercises: [] } },
-                            { id: "h2_b2", title: "العمل والطاقة الحركية", categories: { lessons: [], exercises: [] } },
-                            { id: "h2_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
-                            { id: "h2_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
-                            { id: "h2_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
-                        ] 
-                    },
-                    { 
-                        id: "h_y3", 
-                        title: "السنة الثالثة ثانوي", 
-                        branches: [
-                            { id: "h3_b1", title: "تطور جملة كيميائية نحو حالة التوازن", categories: { lessons: [], exercises: [] } },
-                            { id: "h3_b2", title: "التحولات النووية", categories: { lessons: [], exercises: [] } },
-                            { id: "h3_b3", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [] } },
-                            { id: "h3_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
-                            { id: "h3_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
-                            { id: "h3_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
-                        ] 
-                    }
-                ] 
-            }
-        ];
-
-        onAuthStateChanged(auth, async (user) => {
-            isAuthReady = true;
-            if (user) {
-                try {
-                    const progDoc = await getDoc(doc(programCol, 'main'));
-                    if (!progDoc.exists()) {
-                        // التعديل: إنشاء المنهج فقط إذا كان الداخل هو الأستاذ
-                        if (user.email === 'admin@almojtahid.com') {
-                            await setDoc(doc(programCol, 'main'), { sections: defaultProgramData, latestUpdates: [] });
-                        }
-                    } else {
-                        let data = progDoc.data();
-                        let needsUpdate = false;
-                        data.sections.forEach(part => {
-                            part.years.forEach(year => {
-                                ['s1', 's2', 's3'].forEach((sem, idx) => {
-                                    let semId = `${year.id}_${sem}`; let semTitle = `الفصل ${idx + 1}`;
-                                    let existingSem = year.branches.find(b => b.id === semId);
-                                    if (!existingSem) { year.branches.push({ id: semId, title: semTitle, categories: { terms: [], exams: [] } }); needsUpdate = true; }
-                                });
-                                if (year.id === 'm_y4') {
-                                    let existingB5 = year.branches.find(b => b.id === 'm4_b5');
-                                    if (!existingB5) { year.branches.push({ id: "m4_b5", title: "شهادتك 🎓", categories: { 'past_exams': [], 'mock_exams': [] } }); needsUpdate = true; }
-                                }
-                            });
-                        });
-                        // التعديل: تحديث المنهج فقط إذا كان الأستاذ هو من دخل
-                        if (needsUpdate && user.email === 'admin@almojtahid.com') {
-                             await updateDoc(doc(programCol, 'main'), { sections: data.sections });
-                        }
-                    }
-
-                    // التعديل: البحث وإنشاء حساب الأدمن يتم فقط إذا كان الإيميل للأدمن
-                    if (user.email === 'admin@almojtahid.com') {
-                        const adminDoc = await getDoc(doc(usersCol, 'admin'));
-                        if (!adminDoc.exists()) await setDoc(doc(usersCol, 'admin'), { role: 'admin', approved: true, clickedLinks: [] });
-                    }
-
-                    if (user.email && !window.currentUserRecord && !window.isRegistering) {
-                        const username = user.email.split('@')[0];
-                        const userRef = doc(usersCol, username);
-                        const userSnap = await getDoc(userRef);
-                        
-                        if (userSnap.exists()) {
-                            let data = userSnap.data();
-                            
-                            if (data.role === 'admin') {
-                                const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
-                                window.tempAdminCode = generatedCode;
-                                window.tempAdminData = data;
-                                window.tempAdminUsername = username;
-                                
-                                sendTelegramCode(generatedCode);
-                                
-                                document.getElementById('two-fa-modal').classList.remove('hidden');
-                                document.getElementById('two-fa-modal').classList.add('flex');
-                                document.getElementById('auth-screen').classList.add('blur-sm', 'pointer-events-none');
-                                
-                                return; 
-                            } 
-                            
-                            window.currentUserRecord = { username, ...data };
-
-                            if (!window.currentUserRecord.approved) {
-                                switchScreen('pending-screen');
-                                await signOut(auth);
-                            } else {
-                                await checkAndUpdateStreak(userRef, window.currentUserRecord);
-
-                                document.getElementById('display-username').innerText = username;
-                                document.getElementById('student-level-display').innerText = levelNames[window.currentUserRecord.level] || "مستوى غير محدد";
-                                switchScreen('app-screen');
-                                startStudentListeners();
-                                window.initPomodoro();
-                            }
-                        }
-                    }
-                } catch(e) { console.error("OnAuthState Error:", e); }
-            } else {
-                switchScreen('auth-screen');
-                document.getElementById('auth-screen').classList.remove('blur-sm', 'pointer-events-none');
-            }
-        });
-
-        window.toggleAuthMode = () => {
-            window.isRegistering = !window.isRegistering;
-            document.getElementById('auth-title').innerText = window.isRegistering ? "حساب جديد" : "منصة المجتهد";
-            document.getElementById('auth-action-btn').innerHTML = window.isRegistering ? '<i class="ph-bold ph-paper-plane-tilt"></i> إرسال الطلب' : '<i class="ph-bold ph-sign-in"></i> تسجيل الدخول';
-            document.getElementById('switch-mode-text').innerHTML = window.isRegistering ? 'لديك حساب بالفعل؟ سجل دخولك <i class="ph-bold ph-arrow-left"></i>' : '<i class="ph-fill ph-rocket-launch"></i> إنشاء حساب تلميذ جديد';
-            
-            const levelSelect = document.getElementById('user-level'); const levelIcon = document.getElementById('level-icon');
-            const parentNameCont = document.getElementById('parent-name-container'); const phoneNumCont = document.getElementById('phone-number-container');
-            const forgotPassCont = document.getElementById('forgot-password-container');
-            
-            if(window.isRegistering) {
-                levelSelect.classList.remove('hidden'); levelIcon.classList.remove('hidden');
-                parentNameCont.classList.remove('hidden'); phoneNumCont.classList.remove('hidden');
-                forgotPassCont.classList.add('hidden');
-            } else {
-                levelSelect.classList.add('hidden'); levelIcon.classList.add('hidden');
-                parentNameCont.classList.add('hidden'); phoneNumCont.classList.add('hidden');
-                forgotPassCont.classList.remove('hidden');
-            }
-        };
-
         window.closeWelcomeScreen = () => {
             const screen = document.getElementById('welcome-quote-screen');
             screen.classList.remove('welcome-visible');
@@ -1545,6 +1348,12 @@ const chatId = "6707334537";
                 if(unsubscribeUsers) unsubscribeUsers();
                 if(unsubscribeChat) unsubscribeChat();
                 if(unsubscribeChatMeta) unsubscribeChatMeta();
+                if(unsubscribeResets) unsubscribeResets();
+                window.activePasswordResets = {};
+                window.totalUnreadChats = 0;
+                window.totalResets = 0;
+                window.adminChatNotifs = [];
+
                 if(pomodoroInterval) clearInterval(pomodoroInterval);
                 if (typeof closeChat === 'function') closeChat();
                 switchScreen('auth-screen');
@@ -1821,6 +1630,71 @@ const chatId = "6707334537";
             }
         };
 
+        // دالة لإنهاء طلب تغيير كلمة المرور من طرف الأستاذ
+        window.resolvePasswordReset = async (username, waLink) => {
+            try {
+                await deleteDoc(doc(db, 'physics_db', 'public', 'password_resets', username));
+                if(waLink !== '#') {
+                    window.open(waLink, '_blank');
+                } else {
+                    showToast("تم إخفاء التنبيه بنجاح. (ملاحظة: لا يوجد رقم هاتف مسجل للتلميذ لإرسال رسالة)", "success");
+                }
+            } catch(e) {
+                console.error(e);
+                showToast("حدث خطأ أثناء إخفاء التنبيه", "error");
+            }
+        };
+
+        // دالة لتحديث واجهة جرس الإشعارات الخاص بالأستاذ
+        window.updateAdminNotifications = () => {
+            let notifHtml = '';
+            
+            if (window.totalResets > 0) {
+                notifHtml += `
+                    <button onclick="openAdminSection('accounts')" class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/40 transition border border-red-100 dark:border-red-800/50 group text-right w-full mb-2 shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-red-200 dark:bg-red-800 text-red-700 dark:text-red-300 flex items-center justify-center text-xl shadow-inner"><i class="ph-fill ph-key"></i></div>
+                            <div>
+                                <div class="font-black text-slate-800 dark:text-white text-sm group-hover:text-red-600 transition">نسيان كلمة المرور</div>
+                                <div class="text-xs text-slate-500 dark:text-slate-400 font-bold mt-0.5">لديك ${window.totalResets} طلب استرجاع</div>
+                            </div>
+                        </div>
+                        <i class="ph-bold ph-arrow-left text-red-500 text-xl group-hover:-translate-x-1 transition-transform"></i>
+                    </button>
+                `;
+            }
+
+            window.adminChatNotifs.forEach(chat => {
+                notifHtml += `
+                    <button onclick="openChat('${chat.id}')" class="flex items-center justify-between p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl hover:bg-amber-100 dark:hover:bg-amber-900/40 transition border border-amber-100 dark:border-amber-800/50 group text-right w-full mb-2 shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-amber-200 dark:bg-amber-800 text-amber-700 dark:text-amber-300 flex items-center justify-center text-xl shadow-inner"><i class="ph-fill ph-user"></i></div>
+                            <div>
+                                <div class="font-black text-slate-800 dark:text-white text-sm group-hover:text-amber-600 transition">${chat.id}</div>
+                                <div class="text-xs text-slate-500 dark:text-slate-400 font-bold mt-0.5">لديك ${chat.unread} رسالة/إشعار</div>
+                            </div>
+                        </div>
+                        <i class="ph-bold ph-chat-circle-dots text-amber-500 text-xl group-hover:scale-110 transition"></i>
+                    </button>
+                `;
+            });
+
+            const globalBadge = document.getElementById('admin-global-badge');
+            const notifContainer = document.getElementById('admin-notifications-container');
+            const total = window.totalUnreadChats + window.totalResets;
+
+            if (globalBadge) {
+                if (total > 0) {
+                    globalBadge.innerText = total > 99 ? '99+' : total;
+                    globalBadge.classList.remove('hidden');
+                    if(notifContainer) notifContainer.innerHTML = notifHtml;
+                } else {
+                    globalBadge.classList.add('hidden');
+                    if(notifContainer) notifContainer.innerHTML = '<div class="text-center text-slate-500 dark:text-slate-400 text-sm font-bold p-4">لا توجد إشعارات جديدة</div>';
+                }
+            }
+        };
+
         const catConfig = {
             'lessons': { title: 'الدروس', icon: '<i class="ph-fill ph-books"></i>', bg: 'bg-blue-50/50 dark:bg-blue-900/10', text: 'text-blue-700 dark:text-blue-400', border: 'border-blue-100 dark:border-blue-900/30' },
             'exercises': { title: 'التمارين', icon: '<i class="ph-fill ph-pencil-simple"></i>', bg: 'bg-orange-50/50 dark:bg-orange-900/10', text: 'text-orange-700 dark:text-orange-400', border: 'border-orange-100 dark:border-orange-900/30' },
@@ -2064,6 +1938,24 @@ const chatId = "6707334537";
                 const badgeInfo = getStudentBadge(prog.xp);
                 const streakCount = data.streak || 0;
 
+                // التعديل: إظهار إشعار أحمر في حال طلب التلميذ استرجاع كلمة المرور
+                let hasResetRequest = window.activePasswordResets[d.id] && window.activePasswordResets[d.id].active;
+                let resetUI = '';
+                if (hasResetRequest) {
+                    let waResetMsg = encodeURIComponent(`السلام عليكم، بناءً على طلبكم، هذه كلمة المرور الخاصة بحساب التلميذ (${d.id}):\n🔑 كلمة المرور: ${passDisplay}\n\nيرجى الاحتفاظ بها.`);
+                    let waResetLink = data.phoneNumber ? `https://wa.me/213${data.phoneNumber.substring(1)}?text=${waResetMsg}` : '#';
+                    
+                    resetUI = `
+                    <div class="mt-3 bg-red-50 dark:bg-red-900/30 p-2.5 rounded-xl border border-red-200 dark:border-red-800 flex flex-col sm:flex-row items-center justify-between gap-3 animate-pulse">
+                        <div class="flex items-center gap-2 text-red-600 dark:text-red-400 font-black text-sm">
+                            <i class="ph-fill ph-warning-circle text-xl"></i> نسي كلمة المرور!
+                        </div>
+                        <button onclick="resolvePasswordReset('${d.id}', '${waResetLink}')" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-xs font-black shadow-md transition-colors flex items-center gap-1 w-full sm:w-auto justify-center">
+                            <i class="ph-bold ph-whatsapp-logo"></i> إرسال الكلمة
+                        </button>
+                    </div>`;
+                }
+
                 tbody.innerHTML += `
                     <tr class="hover:bg-blue-50/40 dark:hover:bg-blue-900/20 transition duration-200 group">
                         <td class="p-4 text-center border-b border-slate-100 dark:border-slate-700"><input type="checkbox" aria-label="تحديد التلميذ" class="student-cb custom-cb" value="${d.id}"></td>
@@ -2076,6 +1968,7 @@ const chatId = "6707334537";
                                 </div>
                             </div>
                             <div class="mt-3 bg-slate-50 dark:bg-slate-900/50 p-2.5 rounded-lg border border-slate-100 dark:border-slate-700">${parentInfo}</div>
+                            ${resetUI}
                         </td>
                         <td class="p-4 text-sm font-black text-slate-600 dark:text-slate-300 text-center border-b border-slate-100 dark:border-slate-700">${levelDisplay}</td>
                         <td class="p-4 text-center border-b border-slate-100 dark:border-slate-700">
@@ -2142,42 +2035,36 @@ const chatId = "6707334537";
             if(unsubscribeChatMeta) unsubscribeChatMeta();
             unsubscribeChatMeta = onSnapshot(collection(db, chatsPath), (snapshot) => {
                 window.adminChatsData = {}; 
-                let totalUnread = 0;
-                let notifHtml = '';
+                window.totalUnreadChats = 0;
+                window.adminChatNotifs = [];
 
                 snapshot.forEach(d => { 
                     let data = d.data();
                     window.adminChatsData[d.id] = data; 
                     if(data.unreadAdmin > 0) {
-                        totalUnread += data.unreadAdmin;
-                        notifHtml += `
-                            <button onclick="openChat('${d.id}')" class="flex items-center justify-between p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl hover:bg-amber-100 dark:hover:bg-amber-900/40 transition border border-amber-100 dark:border-amber-800/50 group text-right w-full">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-full bg-amber-200 dark:bg-amber-800 text-amber-700 dark:text-amber-300 flex items-center justify-center text-xl shadow-inner"><i class="ph-fill ph-user"></i></div>
-                                    <div>
-                                        <div class="font-black text-slate-800 dark:text-white text-sm group-hover:text-amber-600 transition">${d.id}</div>
-                                        <div class="text-xs text-slate-500 dark:text-slate-400 font-bold mt-0.5">لديك ${data.unreadAdmin} رسالة/إشعار</div>
-                                    </div>
-                                </div>
-                                <i class="ph-bold ph-chat-circle-dots text-amber-500 text-xl group-hover:scale-110 transition"></i>
-                            </button>
-                        `;
+                        window.totalUnreadChats += data.unreadAdmin;
+                        window.adminChatNotifs.push({
+                            id: d.id, unread: data.unreadAdmin
+                        });
                     }
                 }); 
                 renderAdminTable();
-                
-                const globalBadge = document.getElementById('admin-global-badge');
-                const notifContainer = document.getElementById('admin-notifications-container');
-                if (globalBadge) {
-                    if (totalUnread > 0) {
-                        globalBadge.innerText = totalUnread > 99 ? '99+' : totalUnread;
-                        globalBadge.classList.remove('hidden');
-                        if(notifContainer) notifContainer.innerHTML = notifHtml;
-                    } else {
-                        globalBadge.classList.add('hidden');
-                        if(notifContainer) notifContainer.innerHTML = '<div class="text-center text-slate-500 dark:text-slate-400 text-sm font-bold p-4">لا توجد إشعارات جديدة</div>';
+                window.updateAdminNotifications();
+            });
+
+            // مراقب التذاكر المخفية (نسيان كلمة المرور)
+            if(unsubscribeResets) unsubscribeResets();
+            unsubscribeResets = onSnapshot(collection(db, 'physics_db', 'public', 'password_resets'), (snapshot) => {
+                window.activePasswordResets = {};
+                window.totalResets = 0;
+                snapshot.forEach(d => {
+                    if(d.data().active) {
+                        window.activePasswordResets[d.id] = d.data();
+                        window.totalResets++;
                     }
-                }
+                });
+                renderAdminTable();
+                window.updateAdminNotifications();
             });
         };
 
