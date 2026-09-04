@@ -53,7 +53,11 @@
                     <p class="text-xs text-slate-400 font-bold mt-0.5" id="embed-status-text">جاري التحميل...</p>
                 </div>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- زر التحميل المباشر الجديد -->
+                <a id="embed-download-btn" href="#" target="_blank" class="hidden px-4 py-2.5 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-500 hover:text-white rounded-xl font-black text-sm transition-all items-center gap-2 border border-emerald-500/30 hover:border-emerald-500 shadow-sm" title="تحميل الملف مباشرة">
+                    <span class="hidden sm:inline">تحميل</span> <i class="ph-bold ph-download-simple text-lg"></i>
+                </a>
                 <a id="embed-external-btn" href="#" target="_blank" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 rounded-xl font-black text-sm transition-all flex items-center gap-2 border border-slate-700 hover:border-slate-600 shadow-sm" title="فتح في نافذة جديدة">
                     <span class="hidden sm:inline text-slate-300">نافذة خارجية</span> <i class="ph-bold ph-arrow-square-out text-slate-300 text-lg"></i>
                 </a>
@@ -645,12 +649,11 @@
         window.tempAdminUsername = null;
 
         // إعدادات مؤقت بومودورو
-        let pomodoroTime = 45 * 60; // 45 دقيقة دراسة بالثواني
+        let pomodoroTime = 45 * 60; 
         let pomodoroInterval = null;
         let isPomodoroRunning = false;
-        let isStudySession = true; // true = دراسة (45د), false = راحة (15د)
+        let isStudySession = true; 
 
-        // دوال مؤقت بومودورو
         window.initPomodoro = () => {
             if (!window.currentUserRecord) return;
             const user = window.currentUserRecord.username;
@@ -775,41 +778,60 @@
             window.updatePomodoroUI();
         };
 
-        // دوال ميزة التضمين (Embed)
+        // دوال ميزة التضمين والتحميل المباشر
         window.convertUrlToEmbed = (url) => {
             if (!url) return '';
-            
-            // يوتيوب
             let ytWatchRegex = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/i;
             let matchYt = url.match(ytWatchRegex);
             if (matchYt && matchYt[1]) {
                 return `https://www.youtube.com/embed/${matchYt[1]}?rel=0&modestbranding=1`;
             }
-            
-            // جوجل درايف (تحسين للتعرف على جميع أنواع الروابط)
             let driveRegex = /(?:drive\.google\.com\/file\/d\/|drive\.google\.com\/open\?id=)([^/&?]+)/i;
             let matchDrive = url.match(driveRegex);
             if (matchDrive && matchDrive[1]) {
                 return `https://drive.google.com/file/d/${matchDrive[1]}/preview`;
             }
+            return url; 
+        };
 
-            return url; // إرجاع الرابط كما هو إذا لم يتطابق مع القواعد السابقة (مثل Phet)
+        // دالة جديدة لتوليد رابط تحميل مباشر لملفات درايف
+        window.getDownloadUrl = (url) => {
+            if (!url) return null;
+            let driveRegex = /(?:drive\.google\.com\/file\/d\/|drive\.google\.com\/open\?id=)([^/&?]+)/i;
+            let matchDrive = url.match(driveRegex);
+            if (matchDrive && matchDrive[1]) {
+                return `https://drive.google.com/uc?export=download&id=${matchDrive[1]}`;
+            }
+            return null; // الرابط ليس لجوجل درايف، لا نظهر زر التحميل المباشر
         };
 
         window.openEmbedModal = (url) => {
             const embedUrl = window.convertUrlToEmbed(url);
+            const downloadUrl = window.getDownloadUrl(url);
+            
             const modal = document.getElementById('embed-modal');
             const iframe = document.getElementById('embed-iframe');
             const extBtn = document.getElementById('embed-external-btn');
+            const dlBtn = document.getElementById('embed-download-btn');
             const statusText = document.getElementById('embed-status-text');
 
             statusText.innerText = 'جاري التحميل...';
-            extBtn.href = url; // زر الخروج يفتح الرابط الأصلي
+            extBtn.href = url; 
             iframe.src = embedUrl;
+
+            // إظهار زر التحميل إذا كان الرابط يخص جوجل درايف
+            if (downloadUrl) {
+                dlBtn.href = downloadUrl;
+                dlBtn.classList.remove('hidden');
+                dlBtn.classList.add('flex');
+            } else {
+                dlBtn.classList.add('hidden');
+                dlBtn.classList.remove('flex');
+            }
 
             modal.classList.remove('hidden');
             modal.classList.add('flex');
-            document.body.style.overflow = 'hidden'; // منع التمرير في الخلفية
+            document.body.style.overflow = 'hidden'; 
         };
 
         window.closeEmbedModal = () => {
@@ -818,8 +840,8 @@
 
             modal.classList.add('hidden');
             modal.classList.remove('flex');
-            iframe.src = ''; // مسح الرابط لإيقاف الفيديو/الصوت
-            document.body.style.overflow = ''; // استعادة التمرير
+            iframe.src = ''; 
+            document.body.style.overflow = ''; 
         };
 
         const levelNames = {
@@ -1782,7 +1804,7 @@
                                         <div class="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
                                             ${isRead ? `<span class="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 text-xs font-black px-3 py-1.5 rounded-lg flex items-center gap-1"><i class="ph-bold ph-check"></i> مكتمل</span>` : ''}
                                             <button onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}')" aria-label="مشاهدة المحتوى" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl font-black shadow-sm transition flex items-center gap-2 text-sm whitespace-nowrap">
-                                                مشاهدة <i class="ph-bold ph-arrow-left"></i>
+                                                مشاهدة <i class="ph-bold ph-play-circle"></i>
                                             </button>
                                         </div>
                                     </div>`;
