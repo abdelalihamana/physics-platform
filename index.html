@@ -34,7 +34,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
-    <link rel="manifest" href="/manifest.json">
 </head>
 <body class="text-slate-800 dark:text-slate-200 antialiased p-3 md:p-6 pb-24 selection:bg-blue-200 selection:text-blue-900 dark:selection:bg-blue-900 dark:selection:text-blue-200 relative overflow-x-hidden overflow-y-scroll transition-colors duration-300">
 
@@ -66,12 +65,10 @@
             </div>
         </div>
         <div class="flex-1 w-full h-full p-2 md:p-6 lg:p-8 relative flex items-center justify-center">
-            <!-- Loader Animation -->
             <div class="absolute inset-0 flex items-center justify-center -z-10 text-slate-500 flex-col gap-3">
                 <i class="ph-bold ph-spinner animate-spin text-5xl text-blue-500"></i>
                 <span class="font-bold text-sm tracking-wide">يتم الآن تجهيز المحتوى...</span>
             </div>
-            <!-- Iframe Container -->
             <div class="w-full h-full max-w-6xl mx-auto rounded-[2rem] overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-slate-700/50 bg-black relative">
                 <iframe id="embed-iframe" class="w-full h-full absolute inset-0" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen onload="document.getElementById('embed-status-text').innerText='محتوى جاهز للمشاهدة'"></iframe>
             </div>
@@ -342,20 +339,6 @@
                 </div>
                 <div class="flex items-center gap-3 w-full md:w-auto justify-end flex-wrap relative">
                     
-                    <!-- إحصائيات الإدارة العائمة -->
-                    <div class="relative group z-50">
-                        <button class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-blue-600 dark:text-blue-400 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" aria-label="إحصائيات التلاميذ" title="إحصائيات التلاميذ">
-                            <i class="ph-fill ph-chart-bar"></i>
-                        </button>
-                        <div class="absolute top-full left-0 mt-3 w-[280px] md:w-[300px] bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl border border-slate-100 dark:border-slate-700 p-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-3 cursor-default">
-                            <h4 class="font-black text-slate-800 dark:text-white border-b border-slate-100 dark:border-slate-700 pb-3 mb-4 flex items-center justify-between">
-                                <span class="flex items-center gap-2"><i class="ph-fill ph-users"></i> إحصائيات المنصة</span>
-                                <span id="hover-total-students" class="bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400 px-3 py-1 rounded-lg text-sm shadow-inner">0</span>
-                            </h4>
-                            <div id="header-stats-container" class="grid grid-cols-2 gap-3 max-h-[300px] overflow-y-auto pr-1"></div>
-                        </div>
-                    </div>
-
                     <!-- إشعارات الأستاذ -->
                     <div class="relative group z-50">
                         <button class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-blue-600 dark:text-blue-400 text-2xl shadow-sm border border-slate-200 dark:border-slate-600 relative" aria-label="الإشعارات والرسائل" title="الإشعارات والرسائل">
@@ -428,10 +411,15 @@
                     </div>
                 </div>
 
-                <!-- شريط البحث عن التلاميذ -->
-                <div class="mb-5 relative group w-full md:w-2/3 lg:w-1/2">
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500 transition-colors text-xl"><i class="ph-bold ph-magnifying-glass"></i></div>
-                    <input type="text" id="admin-student-search" aria-label="البحث عن تلميذ" onkeyup="executeAdminStudentSearch()" class="w-full pl-5 pr-14 py-3.5 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-900 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-sm placeholder-slate-400 shadow-sm" placeholder="ابحث عن تلميذ باسم المستخدم أو اسم الولي...">
+                <!-- شريط البحث عن التلاميذ وتحديث البيانات -->
+                <div class="mb-5 flex flex-col sm:flex-row gap-3 items-center">
+                    <div class="relative group w-full flex-1">
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500 transition-colors text-xl"><i class="ph-bold ph-magnifying-glass"></i></div>
+                        <input type="text" id="admin-student-search" aria-label="البحث عن تلميذ" onkeyup="if(event.key === 'Enter') loadAdminPage('init')" class="w-full pl-5 pr-14 py-3.5 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-900 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-sm placeholder-slate-400 shadow-sm" placeholder="ابحث عن تلميذ باسم المستخدم ثم اضغط Enter...">
+                    </div>
+                    <button onclick="loadAdminPage('init')" class="w-full sm:w-auto px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl shadow-sm transition flex items-center justify-center gap-2">
+                        <i class="ph-bold ph-arrows-clockwise"></i> تحديث البيانات
+                    </button>
                 </div>
 
                 <!-- أزرار فلترة الجدول الرئيسية والبوابات الفرعية -->
@@ -461,6 +449,14 @@
                         <tbody id="students-table-body" class="bg-white dark:bg-slate-800 divide-y divide-slate-100 dark:divide-slate-700 text-sm"></tbody>
                     </table>
                 </div>
+
+                <!-- أزرار نظام الصفحات (Pagination) -->
+                <div class="flex flex-col sm:flex-row justify-between items-center bg-white dark:bg-slate-800 p-4 rounded-3xl mt-4 border border-slate-100 dark:border-slate-700 shadow-sm gap-4">
+                    <button onclick="loadAdminPage('prev')" class="w-full sm:w-auto px-6 py-2.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-black text-sm hover:bg-slate-200 dark:hover:bg-slate-600 transition shadow-sm flex items-center justify-center gap-2"><i class="ph-bold ph-arrow-right"></i> الصفحة السابقة</button>
+                    <span id="page-indicator" class="font-bold text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-900 px-4 py-2 rounded-lg border border-slate-100 dark:border-slate-700">الصفحة 1</span>
+                    <button onclick="loadAdminPage('next')" class="w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black text-sm transition shadow-sm flex items-center justify-center gap-2">الصفحة التالية <i class="ph-bold ph-arrow-left"></i></button>
+                </div>
+
             </div>
 
             <!-- قسم إدارة المحتوى -->
@@ -497,9 +493,12 @@
                                 <i class="ph-fill ph-trophy text-2xl"></i> <span class="hidden sm:inline">أبطال المستوى</span>
                             </summary>
                             <div class="absolute top-full right-0 mt-3 w-[320px] md:w-[400px] bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl border border-slate-100 dark:border-slate-700 p-5 z-[60] max-h-[400px] overflow-y-auto">
-                                <h4 class="font-black text-slate-800 dark:text-white text-xl mb-4 border-b border-slate-100 dark:border-slate-700 pb-3 flex items-center gap-2">
-                                    <i class="ph-fill ph-medal text-amber-500"></i> ترتيب المتفوقين
-                                </h4>
+                                <div class="flex justify-between items-center mb-4 border-b border-slate-100 dark:border-slate-700 pb-3">
+                                    <h4 class="font-black text-slate-800 dark:text-white text-xl flex items-center gap-2">
+                                        <i class="ph-fill ph-medal text-amber-500"></i> ترتيب المتفوقين
+                                    </h4>
+                                    <button onclick="loadLeaderboard()" class="text-slate-400 hover:text-blue-500 transition" title="تحديث الترتيب"><i class="ph-bold ph-arrows-clockwise text-xl"></i></button>
+                                </div>
                                 <div id="leaderboard-container"></div>
                             </div>
                         </details>
@@ -623,7 +622,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, deleteDoc, increment, writeBatch, query, limit, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, deleteDoc, increment, writeBatch, query, limit, limitToLast, orderBy, getDocs, where, startAfter, startAt, endBefore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDuuYHwmSW0UV1TO3gDGyETrvOimE7iGLs",
@@ -651,6 +650,7 @@
         
         let unsubscribeProgram = null;
         let unsubscribeUsers = null;
+        let unsubscribeStudentData = null;
         let unsubscribeChat = null;
         let unsubscribeChatMeta = null;
         
@@ -679,6 +679,12 @@
         window.tempAdminCode = null;
         window.tempAdminData = null;
         window.tempAdminUsername = null;
+        
+        // متغيرات الترحيل والتصفح الخاص بالأدمن (Pagination)
+        window.adminCurrentPage = 1;
+        window.adminPageCursors = [];
+        window.adminLastVisible = null;
+        window.adminFirstVisible = null;
 
         // إعدادات مؤقت بومودورو
         let pomodoroTime = 45 * 60; 
@@ -900,13 +906,14 @@
             }
         };
 
+        // تم التعديل: تحديث البث المباشر في مستند meta
         window.startLiveStream = async () => {
             const url = document.getElementById('admin-live-url').value.trim();
             if (!url) return showToast("يرجى إدخال رابط البث أولاً", "error");
             if (!url.startsWith('http')) return showToast("الرابط غير صحيح، تأكد أنه يبدأ بـ http", "error");
             
             try {
-                await updateDoc(doc(programCol, 'main'), { liveStreamUrl: url });
+                await updateDoc(doc(programCol, 'meta'), { liveStreamUrl: url });
                 showToast("تم إطلاق البث بنجاح! سيظهر الزر للتلاميذ الآن 🔴", "success");
             } catch (e) {
                 console.error(e);
@@ -918,7 +925,7 @@
             if (!window.currentLiveUrl) return;
             if(await confirmAction("هل أنت متأكد من إنهاء البث وإخفاء الزر عن التلاميذ؟")) {
                 try {
-                    await updateDoc(doc(programCol, 'main'), { liveStreamUrl: "" });
+                    await updateDoc(doc(programCol, 'meta'), { liveStreamUrl: "" });
                     showToast("تم إنهاء البث وإخفاء الزر بنجاح", "success");
                 } catch (e) {
                     console.error(e);
@@ -1003,6 +1010,8 @@
             if (section === 'accounts') {
                 document.getElementById('admin-accounts-section').classList.remove('hidden');
                 document.getElementById('admin-accounts-section').classList.add('flex');
+                // تم التعديل: استدعاء دالة التحميل المجزأ بدلاً من الانتظار
+                window.loadAdminPage('init');
             } else {
                 document.getElementById('admin-content-section').classList.remove('hidden');
                 document.getElementById('admin-content-section').classList.add('block');
@@ -1088,7 +1097,7 @@
 
         const sendTelegramCode = async (code) => {
            const botToken = "8872128410:AAGiGafbwPhc3EmHeeo1l2lBdhiyxlqlLuk"; 
-const chatId = "6707334537";
+           const chatId = "6707334537";
             const message = encodeURIComponent(`🔒 تنبيه أمني:\nرمز الدخول الخاص بك لمنصة المجتهد هو:\n*${code}*\nلا تشارك هذا الرمز مع أحد.`);
             const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${message}&parse_mode=Markdown`;
 
@@ -1139,7 +1148,6 @@ const chatId = "6707334537";
             }
         };
 
-        // التعديل: استرجاع كلمة المرور بدون الحاجة لقاعدة البيانات 
         window.requestPasswordReset = async () => {
             const username = document.getElementById('username').value.trim();
             if (!username) return showToast("يرجى إدخال اسم المستخدم أولاً لتتمكن من مراسلة الأستاذ", "error");
@@ -1175,7 +1183,6 @@ const chatId = "6707334537";
 
             try {
                 if (window.isRegistering) {
-                    // التعديل: إنشاء الحساب مباشرة لتجنب حظر قواعد البيانات للمستخدمين المجهولين
                     await createUserWithEmailAndPassword(auth, pseudoEmail, password);
                     
                     await setDoc(userRef, { 
@@ -1187,6 +1194,7 @@ const chatId = "6707334537";
                         phoneNumber: phoneNumber,
                         password: password,
                         streak: 0,
+                        xp: 0, 
                         lastLoginDate: ''
                     });
                     
@@ -1245,7 +1253,6 @@ const chatId = "6707334537";
                 }
             } catch (err) { 
                 console.error("Auth Error:", err);
-                // التعديل: توضيح رسائل الخطأ بشكل أدق للمستخدم
                 if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
                     showToast("بيانات الدخول غير صحيحة", "error");
                 } else if (err.code === 'auth/email-already-in-use') {
@@ -1366,38 +1373,33 @@ const chatId = "6707334537";
             isAuthReady = true;
             if (user) {
                 try {
-                    const progDoc = await getDoc(doc(programCol, 'main'));
-                    if (!progDoc.exists()) {
-                        // التعديل: إنشاء المنهج فقط إذا كان الداخل هو الأستاذ
-                        if (user.email === 'admin@almojtahid.com') {
-                            await setDoc(doc(programCol, 'main'), { sections: defaultProgramData, latestUpdates: [] });
-                        }
-                    } else {
-                        let data = progDoc.data();
-                        let needsUpdate = false;
-                        data.sections.forEach(part => {
-                            part.years.forEach(year => {
-                                ['s1', 's2', 's3'].forEach((sem, idx) => {
-                                    let semId = `${year.id}_${sem}`; let semTitle = `الفصل ${idx + 1}`;
-                                    let existingSem = year.branches.find(b => b.id === semId);
-                                    if (!existingSem) { year.branches.push({ id: semId, title: semTitle, categories: { terms: [], exams: [] } }); needsUpdate = true; }
-                                });
-                                if (year.id === 'm_y4') {
-                                    let existingB5 = year.branches.find(b => b.id === 'm4_b5');
-                                    if (!existingB5) { year.branches.push({ id: "m4_b5", title: "شهادتك 🎓", categories: { 'past_exams': [], 'mock_exams': [] } }); needsUpdate = true; }
-                                }
-                            });
-                        });
-                        // التعديل: تحديث المنهج فقط إذا كان الأستاذ هو من دخل
-                        if (needsUpdate && user.email === 'admin@almojtahid.com') {
-                             await updateDoc(doc(programCol, 'main'), { sections: data.sections });
-                        }
-                    }
-
-                    // التعديل: البحث وإنشاء حساب الأدمن يتم فقط إذا كان الإيميل للأدمن
+                    // تم التعديل: سكريبت ترحيل قاعدة البيانات (Migration) وتقسيم المنهج
                     if (user.email === 'admin@almojtahid.com') {
                         const adminDoc = await getDoc(doc(usersCol, 'admin'));
                         if (!adminDoc.exists()) await setDoc(doc(usersCol, 'admin'), { role: 'admin', approved: true, clickedLinks: [] });
+                        
+                        const oldMainDoc = await getDoc(doc(programCol, 'main'));
+                        if (oldMainDoc.exists()) {
+                            let data = oldMainDoc.data();
+                            console.log("Migration Starting...");
+                            if(data.sections && data.sections.length >= 2) {
+                                await setDoc(doc(programCol, 'part_middle'), data.sections[0]);
+                                await setDoc(doc(programCol, 'part_high'), data.sections[1]);
+                            }
+                            await setDoc(doc(programCol, 'meta'), {
+                                liveStreamUrl: data.liveStreamUrl || "",
+                                latestUpdates: data.latestUpdates || []
+                            });
+                            await deleteDoc(doc(programCol, 'main')); // حذف المستند القديم ذو الحجم الكبير
+                            console.log("Migration Successful!");
+                        } else {
+                            const metaDoc = await getDoc(doc(programCol, 'meta'));
+                            if (!metaDoc.exists()) {
+                                await setDoc(doc(programCol, 'part_middle'), defaultProgramData[0]);
+                                await setDoc(doc(programCol, 'part_high'), defaultProgramData[1]);
+                                await setDoc(doc(programCol, 'meta'), { liveStreamUrl: "", latestUpdates: [] });
+                            }
+                        }
                     }
 
                     if (user.email && !window.currentUserRecord && !window.isRegistering) {
@@ -1494,7 +1496,6 @@ const chatId = "6707334537";
             document.getElementById('student-logout-btn').classList.add('hidden'); 
             document.getElementById('student-notif-btn').classList.add('hidden');
 
-            if(unsubscribeUsers) unsubscribeUsers();
             if(unsubscribeChatMeta) unsubscribeChatMeta();
 
             switchScreen('app-screen');
@@ -1515,7 +1516,7 @@ const chatId = "6707334537";
             document.getElementById('student-logout-btn').classList.remove('hidden');
             document.getElementById('student-notif-btn').classList.remove('hidden');
 
-            if(unsubscribeUsers) unsubscribeUsers();
+            if(unsubscribeStudentData) unsubscribeStudentData();
             if(unsubscribeChatMeta) unsubscribeChatMeta();
             if(pomodoroInterval) clearInterval(pomodoroInterval);
 
@@ -1543,6 +1544,7 @@ const chatId = "6707334537";
 
                 if(unsubscribeProgram) unsubscribeProgram();
                 if(unsubscribeUsers) unsubscribeUsers();
+                if(unsubscribeStudentData) unsubscribeStudentData();
                 if(unsubscribeChat) unsubscribeChat();
                 if(unsubscribeChatMeta) unsubscribeChatMeta();
                 if(pomodoroInterval) clearInterval(pomodoroInterval);
@@ -1642,14 +1644,14 @@ const chatId = "6707334537";
             btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-xl"></i> جاري الإرسال...';
 
             try {
-                let targetUsers = window.adminUsersList;
+                // لإرسال رسالة جماعية، سنضطر لجلب المستهدفين (يمكن تطويرها لتعمل عبر Cloud Functions مستقبلاً)
+                let targetQuery = query(usersCol, where('role', '==', 'student'), where('approved', '==', true));
                 if (target !== 'all') {
-                    targetUsers = targetUsers.filter(u => u.data.level === target);
+                    targetQuery = query(usersCol, where('role', '==', 'student'), where('approved', '==', true), where('level', '==', target));
                 }
-
-                targetUsers = targetUsers.filter(u => u.data.approved === true);
-
-                if (targetUsers.length === 0) {
+                const snap = await getDocs(targetQuery);
+                
+                if (snap.empty) {
                     showToast("لا يوجد تلاميذ مفعلين في هذا المستوى حالياً", "error");
                     btn.disabled = false; btn.innerHTML = origHTML;
                     return;
@@ -1659,7 +1661,7 @@ const chatId = "6707334537";
                 const timestamp = Date.now();
                 let count = 0;
 
-                targetUsers.forEach(user => {
+                snap.forEach(user => {
                     const username = user.id;
                     const msgId = timestamp.toString() + '_' + count;
                     const msgRef = doc(collection(db, chatsPath, username, 'messages'), msgId);
@@ -1811,12 +1813,17 @@ const chatId = "6707334537";
                     clickedLinks.push(linkId);
                     window.currentUserRecord.clickedLinks = clickedLinks;
                     window.fireConfetti();
+                    
+                    let result = calculateProgressXP(window.currentUserRecord.level, window.currentUserRecord, window.currentSections);
                     showToast(`+${XP_PER_ITEM} XP ! أحسنت 🌟`);
                     updateProgressUI(window.currentSections);
+                    
                     if(document.getElementById('lesson-search').value.trim() === '') {
                         window.renderProgramUI(window.currentSections, 'student-program-view', false);
                     } else { window.executeStudentSearch(); }
-                    await updateDoc(doc(usersCol, window.currentUserRecord.username), { clickedLinks: clickedLinks });
+
+                    // تم التعديل: حفظ نقاط الخبرة مباشرة في المستند لتسهيل ترتيب المتفوقين لاحقاً
+                    await updateDoc(doc(usersCol, window.currentUserRecord.username), { clickedLinks: clickedLinks, xp: result.xp });
                 }
             }
         };
@@ -1891,10 +1898,7 @@ const chatId = "6707334537";
             html += `</div></div>`; container.innerHTML = html;
         };
         
-        window.executeAdminStudentSearch = () => {
-            renderAdminTable();
-        };
-        
+        // تم التعديل: تصفية السنوات الخاصة بالأدمن (لا تعتمد على onSnapshot بعد الآن)
         window.filterMainStudents = (mainType) => {
             window.adminMainFilter = mainType;
             window.adminSubFilter = 'all'; 
@@ -1923,7 +1927,7 @@ const chatId = "6707334537";
                 }
                 subContainer.innerHTML = html;
             }
-            renderAdminTable();
+            renderAdminTable(); // تصفية النتائج الحالية (Client-side)
         };
 
         window.filterSubStudents = (subType) => {
@@ -1938,7 +1942,7 @@ const chatId = "6707334537";
                     }
                 });
             }
-            renderAdminTable();
+            renderAdminTable(); // تصفية النتائج الحالية (Client-side)
         };
 
         window.toggleSelectAll = () => { const state = document.getElementById('select-all-cb').checked; document.querySelectorAll('.student-cb').forEach(cb => cb.checked = state); };
@@ -1948,6 +1952,7 @@ const chatId = "6707334537";
                 if(await confirmAction("هل أنت متأكد من إلغاء تفعيل هذا الحساب؟")) {
                     await updateDoc(doc(usersCol, uid), { approved: false });
                     showToast("تم إلغاء التفعيل");
+                    window.loadAdminPage('init'); // تحديث سريع للبيانات
                 }
             } else {
                 let waLink = null;
@@ -1960,6 +1965,7 @@ const chatId = "6707334537";
                 try {
                     await updateDoc(doc(usersCol, uid), { approved: true });
                     showToast("تم تفعيل الحساب بنجاح ✅");
+                    window.loadAdminPage('init'); // تحديث سريع للبيانات
                 } catch(e) {
                     if(win) win.close(); showToast("حدث خطأ أثناء التفعيل", "error");
                 }
@@ -1973,6 +1979,9 @@ const chatId = "6707334537";
             const actionText = action === 'approve' ? 'تفعيل' : (action === 'deactivate' ? 'إلغاء تفعيل' : 'حذف نهائي لـ');
             if(!await confirmAction(`هل أنت متأكد من ${actionText} ${checked.length} حساب(ات)؟`)) return;
 
+            const btnHTML = document.getElementById('select-all-cb').parentElement.innerHTML;
+            document.getElementById('select-all-cb').parentElement.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i>';
+
             for(let username of checked) {
                 if(action === 'approve') { await updateDoc(doc(usersCol, username), { approved: true }); } 
                 else if (action === 'deactivate') { await updateDoc(doc(usersCol, username), { approved: false }); } 
@@ -1980,6 +1989,26 @@ const chatId = "6707334537";
             }
             showToast(`تم ${actionText} الحسابات المحددة بنجاح 🚀`);
             document.getElementById('select-all-cb').checked = false;
+            window.loadAdminPage('init'); // تحديث سريع
+        };
+
+        // تم التعديل: جلب ترتيب المتفوقين بناءً على بيانات المستند (تقليل القراءات)
+        window.loadLeaderboard = async () => {
+             if(!window.currentUserRecord || window.currentUserRecord.role === 'admin') return;
+             
+             try {
+                 // جلب تلاميذ نفس المستوى فقط
+                 const q = query(usersCol, where('level', '==', window.currentUserRecord.level), where('approved', '==', true), limit(50));
+                 const snap = await getDocs(q);
+                 window.allStudentsProgress = [];
+                 snap.forEach(d => {
+                      let data = d.data();
+                      // نعتمد على حقل xp المحدث مسبقاً بدلاً من حسابه لكل مستخدم
+                      let currentXp = data.xp || calculateProgressXP(data.level, data, window.currentSections).xp;
+                      window.allStudentsProgress.push({ id: d.id, level: data.level, xp: currentXp, approved: data.approved });
+                 });
+                 renderLeaderboard();
+             } catch(e) { console.error("Error loading leaderboard", e); }
         };
 
         const renderLeaderboard = () => {
@@ -1987,7 +2016,8 @@ const chatId = "6707334537";
             const container = document.getElementById('leaderboard-container');
             container.innerHTML = '';
             
-            let levelMates = window.allStudentsProgress.filter(s => s.level === window.currentUserRecord.level && s.approved).sort((a, b) => b.xp - a.xp);
+            let levelMates = window.allStudentsProgress.sort((a, b) => b.xp - a.xp);
+            
             if(levelMates.length === 0) { container.innerHTML = `<div class="flex flex-col items-center justify-center p-6 opacity-50"><i class="ph-fill ph-ghost text-5xl mb-2"></i><div class="text-slate-500 dark:text-slate-400 font-bold text-center">لا يوجد منافسون بعد.. كن أنت المتصدر!</div></div>`; return; }
 
             let html = '<div class="flex flex-col gap-2">';
@@ -2012,10 +2042,14 @@ const chatId = "6707334537";
 
         const renderAdminTable = () => {
             const tbody = document.getElementById('students-table-body');
-            tbody.innerHTML = ''; let studentCount = 0; let levelStats = {}; 
+            tbody.innerHTML = ''; 
+            let levelStats = {}; 
             
             const searchInput = document.getElementById('admin-student-search');
             const searchQuery = searchInput ? searchInput.value.trim().toLowerCase() : '';
+
+            // تم التعديل: التصفية تتم فقط على الصفحة الحالية (50 مستخدم كأقصى حد)
+            let displayCount = 0;
 
             window.adminUsersList.forEach(d => {
                 const data = d.data;
@@ -2026,7 +2060,6 @@ const chatId = "6707334537";
                 
                 if(window.adminMainFilter === 'middle' && !isMiddle) return;
                 if(window.adminMainFilter === 'high' && !isHigh) return;
-                
                 if(window.adminSubFilter !== 'all' && data.level !== window.adminSubFilter) return;
 
                 if (searchQuery) {
@@ -2037,7 +2070,7 @@ const chatId = "6707334537";
                     }
                 }
 
-                studentCount++; 
+                displayCount++; 
 
                 let levelDisplay = data.level ? (levelNames[data.level] || data.level) : "غير محدد";
                 let prog = calculateProgressXP(data.level, data, window.currentSections);
@@ -2094,50 +2127,96 @@ const chatId = "6707334537";
                         </td>
                     </tr>`;
             });
+
+            if (displayCount === 0) {
+                 tbody.innerHTML = '<tr><td colspan="6" class="text-center p-8 opacity-60"><i class="ph-fill ph-ghost text-4xl text-slate-400 mb-2"></i><br>لا يوجد تلاميذ في هذه الصفحة</td></tr>';
+            }
+        };
+
+        // تم التعديل: تفعيل نظام الصفحات (Pagination) لتقليل تكلفة القراءة
+        window.loadAdminPage = async (direction = 'init') => {
+            const tbody = document.getElementById('students-table-body');
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center p-10"><i class="ph-bold ph-spinner animate-spin text-3xl text-blue-500"></i> جاري التحميل...</td></tr>';
             
-            document.getElementById('hover-total-students').innerText = studentCount;
-            const statsContainer = document.getElementById('header-stats-container');
-            if(statsContainer) {
-                statsContainer.innerHTML = '';
-                const colors = ['bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800', 
-                                'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800', 
-                                'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800', 
-                                'bg-purple-50 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-800'];
-                Object.keys(levelStats).sort().forEach((lvl, i) => {
-                    let c = colors[i % colors.length];
-                    statsContainer.innerHTML += `
-                        <div class="p-3 rounded-xl border flex justify-between items-center text-center shadow-sm ${c}">
-                            <span class="text-xs font-black">${levelNames[lvl] || lvl}</span>
-                            <span class="text-lg font-black">${levelStats[lvl]}</span>
-                        </div>`;
-                });
+            const pageSize = 50; 
+            let queryConstraints = [where('role', '==', 'student'), orderBy('__name__')]; // ترتيب حسب اليوزرنيم
+
+            const searchQuery = document.getElementById('admin-student-search').value.trim();
+            if (searchQuery) {
+                // تفعيل البحث المباشر في قاعدة البيانات بدلاً من التصفح المكتبي
+                queryConstraints = [
+                    where('role', '==', 'student'),
+                    where('__name__', '>=', searchQuery.toLowerCase()), 
+                    where('__name__', '<=', searchQuery.toLowerCase() + '\uf8ff'),
+                    orderBy('__name__')
+                ];
+                direction = 'init'; // إعادة تعيين الصفحة عند البحث
+            }
+
+            if (direction === 'next' && window.adminLastVisible) {
+                window.adminPageCursors.push(window.adminFirstVisible);
+                queryConstraints.push(startAfter(window.adminLastVisible));
+                window.adminCurrentPage++;
+            } else if (direction === 'prev' && window.adminPageCursors.length > 0) {
+                let prevStart = window.adminPageCursors.pop();
+                queryConstraints.push(startAt(prevStart));
+                window.adminCurrentPage--;
+            } else if (direction === 'init') {
+                window.adminCurrentPage = 1;
+                window.adminPageCursors = [];
+            }
+            queryConstraints.push(limit(pageSize));
+
+            try {
+                const q = query(usersCol, ...queryConstraints);
+                const snap = await getDocs(q);
+
+                if (snap.empty) {
+                    if (direction === 'next') showToast('لا يوجد المزيد من التلاميذ في الصفحة التالية');
+                    if (direction === 'init') tbody.innerHTML = '<tr><td colspan="6" class="text-center p-8 opacity-60">لا يوجد بيانات مطابقة</td></tr>';
+                    else renderAdminTable(); // إعادة عرض آخر بيانات ناجحة
+                    return;
+                }
+
+                window.adminFirstVisible = snap.docs[0];
+                window.adminLastVisible = snap.docs[snap.docs.length - 1];
+
+                window.adminUsersList = [];
+                snap.forEach(d => { window.adminUsersList.push({ id: d.id, data: d.data() }); });
+                
+                renderAdminTable();
+                document.getElementById('page-indicator').innerText = `الصفحة ${window.adminCurrentPage}`;
+
+            } catch (e) {
+                console.error("Pagination Error:", e);
+                showToast("حدث خطأ في تحميل البيانات", "error");
             }
         };
 
         const startAdminListeners = () => {
-            unsubscribeProgram = onSnapshot(doc(programCol, 'main'), (docSnap) => {
-                if(docSnap.exists()) { 
-                    let data = docSnap.data();
-                    window.currentSections = data.sections; 
-                    window.currentUpdates = data.latestUpdates || []; 
+            // تم التعديل: الاستماع لمجموعة المستندات المجزأة (programCol) بدلاً من main
+            unsubscribeProgram = onSnapshot(programCol, (snapshot) => {
+                let mid = null, hi = null, meta = null;
+                snapshot.forEach(d => {
+                    if(d.id === 'part_middle') mid = d.data();
+                    if(d.id === 'part_high') hi = d.data();
+                    if(d.id === 'meta') meta = d.data();
+                });
+                
+                if(mid && hi && meta) {
+                    window.currentSections = [mid, hi];
+                    window.currentUpdates = meta.latestUpdates || [];
+                    if (meta.liveStreamUrl !== undefined) {
+                        window.currentLiveUrl = meta.liveStreamUrl;
+                        window.updateLiveStreamUI(meta.liveStreamUrl);
+                    }
                     if (!document.getElementById('admin-content-section').classList.contains('hidden')) {
                         window.renderProgramUI(window.currentSections, 'admin-program-view', true);
                     }
                 }
             });
 
-            if(unsubscribeUsers) unsubscribeUsers();
-            unsubscribeUsers = onSnapshot(usersCol, (snapshot) => {
-                window.adminUsersList = []; window.allStudentsProgress = []; 
-                snapshot.forEach(d => { 
-                    if(d.data().role !== 'admin') {
-                        let data = d.data(); window.adminUsersList.push({id: d.id, data: data}); 
-                        let prog = calculateProgressXP(data.level, data, window.currentSections);
-                        window.allStudentsProgress.push({ id: d.id, level: data.level, xp: prog.xp, approved: data.approved });
-                    }
-                });
-                renderAdminTable();
-            });
+            // تم إيقاف onSnapshot لكل المستخدمين (usersCol) للحماية من تكلفة Firebase
 
             if(unsubscribeChatMeta) unsubscribeChatMeta();
             unsubscribeChatMeta = onSnapshot(collection(db, chatsPath), (snapshot) => {
@@ -2164,7 +2243,7 @@ const chatId = "6707334537";
                         `;
                     }
                 }); 
-                renderAdminTable();
+                renderAdminTable(); 
                 
                 const globalBadge = document.getElementById('admin-global-badge');
                 const notifContainer = document.getElementById('admin-notifications-container');
@@ -2184,22 +2263,28 @@ const chatId = "6707334537";
         const startStudentListeners = () => {
             let isInitialProgramLoad = true;
 
-            unsubscribeProgram = onSnapshot(doc(programCol, 'main'), (docSnap) => {
-                if(docSnap.exists()) { 
-                    let data = docSnap.data();
-                    window.currentSections = data.sections; 
-                    window.currentUpdates = data.latestUpdates || [];
+            // تم التعديل: استماع للمستندات المجزأة بدلاً من main
+            unsubscribeProgram = onSnapshot(programCol, (snapshot) => {
+                let mid = null, hi = null, meta = null;
+                snapshot.forEach(d => {
+                    if(d.id === 'part_middle') mid = d.data();
+                    if(d.id === 'part_high') hi = d.data();
+                    if(d.id === 'meta') meta = d.data();
+                });
+                
+                if(mid && hi && meta) {
+                    window.currentSections = [mid, hi];
+                    window.currentUpdates = meta.latestUpdates || [];
 
-                    if (data.liveStreamUrl !== undefined) {
-                        window.currentLiveUrl = data.liveStreamUrl;
-                        window.updateLiveStreamUI(data.liveStreamUrl);
+                    if (meta.liveStreamUrl !== undefined) {
+                        window.currentLiveUrl = meta.liveStreamUrl;
+                        window.updateLiveStreamUI(meta.liveStreamUrl);
                     }
 
                     if(document.getElementById('lesson-search').value.trim() === '') { 
                         window.renderProgramUI(window.currentSections, 'student-program-view', false); 
                     }
                     updateProgressUI(window.currentSections); 
-                    renderLeaderboard(); 
 
                     if (window.currentUserRecord && window.currentUserRecord.role === 'student') {
                         let myUpdates = window.currentUpdates.filter(u => u.level === window.currentUserRecord.level);
@@ -2220,30 +2305,26 @@ const chatId = "6707334537";
                 }
             });
             
-            if(unsubscribeUsers) unsubscribeUsers();
-            unsubscribeUsers = onSnapshot(usersCol, (snapshot) => {
-                window.allStudentsProgress = [];
-                snapshot.forEach(d => {
-                    let data = d.data();
-                    if(data.role !== 'admin') {
-                        let prog = calculateProgressXP(data.level, data, window.currentSections);
-                        window.allStudentsProgress.push({ id: d.id, level: data.level, xp: prog.xp, approved: data.approved });
-                    }
-                    if(d.id === window.currentUserRecord.username) {
-                        window.currentUserRecord.clickedLinks = data.clickedLinks || [];
-                        window.currentUserRecord.phoneNumber = data.phoneNumber || ''; 
-                        
-                        if(data.streak !== undefined) window.currentUserRecord.streak = data.streak;
-                        if(data.lastLoginDate !== undefined) window.currentUserRecord.lastLoginDate = data.lastLoginDate;
-                        
-                        updateProgressUI(window.currentSections || []); 
-                        
-                        if(document.getElementById('lesson-search').value.trim() === '') { window.renderProgramUI(window.currentSections || [], 'student-program-view', false); } 
-                        else { window.executeStudentSearch(); }
-                    }
-                });
-                renderLeaderboard(); 
+            // تم التعديل: التلميذ يستمع لمستنده الخاص فقط لمنع قراءة كل المستخدمين
+            if(unsubscribeStudentData) unsubscribeStudentData();
+            unsubscribeStudentData = onSnapshot(doc(usersCol, window.currentUserRecord.username), (docSnap) => {
+                if(docSnap.exists()) {
+                    let data = docSnap.data();
+                    window.currentUserRecord.clickedLinks = data.clickedLinks || [];
+                    window.currentUserRecord.phoneNumber = data.phoneNumber || ''; 
+                    
+                    if(data.streak !== undefined) window.currentUserRecord.streak = data.streak;
+                    if(data.lastLoginDate !== undefined) window.currentUserRecord.lastLoginDate = data.lastLoginDate;
+                    
+                    updateProgressUI(window.currentSections || []); 
+                    
+                    if(document.getElementById('lesson-search').value.trim() === '') { window.renderProgramUI(window.currentSections || [], 'student-program-view', false); } 
+                    else { window.executeStudentSearch(); }
+                }
             });
+
+            // تحميل المتصدرين (لوحة الشرف) مرة واحدة عند الدخول
+            window.loadLeaderboard();
 
             if(unsubscribeChatMeta) unsubscribeChatMeta();
             unsubscribeChatMeta = onSnapshot(doc(db, chatsPath, window.currentUserRecord.username), (docSnap) => {
@@ -2316,6 +2397,7 @@ const chatId = "6707334537";
             btn.disabled = false; btn.innerHTML = origHtml;
         };
 
+        // تم التعديل: تحديث الرابط يتم على المستند الفرعي المناسب للطور
         window.adminAddLink = async (pIdx, yIdx, bIdx, cat, branchId) => {
             let title = document.getElementById(`title_${branchId}_${cat}`).value.trim(); 
             let url = document.getElementById(`url_${branchId}_${cat}`).value.trim();
@@ -2323,19 +2405,16 @@ const chatId = "6707334537";
             if(!title || !url) return showToast("يرجى إدخال العنوان والرابط", "error");
             if(!url.startsWith('http')) url = 'https://' + url;
             
-            const docRef = doc(programCol, 'main'); 
             let sections = window.currentSections;
-            
             if (!sections[pIdx].years[yIdx].branches[bIdx].categories[cat]) {
                 sections[pIdx].years[yIdx].branches[bIdx].categories[cat] = [];
             }
-            
             sections[pIdx].years[yIdx].branches[bIdx].categories[cat].push({title, url});
 
             let levelId = sections[pIdx].years[yIdx].id;
             let branchTitle = sections[pIdx].years[yIdx].branches[bIdx].title;
-            let updates = window.currentUpdates || [];
             
+            let updates = window.currentUpdates || [];
             updates.push({
                 id: Date.now().toString(),
                 title: title,
@@ -2343,18 +2422,28 @@ const chatId = "6707334537";
                 branch: branchTitle,
                 timestamp: Date.now()
             });
-
             if (updates.length > 50) updates = updates.slice(updates.length - 50);
 
-            await updateDoc(docRef, { sections: sections, latestUpdates: updates }); 
-            showToast("تمت الإضافة بنجاح وتنبيه التلاميذ 📚");
+            try {
+                // تحديث مستند الطور المعني (المتوسط أو الثانوي) لتجنب الحجم الكبير
+                const docRef = doc(programCol, sections[pIdx].id); 
+                await updateDoc(docRef, { years: sections[pIdx].years }); 
+                
+                // تحديث مستند meta للإشعارات
+                await updateDoc(doc(programCol, 'meta'), { latestUpdates: updates });
+                showToast("تمت الإضافة بنجاح وتنبيه التلاميذ 📚");
+            } catch (e) { console.error(e); showToast("خطأ في الإضافة", "error"); }
         };
 
+        // تم التعديل: حذف الرابط من المستند الفرعي
         window.adminDeleteLink = async (pIdx, yIdx, bIdx, cat, lIdx) => {
             if(await confirmAction("هل أنت متأكد من مسح هذا الرابط نهائياً؟")) {
-                const docRef = doc(programCol, 'main'); let sections = window.currentSections;
+                let sections = window.currentSections;
                 sections[pIdx].years[yIdx].branches[bIdx].categories[cat].splice(lIdx, 1);
-                await updateDoc(docRef, { sections }); showToast("تم مسح الرابط");
+                
+                const docRef = doc(programCol, sections[pIdx].id); 
+                await updateDoc(docRef, { years: sections[pIdx].years }); 
+                showToast("تم مسح الرابط");
             }
         };
 
@@ -2367,13 +2456,17 @@ const chatId = "6707334537";
 
         window.closeEditModal = () => { document.getElementById('edit-modal').classList.add('hidden'); document.getElementById('edit-modal').classList.remove('flex'); window.currentEditParams = null; };
 
+        // تم التعديل: حفظ الرابط المعدل في المستند الفرعي
         window.saveEditedLink = async () => {
             let newTitle = document.getElementById('edit-link-title').value.trim(); let newUrl = document.getElementById('edit-link-url').value.trim();
             if(!newTitle || !newUrl) return showToast("يرجى إدخال العنوان والرابط", "error"); if(!newUrl.startsWith('http')) newUrl = 'https://' + newUrl;
             if(window.currentEditParams) {
                 let { pIdx, yIdx, bIdx, cat, lIdx } = window.currentEditParams; let sections = window.currentSections;
                 sections[pIdx].years[yIdx].branches[bIdx].categories[cat][lIdx] = { title: newTitle, url: newUrl };
-                await updateDoc(doc(programCol, 'main'), { sections }); showToast("تم التعديل بنجاح ✏️"); closeEditModal();
+                
+                const docRef = doc(programCol, sections[pIdx].id); 
+                await updateDoc(docRef, { years: sections[pIdx].years }); 
+                showToast("تم التعديل بنجاح ✏️"); closeEditModal();
             }
         };
 
