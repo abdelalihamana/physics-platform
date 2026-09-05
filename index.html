@@ -1455,19 +1455,21 @@
                         if (userSnap.exists()) {
                             let data = userSnap.data();
                             
-                            if (data.role === 'admin') {
-                                const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
-                                window.tempAdminCode = generatedCode;
-                                window.tempAdminData = data;
-                                window.tempAdminUsername = username;
+                                                        if (data.role === 'admin') {
+                                // بما أن المتصفح يتذكر الجلسة الآمنة، فلا داعي لطلب كود جديد!
+                                window.currentUserRecord = { username: 'admin', ...data };
                                 
-                                sendTelegramCode(generatedCode);
+                                // إخفاء نوافذ الدخول
+                                document.getElementById('two-fa-modal').classList.add('hidden');
+                                document.getElementById('two-fa-modal').classList.remove('flex');
+                                document.getElementById('auth-screen').classList.remove('blur-sm', 'pointer-events-none');
                                 
-                                document.getElementById('two-fa-modal').classList.remove('hidden');
-                                document.getElementById('two-fa-modal').classList.add('flex');
-                                document.getElementById('auth-screen').classList.add('blur-sm', 'pointer-events-none');
-                                
+                                // التوجيه المباشر للوحة التحكم
+                                switchScreen('admin-screen');
+                                startAdminListeners();
                                 return; 
+                            } 
+ 
                             } 
                             
                             window.currentUserRecord = { username, ...data };
