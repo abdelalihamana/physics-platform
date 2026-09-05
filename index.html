@@ -1118,23 +1118,46 @@
             }
         };
         // الاستماع لتغيرات الرابط (Hash) لمعالجة التوجيه
+                // الاستماع لتغيرات الرابط (Hash) لمعالجة التوجيه العميق
         window.addEventListener('hashchange', () => {
             const hash = window.location.hash.substring(1); // إزالة علامة #
             
             if (hash) {
+                // تقسيم الرابط لمعرفة الشاشة الأساسية والتفاصيل (إن وجدت)
+                const hashParts = hash.split('/'); 
+                const mainScreen = hashParts[0];
+
                 // منع التلميذ من الدخول لشاشة الأستاذ عبر الرابط
-                if (hash === 'admin-screen' && (!window.currentUserRecord || window.currentUserRecord.role !== 'admin')) {
+                if (mainScreen === 'admin-screen' && (!window.currentUserRecord || window.currentUserRecord.role !== 'admin')) {
                     switchScreen('app-screen', false); 
                     return;
                 }
                 
-                // التأكد من أن المستخدم مسجل الدخول قبل نقله לשاشات المحمية
-                if ((hash === 'app-screen' || hash === 'admin-screen' || hash === 'pending-screen') && !window.currentUserRecord) {
+                // التأكد من أن المستخدم مسجل الدخول قبل نقله للشاشات المحمية
+                if ((mainScreen === 'app-screen' || mainScreen === 'admin-screen' || mainScreen === 'pending-screen') && !window.currentUserRecord) {
                     switchScreen('auth-screen', false);
                     return;
                 }
 
-                switchScreen(hash, false); 
+                switchScreen(mainScreen, false); 
+                
+                // معالجة التوجيه العميق (Deep Routing) داخل شاشة التلميذ
+                if (mainScreen === 'app-screen' && hashParts.length === 3 && hashParts[1] === 'branch') {
+                    const branchId = hashParts[2];
+                    window.studentActiveBranchTab = branchId;
+                    window.studentViewMode = 'details';
+                    // إذا كانت البيانات محملة بالفعل، قم بتحديث الواجهة
+                    if (window.currentSections && window.currentSections.length > 0) {
+                         window.renderProgramUI(window.currentSections, 'student-program-view', false);
+                    }
+                } else if (mainScreen === 'app-screen') {
+                    // إذا كان الرابط app-screen فقط، تأكد من عرض الشبكة الرئيسية
+                    window.studentViewMode = 'grid';
+                    if (window.currentSections && window.currentSections.length > 0) {
+                         window.renderProgramUI(window.currentSections, 'student-program-view', false);
+                    }
+                }
+
             } else {
                 switchScreen('auth-screen', false);
             }
@@ -2400,10 +2423,18 @@ unsubscribeProgram = onSnapshot(progQuery, (snapshot) => {
                         window.updateLiveStreamUI(meta.liveStreamUrl);
                     }
 
-                    if(document.getElementById('lesson-search').value.trim() === '') { 
+                                         if(document.getElementById('lesson-search').value.trim() === '') { 
+                        // التحقق من وجود مسار عميق في الرابط عند التحميل الأولي
+                        const currentHash = window.location.hash.substring(1);
+                        if (currentHash.startsWith('app-screen/branch/')) {
+                            const branchId = currentHash.split('/')[2];
+                            window.studentActiveBranchTab = branchId;
+                            window.studentViewMode = 'details';
+                        }
                         window.renderProgramUI(window.currentSections, 'student-program-view', false); 
                     }
                     updateProgressUI(window.currentSections); 
+ 
 
                     if (window.currentUserRecord && window.currentUserRecord.role === 'student') {
                         let myUpdates = window.currentUpdates.filter(u => u.level === window.currentUserRecord.level);
@@ -2725,7 +2756,7 @@ unsubscribeProgram = onSnapshot(progQuery, (snapshot) => {
                                 });
                                 let unitProg = branchLinksTotal === 0 ? 0 : Math.round((branchLinksClicked / branchLinksTotal) * 100);
                                 
-                                html += `<button onclick="window.studentActiveBranchTab='${branch.id}'; window.studentViewMode='details'; window.renderProgramUI(window.currentSections, 'student-program-view', false);" class="bg-gradient-to-br ${color} p-6 md:p-8 rounded-[2rem] shadow-lg hover:scale-[1.03] transition-all duration-300 flex flex-col items-center justify-center gap-4 text-center relative overflow-hidden group min-h-[220px]">
+                                html += `button onclick="window.studentActiveBranchTab='${branch.id}'; window.studentViewMode='details'; window.location.hash = 'app-screen/branch/' + '${branch.id}'; window.renderProgramUI(window.currentSections, 'student-program-view', false);" class="bg-gradient-to-br ${color} p-6 md:p-8 rounded-[2rem] shadow-lg hover:scale-[1.03] transition-all duration-300 flex flex-col items-center justify-center gap-4 text-center relative overflow-hidden group min-h-[220px]">
                                     ${unitProg === 100 && branchLinksTotal > 0 ? '<div class="absolute top-4 right-4 bg-white/30 backdrop-blur-sm rounded-full p-2"><i class="ph-bold ph-check text-white text-xl"></i></div>' : ''}
                                     <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center text-5xl shadow-inner group-hover:scale-110 transition-transform">${getBranchIcon(branch.title)}</div>
                                     <h3 class="text-2xl font-black drop-shadow-sm leading-tight text-white">${branch.title}</h3>
@@ -2742,7 +2773,7 @@ unsubscribeProgram = onSnapshot(progQuery, (snapshot) => {
                         } 
                         else if (window.studentViewMode === 'details') {
                             html += `<div class="mb-6 flex justify-between items-center animate-[fadeInTab_0.3s_ease]">
-                                <button onclick="window.studentViewMode='grid'; window.renderProgramUI(window.currentSections, 'student-program-view', false);" class="px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm"><i class="ph-bold ph-arrow-right"></i> عودة للوحدات</button>
+                                button onclick="window.studentViewMode='grid'; window.location.hash = 'app-screen'; window.renderProgramUI(window.currentSections, 'student-program-view', false);" class="px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm"><i class="ph-bold ph-arrow-right"></i> عودة للوحدات</button>
                             </div>`;
 
                             userYearData.branches.forEach(branch => {
