@@ -1106,10 +1106,40 @@
             window.toggleAuthMode();
         };
 
-        const switchScreen = (screenId) => {
+                const switchScreen = (screenId, updateHash = true) => {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
+            const targetScreen = document.getElementById(screenId);
+            if (targetScreen) {
+                targetScreen.classList.add('active');
+                // تحديث الرابط في المتصفح
+                if (updateHash) {
+                    window.location.hash = screenId;
+                }
+            }
         };
+        // الاستماع لتغيرات الرابط (Hash) لمعالجة التوجيه
+        window.addEventListener('hashchange', () => {
+            const hash = window.location.hash.substring(1); // إزالة علامة #
+            
+            if (hash) {
+                // منع التلميذ من الدخول لشاشة الأستاذ عبر الرابط
+                if (hash === 'admin-screen' && (!window.currentUserRecord || window.currentUserRecord.role !== 'admin')) {
+                    switchScreen('app-screen', false); 
+                    return;
+                }
+                
+                // التأكد من أن المستخدم مسجل الدخول قبل نقله לשاشات المحمية
+                if ((hash === 'app-screen' || hash === 'admin-screen' || hash === 'pending-screen') && !window.currentUserRecord) {
+                    switchScreen('auth-screen', false);
+                    return;
+                }
+
+                switchScreen(hash, false); 
+            } else {
+                switchScreen('auth-screen', false);
+            }
+        });
+
 
                            const sendTelegramCode = async (code) => {
             // ضع الرابط الطويل الذي حصلت عليه من Google Apps Script
@@ -1456,7 +1486,15 @@
 
                                 document.getElementById('display-username').innerText = username;
                                 document.getElementById('student-level-display').innerText = levelNames[window.currentUserRecord.level] || "مستوى غير محدد";
-                                switchScreen('app-screen');
+                                                                   // --- تعديل التوجيه (Routing) ---
+                                   const currentHash = window.location.hash.substring(1); 
+                                   if (currentHash === 'app-screen') {
+                                       switchScreen('app-screen', false); 
+                                   } else {
+                                       switchScreen('app-screen'); 
+                                   }
+                                   // -------------------
+
                                 startStudentListeners();
                                 window.initPomodoro();
                             }
@@ -1464,7 +1502,15 @@
                     }
                 } catch(e) { console.error("OnAuthState Error:", e); }
             } else {
-                switchScreen('auth-screen');
+                                   // --- تعديل التوجيه (Routing) ---
+                   const currentHash = window.location.hash.substring(1);
+                   if (currentHash === 'auth-screen' || currentHash === '') {
+                       switchScreen('auth-screen', false); 
+                   } else {
+                       switchScreen('auth-screen'); 
+                   }
+                   // -------------------
+
                 document.getElementById('auth-screen').classList.remove('blur-sm', 'pointer-events-none');
             }
         });
