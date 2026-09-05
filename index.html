@@ -2243,7 +2243,9 @@
             // تم إيقاف onSnapshot لكل المستخدمين (usersCol) للحماية من تكلفة Firebase
 
             if(unsubscribeChatMeta) unsubscribeChatMeta();
-            unsubscribeChatMeta = onSnapshot(collection(db, chatsPath), (snapshot) => {
+            const unreadQuery = query(collection(db, chatsPath), where('unreadAdmin', '>', 0));
+unsubscribeChatMeta = onSnapshot(unreadQuery, (snapshot) => {
+
                 window.adminChatsData = {}; 
                 let totalUnread = 0;
                 let notifHtml = '';
@@ -2321,16 +2323,22 @@
             let isInitialProgramLoad = true;
 
             // تم التعديل: استماع للمستندات المجزأة بدلاً من main
-            unsubscribeProgram = onSnapshot(programCol, (snapshot) => {
-                let mid = null, hi = null, meta = null;
-                snapshot.forEach(d => {
-                    if(d.id === 'part_middle') mid = d.data();
-                    if(d.id === 'part_high') hi = d.data();
-                    if(d.id === 'meta') meta = d.data();
-                });
-                
-                if(mid && hi && meta) {
-                    window.currentSections = [mid, hi];
+            // تحديد الطور الخاص بالتلميذ لجلب بياناته فقط
+let targetPart = window.currentUserRecord.level.startsWith('m_') ? 'part_middle' : 'part_high';
+const progQuery = query(programCol, where(documentId(), 'in', ['meta', targetPart]));
+
+unsubscribeProgram = onSnapshot(progQuery, (snapshot) => {
+    let loadedSections = []; 
+    let meta = null;
+
+    snapshot.forEach(d => {
+        if(d.id === 'meta') meta = d.data();
+        else loadedSections.push(d.data());
+    });
+
+    if(loadedSections.length > 0 && meta) {
+        window.currentSections = loadedSections;
+
                     window.currentUpdates = meta.latestUpdates || [];
 
                     if (meta.liveStreamUrl !== undefined) {
