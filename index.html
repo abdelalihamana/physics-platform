@@ -1153,11 +1153,8 @@
 
             try {
                 // إرسال الكود للخادم للتحقق منه
-                const response = await fetch(window.GAS_WEB_APP_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: JSON.stringify({ action: 'verify2FA', username: window.tempAdminUsername, code: inputCode })
-                });
+               const url = `${window.GAS_WEB_APP_URL}?action=verify2FA&code=${encodeURIComponent(inputCode)}`;
+                const response = await fetch(url);
                 const result = await response.json();
 
                 if (result.success) {
@@ -1250,11 +1247,9 @@
                     // --- النظام الأمني الجديد للأدمن ---
                     if (username === 'admin') {
                         try {
-                            const response = await fetch(window.GAS_WEB_APP_URL, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'text/plain' },
-                                body: JSON.stringify({ action: 'request2FA', username: username, password: password })
-                            });
+                           const url = `${window.GAS_WEB_APP_URL}?action=request2FA&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`;
+                            const response = await fetch(url);
+
                             const result = await response.json();
                             
                             if (result.success) {
