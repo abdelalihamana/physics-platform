@@ -1111,19 +1111,15 @@
             document.getElementById(screenId).classList.add('active');
         };
 
-        const sendTelegramCode = async (code) => {
-           const botToken = "8872128410:AAGiGafbwPhc3EmHeeo1l2lBdhiyxlqlLuk"; 
-           const chatId = "6707334537";
-            const message = encodeURIComponent(`🔒 تنبيه أمني:\nرمز الدخول الخاص بك لمنصة المجتهد هو:\n*${code}*\nلا تشارك هذا الرمز مع أحد.`);
-            const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${message}&parse_mode=Markdown`;
+           const sendTelegramCode = async (code) => {
+    // 🔴 تم إزالة التوكن لحماية البوت
+    // سنقوم لاحقاً بربط هذه الدالة بـ Firebase Cloud Function
+    console.log("تنبيه: سيتم إرسال كود تيليجرام عبر الخادم في التحديث القادم.");
 
-            try {
-                await fetch(url, { mode: 'no-cors' });
-                console.log("تم طلب إرسال رسالة تيليجرام (يرجى التأكد من التوكن والـ ID)");
-            } catch(e) {
-                console.error("فشل إرسال كود تيليجرام", e);
-            }
-        };
+    // مؤقتاً لتتمكن من الدخول أثناء تطويرنا للمنصة، سنطبع الكود هنا:
+    console.log("كود التحقق الخاص بالأدمن هو:", code); 
+};
+
 
         window.cancel2FA = async () => {
             window.tempAdminCode = null;
@@ -1143,7 +1139,8 @@
             
             if(!inputCode || inputCode.length < 6) return showToast("يرجى إدخال الكود المكون من 6 أرقام", "error");
             
-            if (inputCode === window.tempAdminCode || inputCode === "000000") {
+            if (inputCode === window.tempAdminCode) {
+ 
                 window.currentUserRecord = { username: window.tempAdminUsername, ...window.tempAdminData };
                 
                 window.tempAdminCode = null;
