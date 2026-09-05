@@ -661,6 +661,7 @@
         const XP_PER_ITEM = 10;
 
         let isAuthReady = false;
+        window.GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzlw1g-QZFImAddPFgEogVqzug-C0PZ8SCpN3262-p06dd9JGpsEvt5XF8ND4_782rB/exec";
         window.currentUserRecord = null;
         window.originalAdminRecord = null; 
         
@@ -1141,32 +1142,53 @@
             document.getElementById('auth-screen').classList.remove('blur-sm', 'pointer-events-none');
         };
 
-        window.verifyAdminCode = () => {
+        window.verifyAdminCode = async () => {
             const inputCode = document.getElementById('two-fa-input').value.trim();
             const btn = document.getElementById('verify-2fa-btn');
             
             if(!inputCode || inputCode.length < 6) return showToast("يرجى إدخال الكود المكون من 6 أرقام", "error");
             
-            if (inputCode === window.tempAdminCode) {
- 
-                window.currentUserRecord = { username: window.tempAdminUsername, ...window.tempAdminData };
-                
-                window.tempAdminCode = null;
-                window.tempAdminData = null;
-                window.tempAdminUsername = null;
-                document.getElementById('two-fa-input').value = '';
-                document.getElementById('two-fa-modal').classList.add('hidden');
-                document.getElementById('two-fa-modal').classList.remove('flex');
-                document.getElementById('auth-screen').classList.remove('blur-sm', 'pointer-events-none');
+            const originalHTML = btn.innerHTML;
+            btn.disabled = true; btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i> جاري التحقق...';
 
-                showToast("تم التحقق بنجاح! أهلاً بك أستاذ.", "success");
-                switchScreen('admin-screen');
-                startAdminListeners();
-            } else {
-                btn.classList.add('bg-red-600', 'animate-shake');
-                setTimeout(() => btn.classList.remove('bg-red-600', 'animate-shake'), 500);
-                showToast("الكود غير صحيح، يرجى المحاولة مرة أخرى", "error");
+            try {
+                // إرسال الكود للخادم للتحقق منه
+                const response = await fetch(window.GAS_WEB_APP_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({ action: 'verify2FA', username: window.tempAdminUsername, code: inputCode })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    // نجح التحقق! نسجل الدخول بالكلمة المعقدة
+                    const complexPassword = result.complexPassword;
+                    const pseudoEmail = `${window.tempAdminUsername}@almojtahid.com`;
+                    
+                    await signInWithEmailAndPassword(auth, pseudoEmail, complexPassword);
+                    const userSnap = await getDoc(doc(usersCol, window.tempAdminUsername));
+                    
+                    window.currentUserRecord = { username: window.tempAdminUsername, ...userSnap.data() };
+                    
+                    window.tempAdminUsername = null;
+                    document.getElementById('two-fa-input').value = '';
+                    document.getElementById('two-fa-modal').classList.add('hidden');
+                    document.getElementById('two-fa-modal').classList.remove('flex');
+                    document.getElementById('auth-screen').classList.remove('blur-sm', 'pointer-events-none');
+
+                    showToast("تم التحقق بنجاح! أهلاً بك أستاذ.", "success");
+                    switchScreen('admin-screen');
+                    startAdminListeners();
+                } else {
+                    btn.classList.add('bg-red-600', 'animate-shake');
+                    setTimeout(() => btn.classList.remove('bg-red-600', 'animate-shake'), 500);
+                    showToast(result.error || "الكود غير صحيح، يرجى المحاولة مرة أخرى", "error");
+                }
+            } catch (e) {
+                showToast("حدث خطأ في الاتصال بالخادم", "error");
             }
+            
+            btn.disabled = false; btn.innerHTML = originalHTML;
         };
 
         window.requestPasswordReset = async () => {
@@ -1224,29 +1246,61 @@
                     document.getElementById('username').value = ''; document.getElementById('password').value = '';
                     await signOut(auth); 
                     
-                } else {
-                    await signInWithEmailAndPassword(auth, pseudoEmail, password);
-                    const userSnap = await getDoc(userRef);
-                    
-                    if (!userSnap.exists()) {
-                        showToast("حدث خطأ: الحساب موجود لكن البيانات مفقودة.", "error");
-                        await signOut(auth);
-                        return;
+               } else {
+                    // --- النظام الأمني الجديد ---
+                    if (username === 'admin') {
+                        try {
+                            const response = await fetch(window.GAS_WEB_APP_URL, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'text/plain' },
+                                body: JSON.stringify({ action: 'request2FA', username: username, password: password })
+                            });
+                            const result = await response.json();
+                            
+                            if (result.success) {
+                                window.tempAdminUsername = username;
+                                document.getElementById('two-fa-modal').classList.remove('hidden');
+                                document.getElementById('two-fa-modal').classList.add('flex');
+                                document.getElementById('auth-screen').classList.add('blur-sm', 'pointer-events-none');
+                            } else {
+                                showToast(result.error || "بيانات الدخول غير صحيحة", "error");
+                            }
+                        } catch (e) {
+                            showToast("حدث خطأ في الاتصال بالخادم الآمن", "error");
+                        }
+                    } else {
+                        // --- دخول التلاميذ المعتاد ---
+                        await signInWithEmailAndPassword(auth, pseudoEmail, password);
+                        const userSnap = await getDoc(userRef);
+                        
+                        if (!userSnap.exists()) {
+                            showToast("حدث خطأ: الحساب موجود لكن البيانات مفقودة.", "error");
+                            await signOut(auth);
+                            btn.disabled = false; btn.innerHTML = originalHTML;
+                            return;
+                        }
+
+                        let data = userSnap.data();
+                        window.currentUserRecord = { username, ...data };
+                        
+                        if (!window.currentUserRecord.password) {
+                             await updateDoc(userRef, { password: password });
+                             window.currentUserRecord.password = password;
+                        }
+                        
+                        if (!window.currentUserRecord.approved) {
+                            switchScreen('pending-screen');
+                            await signOut(auth);
+                        } else {
+                            await checkAndUpdateStreak(userRef, window.currentUserRecord);
+                            document.getElementById('display-username').innerText = username;
+                            document.getElementById('student-level-display').innerText = levelNames[window.currentUserRecord.level] || "مستوى غير محدد";
+                            switchScreen('app-screen');
+                            startStudentListeners();
+                            window.initPomodoro();
+                        }
                     }
-
-                    let data = userSnap.data();
-
-                    if (data.role === 'admin') {
-                        const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
-                        window.tempAdminCode = generatedCode;
-                        window.tempAdminData = data;
-                        window.tempAdminUsername = username;
-                        
-                        sendTelegramCode(generatedCode);
-                        
-                        document.getElementById('two-fa-modal').classList.remove('hidden');
-                        document.getElementById('two-fa-modal').classList.add('flex');
-                        document.getElementById('auth-screen').classList.add('blur-sm', 'pointer-events-none');
+                }
                         
                         btn.disabled = false; btn.innerHTML = originalHTML;
                         return; 
