@@ -1418,7 +1418,7 @@
             isAuthReady = true;
             if (user) {
                 try {
-                    // تم التعديل: سكريبت ترحيل قاعدة البيانات (Migration) وتقسيم المنهج
+                    // سكريبت ترحيل قاعدة البيانات (Migration) وتقسيم المنهج
                     if (user.email === 'admin@almojtahid.com') {
                         const adminDoc = await getDoc(doc(usersCol, 'admin'));
                         if (!adminDoc.exists()) await setDoc(doc(usersCol, 'admin'), { role: 'admin', approved: true, clickedLinks: [] });
@@ -1435,13 +1435,15 @@
                                 liveStreamUrl: data.liveStreamUrl || "",
                                 latestUpdates: data.latestUpdates || []
                             });
-                            await deleteDoc(doc(programCol, 'main')); // حذف المستند القديم ذو الحجم الكبير
+                            await deleteDoc(doc(programCol, 'main')); 
                             console.log("Migration Successful!");
                         } else {
                             const metaDoc = await getDoc(doc(programCol, 'meta'));
                             if (!metaDoc.exists()) {
-                                await setDoc(doc(programCol, 'part_middle'), defaultProgramData[0]);
-                                await setDoc(doc(programCol, 'part_high'), defaultProgramData[1]);
+                                if (typeof defaultProgramData !== 'undefined') {
+                                    await setDoc(doc(programCol, 'part_middle'), defaultProgramData[0]);
+                                    await setDoc(doc(programCol, 'part_high'), defaultProgramData[1]);
+                                }
                                 await setDoc(doc(programCol, 'meta'), { liveStreamUrl: "", latestUpdates: [] });
                             }
                         }
@@ -1455,23 +1457,20 @@
                         if (userSnap.exists()) {
                             let data = userSnap.data();
                             
-                                                        if (data.role === 'admin') {
-                                // بما أن المتصفح يتذكر الجلسة الآمنة، فلا داعي لطلب كود جديد!
+                            // --- كود الأستاذ (الإصلاح الجديد للـ Refresh) ---
+                            if (data.role === 'admin') {
                                 window.currentUserRecord = { username: 'admin', ...data };
                                 
-                                // إخفاء نوافذ الدخول
                                 document.getElementById('two-fa-modal').classList.add('hidden');
                                 document.getElementById('two-fa-modal').classList.remove('flex');
                                 document.getElementById('auth-screen').classList.remove('blur-sm', 'pointer-events-none');
                                 
-                                // التوجيه المباشر للوحة التحكم
                                 switchScreen('admin-screen');
                                 startAdminListeners();
                                 return; 
                             } 
- 
-                            } 
                             
+                            // --- كود التلميذ ---
                             window.currentUserRecord = { username, ...data };
 
                             if (!window.currentUserRecord.approved) {
@@ -1484,7 +1483,9 @@
                                 document.getElementById('student-level-display').innerText = levelNames[window.currentUserRecord.level] || "مستوى غير محدد";
                                 switchScreen('app-screen');
                                 startStudentListeners();
-                                window.initPomodoro();
+                                if (typeof window.initPomodoro === 'function') {
+                                    window.initPomodoro();
+                                }
                             }
                         }
                     }
