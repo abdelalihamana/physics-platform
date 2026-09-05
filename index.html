@@ -1111,19 +1111,21 @@
             document.getElementById(screenId).classList.add('active');
         };
 
-                   const sendTelegramCode = async (code) => {
-            // ضع الرابط الطويل الذي حصلت عليه من Google Apps Script بين علامتي التنصيص:
-            const scriptUrl = "https://script.google.com/macros/s/AKfycbyBd5R5-1K--uGloBUA3fgL3kLqb3jfn-kAOaPwwUvryyna6MYTpStSArvpN8HXOUCj/exec"; 
+                           const sendTelegramCode = async (code) => {
+            // ضع الرابط الطويل الذي حصلت عليه من Google Apps Script
+            const scriptUrl = "https://script.google.com/macros/s/AKfycbzthWfE9JKl6i--6AfczqTTgj6WKzg0THpt8UeptPymHfr3k62gDn7ipJYQyWU8r8wv/exec"; 
+            const secretKey = "ALMOJTAHID_SECURE_2026_KEY!"; // نفس المفتاح الموجود في الخادم
             
             try {
-                // نرسل الطلب للخادم الخاص بنا دون الكشف عن تفاصيل تيليجرام
-                await fetch(`${scriptUrl}?code=${code}`, { mode: 'no-cors' });
-                console.log("تم طلب الإرسال من الخادم المجاني السري بنجاح ☁️");
+                // نرسل الكود والمفتاح السري معاً
+                await fetch(`${scriptUrl}?code=${code}&key=${secretKey}`, { mode: 'no-cors' });
+                console.log("تم طلب الإرسال من الخادم المجاني المشفر بنجاح ☁️🔒");
             } catch(e) {
                 console.error("فشل الاتصال بالخادم", e);
                 showToast("حدث خطأ في طلب كود التحقق", "error");
             }
         };
+
 
 
 
