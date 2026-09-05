@@ -1201,7 +1201,7 @@
             }
         };
 
-        window.handleAuth = async () => {
+    window.handleAuth = async () => {
             if (!isAuthReady) return showToast("يتم الاتصال بالسحابة... يرجى الانتظار", "error");
             
             const username = document.getElementById('username').value.trim().toLowerCase();
@@ -1246,8 +1246,8 @@
                     document.getElementById('username').value = ''; document.getElementById('password').value = '';
                     await signOut(auth); 
                     
-               } else {
-                    // --- النظام الأمني الجديد ---
+                } else {
+                    // --- النظام الأمني الجديد للأدمن ---
                     if (username === 'admin') {
                         try {
                             const response = await fetch(window.GAS_WEB_APP_URL, {
@@ -1299,31 +1299,6 @@
                             startStudentListeners();
                             window.initPomodoro();
                         }
-                    }
-                }
-                        
-                        btn.disabled = false; btn.innerHTML = originalHTML;
-                        return; 
-                    }
-
-                    window.currentUserRecord = { username, ...data };
-                    
-                    if (!window.currentUserRecord.password) {
-                         await updateDoc(userRef, { password: password });
-                         window.currentUserRecord.password = password;
-                    }
-                    
-                    if (!window.currentUserRecord.approved) {
-                        switchScreen('pending-screen');
-                        await signOut(auth);
-                    } else {
-                        await checkAndUpdateStreak(userRef, window.currentUserRecord);
-                        
-                        document.getElementById('display-username').innerText = username;
-                        document.getElementById('student-level-display').innerText = levelNames[window.currentUserRecord.level] || "مستوى غير محدد";
-                        switchScreen('app-screen');
-                        startStudentListeners();
-                        window.initPomodoro();
                     }
                 }
             } catch (err) { 
