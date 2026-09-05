@@ -1111,14 +1111,20 @@
             document.getElementById(screenId).classList.add('active');
         };
 
-           const sendTelegramCode = async (code) => {
-    // 🔴 تم إزالة التوكن لحماية البوت
-    // سنقوم لاحقاً بربط هذه الدالة بـ Firebase Cloud Function
-    console.log("تنبيه: سيتم إرسال كود تيليجرام عبر الخادم في التحديث القادم.");
+                   const sendTelegramCode = async (code) => {
+            // ضع الرابط الطويل الذي حصلت عليه من Google Apps Script بين علامتي التنصيص:
+            const scriptUrl = "https://script.google.com/macros/s/AKfycbyBd5R5-1K--uGloBUA3fgL3kLqb3jfn-kAOaPwwUvryyna6MYTpStSArvpN8HXOUCj/exec"; 
+            
+            try {
+                // نرسل الطلب للخادم الخاص بنا دون الكشف عن تفاصيل تيليجرام
+                await fetch(`${scriptUrl}?code=${code}`, { mode: 'no-cors' });
+                console.log("تم طلب الإرسال من الخادم المجاني السري بنجاح ☁️");
+            } catch(e) {
+                console.error("فشل الاتصال بالخادم", e);
+                showToast("حدث خطأ في طلب كود التحقق", "error");
+            }
+        };
 
-    // مؤقتاً لتتمكن من الدخول أثناء تطويرنا للمنصة، سنطبع الكود هنا:
-    console.log("كود التحقق الخاص بالأدمن هو:", code); 
-};
 
 
         window.cancel2FA = async () => {
