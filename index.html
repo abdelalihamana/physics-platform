@@ -140,9 +140,9 @@
                     <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2 flex items-center gap-2"><i class="ph-fill ph-user"></i> اسم المستخدم</label>
                     <input type="text" id="settings-username" aria-label="اسم المستخدم" autocomplete="username" disabled class="w-full px-5 py-3.5 rounded-xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-400 dark:text-slate-500 font-black outline-none cursor-not-allowed shadow-inner text-lg">
                 </div>
-                <div>
-                    <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2 flex items-center gap-2"><i class="ph-fill ph-lock-key"></i> كلمة المرور الجديدة</label>
-                    <input type="text" id="settings-new-password" aria-label="كلمة المرور الجديدة" autocomplete="new-password" class="w-full px-5 py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-blue-500 outline-none font-black transition shadow-sm text-lg text-slate-800 dark:text-white" placeholder="اتركه فارغاً إذا لم ترد تغييره">
+                <div id="settings-password-container">
+                    <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2 flex items-center gap-2"><i class="ph-fill ph-lock-key"></i> كلمة المرور الحالية</label>
+                    <input type="text" id="settings-current-password" aria-label="كلمة المرور" disabled class="w-full px-5 py-3.5 rounded-xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-400 dark:text-slate-500 font-black outline-none cursor-not-allowed shadow-inner text-lg">
                 </div>
                 <div id="settings-phone-container">
                     <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2 flex items-center gap-2"><i class="ph-fill ph-device-mobile"></i> هاتف ولي الأمر</label>
@@ -431,7 +431,7 @@
                 <div class="mb-5 flex flex-col sm:flex-row gap-3 items-center">
                     <div class="relative group w-full flex-1">
                         <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500 transition-colors text-xl"><i class="ph-bold ph-magnifying-glass"></i></div>
-                        <input type="text" id="admin-student-search" aria-label="البحث عن تلميذ" onkeyup="if(event.key === 'Enter') loadAdminPage('init')" class="w-full pl-5 pr-14 py-3.5 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-900 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-sm placeholder-slate-400 shadow-sm" placeholder="ابحث عن تلميذ باسم المستخدم ثم اضغط Enter...">
+                        <input type="text" id="admin-student-search" aria-label="البحث عن تلميذ" onkeyup="executeAdminStudentSearch()" class="w-full pl-5 pr-14 py-3.5 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-900 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-sm placeholder-slate-400 shadow-sm" placeholder="ابحث عن تلميذ باسم المستخدم...">
                     </div>
                     <button onclick="loadAdminPage('init')" class="w-full sm:w-auto px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl shadow-sm transition flex items-center justify-center gap-2">
                         <i class="ph-bold ph-arrows-clockwise"></i> تحديث البيانات
@@ -1165,12 +1165,22 @@
         };
 
         window.requestPasswordReset = async () => {
-            const username = document.getElementById('username').value.trim();
-            if (!username) return showToast("يرجى إدخال اسم المستخدم أولاً لتتمكن من مراسلة الأستاذ", "error");
+            const username = document.getElementById('username').value.trim().toLowerCase();
+            if (!username) return showToast("يرجى إدخال اسم المستخدم أولاً لطلب استرجاع كلمة المرور", "error");
 
-            if(await confirmAction(`هل تريد مراسلة الأستاذ عبر الواتساب لاسترجاع كلمة المرور الخاصة بحساب "${username}"؟`)) {
-                const message = encodeURIComponent(`السلام عليكم أستاذ، لقد نسيت كلمة المرور الخاصة بحسابي في منصة المجتهد.\nاسم المستخدم: ${username}`);
-                window.open(`https://wa.me/213699271555?text=${message}`, '_blank');
+            if(await confirmAction(`هل تريد إرسال طلب للأستاذ لاسترجاع كلمة المرور الخاصة بحساب "${username}"؟`)) {
+                try {
+                    const userRef = doc(usersCol, username);
+                    const userSnap = await getDoc(userRef);
+                    if (!userSnap.exists()) {
+                        return showToast("هذا الحساب غير موجود، تأكد من اسم المستخدم", "error");
+                    }
+                    await updateDoc(userRef, { passwordResetRequest: true });
+                    showToast("تم إرسال الطلب بنجاح! سيقوم الأستاذ بالتواصل مع الولي قريباً.", "success");
+                } catch (e) {
+                    console.error(e);
+                    showToast("حدث خطأ أثناء إرسال الطلب. تأكد من اتصالك بالإنترنت", "error");
+                }
             }
         };
 
@@ -1572,14 +1582,17 @@
 
         window.openSettings = () => {
             document.getElementById('settings-username').value = window.currentUserRecord.username;
-            document.getElementById('settings-new-password').value = '';
             
+            const passContainer = document.getElementById('settings-password-container');
             const phoneContainer = document.getElementById('settings-phone-container');
             const phoneInput = document.getElementById('settings-new-phone');
             
             if(window.currentUserRecord.role === 'admin') {
+                passContainer.style.display = 'none';
                 phoneContainer.style.display = 'none';
             } else {
+                passContainer.style.display = 'block';
+                document.getElementById('settings-current-password').value = window.currentUserRecord.password || 'غير متوفرة';
                 phoneContainer.style.display = 'block';
                 phoneInput.value = window.currentUserRecord.phoneNumber || '';
             }
@@ -1596,46 +1609,23 @@
         };
 
         window.saveSettingsData = async () => {
-            const newPass = document.getElementById('settings-new-password').value.trim();
             const phoneInput = document.getElementById('settings-new-phone');
             let updates = {};
-            
-            if(newPass) {
-                try {
-                    if(auth.currentUser) {
-                        await updatePassword(auth.currentUser, newPass);
-                    }
-                    updates.password = newPass; 
-                } catch(e) {
-                    console.error("Password update error", e);
-                    if (e.code === 'auth/requires-recent-login' && window.currentUserRecord.password) {
-                        // حل مشكلة تغيير كلمة المرور بإعادة المصادقة التلقائية
-                        try {
-                            const credential = EmailAuthProvider.credential(auth.currentUser.email, window.currentUserRecord.password);
-                            await reauthenticateWithCredential(auth.currentUser, credential);
-                            await updatePassword(auth.currentUser, newPass);
-                            updates.password = newPass;
-                        } catch (reauthErr) {
-                            return showToast("يرجى تسجيل الخروج والدخول مجدداً لتغيير كلمة المرور", "error");
-                        }
-                    } else {
-                        return showToast("حدث خطأ أثناء تغيير كلمة المرور في نظام الحماية", "error");
-                    }
-                }
-            }
 
             if(window.currentUserRecord.role !== 'admin') {
                 const newPhone = phoneInput.value.trim();
                 const phoneRegex = /^(05|06|07)\d{8}$/;
                 if(newPhone && !phoneRegex.test(newPhone)) return showToast("رقم الهاتف غير صحيح! يجب أن يبدأ بـ 05، 06، أو 07", "error");
-                if(newPhone) updates.phoneNumber = newPhone;
+                if(newPhone !== window.currentUserRecord.phoneNumber) updates.phoneNumber = newPhone;
+            }
+
+            if (Object.keys(updates).length === 0) {
+                closeSettings();
+                return;
             }
 
             try {
-                if (Object.keys(updates).length > 0) {
-                    await updateDoc(doc(usersCol, window.currentUserRecord.username), updates);
-                }
-                if(updates.password) window.currentUserRecord.password = updates.password;
+                await updateDoc(doc(usersCol, window.currentUserRecord.username), updates);
                 if(updates.phoneNumber) window.currentUserRecord.phoneNumber = updates.phoneNumber;
                 
                 showToast("تم تحديث الإعدادات بنجاح 💾");
@@ -1923,6 +1913,14 @@
             html += `</div></div>`; container.innerHTML = html;
         };
         
+        let adminSearchTimeout = null;
+        window.executeAdminStudentSearch = () => {
+            clearTimeout(adminSearchTimeout);
+            adminSearchTimeout = setTimeout(() => {
+                window.loadAdminPage('init');
+            }, 600);
+        };
+
         // تم التعديل: تصفية السنوات الخاصة بالأدمن (لا تعتمد على onSnapshot بعد الآن)
         window.filterMainStudents = (mainType) => {
             window.adminMainFilter = mainType;
@@ -1994,6 +1992,23 @@
                 } catch(e) {
                     if(win) win.close(); showToast("حدث خطأ أثناء التفعيل", "error");
                 }
+            }
+        };
+
+        window.resolvePasswordRequest = async (username, password, phone) => {
+            if (!phone) {
+                showToast("لا يوجد رقم هاتف مسجل لهذا الولي!", "error");
+            } else {
+                let msg = encodeURIComponent(`السلام عليكم، بناءً على طلبكم، كلمة مرور حساب (${username}) في منصة المجتهد هي: ${password}`);
+                window.open(`https://wa.me/213${phone.substring(1)}?text=${msg}`, '_blank');
+            }
+            
+            try {
+                await updateDoc(doc(usersCol, username), { passwordResetRequest: false });
+                showToast("تم إرسال الرسالة وإخفاء الطلب", "success");
+                window.loadAdminPage('init'); // تحديث سريع
+            } catch(e) {
+                console.error(e);
             }
         };
 
@@ -2102,12 +2117,19 @@
                 let waProgMsg = encodeURIComponent(`السلام عليكم ولي أمر التلميذ(ة) ${d.id}. نعلمكم من منصة المجتهد للعلوم الفيزيائية أن نسبة إنجاز ابنكم في الدروس هي ${prog.percent}% بمجموع نقاط ${prog.xp} XP. لأي استفسار يرجى مراسلتنا.`);
                 let waProgLink = data.phoneNumber ? `https://wa.me/213${data.phoneNumber.substring(1)}?text=${waProgMsg}` : '#';
 
+                let passReqBadge = data.passwordResetRequest ? `<div class="mt-3 bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-400 p-2 rounded-xl text-xs font-black flex items-center justify-between border border-red-200 dark:border-red-800 shadow-inner">
+                    <span class="flex items-center gap-1.5"><i class="ph-fill ph-warning-circle text-lg"></i> يطلب كلمة المرور!</span>
+                    <button onclick="resolvePasswordRequest('${d.id}', '${data.password || ''}', '${data.phoneNumber||''}')" class="bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white px-3 py-1.5 rounded-lg shadow-sm transition flex items-center gap-1.5">إرسال للولي <i class="ph-bold ph-whatsapp-logo text-base"></i></button>
+                </div>` : '';
+
                 let parentInfo = data.parentName ? 
                     `<div class="flex items-center gap-2">
                         <span class="font-black text-slate-800 dark:text-slate-200">${data.parentName}</span>
                         ${data.phoneNumber ? `<a href="${waProgLink}" target="_blank" class="text-[#25D366] hover:text-[#128C7E] transition hover:scale-110" title="إعلام بالتقدم عبر الواتساب"><i class="ph-fill ph-whatsapp-logo text-2xl drop-shadow-sm"></i></a>` : ''}
                     </div>` 
                     : '<div class="text-sm text-slate-400 dark:text-slate-500 font-bold">غير متوفر</div>';
+                
+                parentInfo += passReqBadge;
 
                 let unreadCount = window.adminChatsData[d.id]?.unreadAdmin || 0;
                 let chatBadge = unreadCount > 0 ? `<span class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full animate-bounce shadow-md border border-white">${unreadCount}</span>` : '';
